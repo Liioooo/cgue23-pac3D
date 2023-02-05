@@ -104,6 +104,11 @@ list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES glad)
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glad/include")
 ################################################################################
 
+# GLM ##########################################################################
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glm")
+################################################################################
+
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
