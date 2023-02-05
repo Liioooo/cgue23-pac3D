@@ -1,0 +1,4 @@
+[submodule "CgEngine_Solution/vendor/glfw"]
+	path = CgEngine_Solution/vendor/glfw
+	url = https://github.com/glfw/glfw
+	branch = master

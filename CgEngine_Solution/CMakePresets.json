@@ -14,8 +14,8 @@
             "binaryDir": "${sourceDir}/../bin/CgEngine_Solution/DebugLinux",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_FLAGS_INIT": "-O2 -g0 -Wall -Wno-unknown-pragmas",
-                "CMAKE_CXX_FLAGS_INIT": "-O2 -g0 -std=c++17 -Wall -Wno-unknown-pragmas"
+                "CMAKE_C_FLAGS_INIT": "-Og -g3 -Wall -Wno-unknown-pragmas",
+                "CMAKE_CXX_FLAGS_INIT": "-Og -g3 -std=c++17 -Wall -Wno-unknown-pragmas"
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -65,8 +65,8 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_C_FLAGS_INIT": "/Od /W3 /sdl",
-                "CMAKE_CXX_FLAGS_INIT": "/Od /std:c++17 /W3 /sdl"
+                "CMAKE_C_FLAGS_INIT": "/Od /W3 /sdl /ZI",
+                "CMAKE_CXX_FLAGS_INIT": "/Od /std:c++17 /W3 /sdl /ZI"
             }
         },
         {

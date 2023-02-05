@@ -80,3 +80,31 @@ else ()
             >
             )
 endif ()
+
+################################################################################
+# Dependencies
+################################################################################
+set(ADDITIONAL_LIBRARY_DEPENDENCIES)
+set(ADDITIONAL_INCLUDE_DIRECTORIES)
+
+# GLFW #########################################################################
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
+add_subdirectory(vendor/glfw)
+list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES glfw)
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glfw/include")
+################################################################################
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        "${PROJECT_BINARY_DIR}"
+        "${ADDITIONAL_INCLUDE_DIRECTORIES}"
+        )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
+
+################################################################################
+# Assets handling
+################################################################################
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:CgEngine_Solution>/assets)

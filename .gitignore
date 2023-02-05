@@ -1,2 +1,4 @@
 .idea
 /bin/**
+
+CgEngine_Solution/vendor/glfw
