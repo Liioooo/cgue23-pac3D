@@ -108,14 +108,17 @@ list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glad/in
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glm")
 ################################################################################
 
-
-
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
         "${ADDITIONAL_INCLUDE_DIRECTORIES}"
         )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
+
+################################################################################
+# Precompiled Header
+################################################################################
+target_precompile_headers(${PROJECT_NAME} PRIVATE "src/pch.h")
 
 ################################################################################
 # Assets handling
