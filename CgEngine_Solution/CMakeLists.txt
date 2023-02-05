@@ -92,10 +92,18 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF CACHE BOOL "" FORCE)
+target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 add_subdirectory(vendor/glfw)
 list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES glfw)
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glfw/include")
 ################################################################################
+
+# GLAD #########################################################################
+add_subdirectory(vendor/glad)
+list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES glad)
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glad/include")
+################################################################################
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
