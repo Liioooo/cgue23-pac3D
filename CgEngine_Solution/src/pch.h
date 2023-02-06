@@ -1,5 +1,6 @@
 #include <glm/glm.hpp>
 
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>

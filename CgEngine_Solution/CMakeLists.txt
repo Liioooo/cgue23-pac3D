@@ -108,6 +108,15 @@ list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glad/in
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/glm")
 ################################################################################
 
+# SPDLOG #######################################################################
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/spdlog/include")
+################################################################################
+
+# INIH #########################################################################
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/inih")
+################################################################################
+
+
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
         "${ADDITIONAL_INCLUDE_DIRECTORIES}"

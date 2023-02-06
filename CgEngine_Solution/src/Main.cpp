@@ -1,27 +1,14 @@
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
-
+#include "CgEngine/Logging.h"
+#include "CgEngine/Application.h"
 
 int main(int argc, char **argv) {
-    glfwInit();
-    auto* win = glfwCreateWindow(400, 400, "test", nullptr, nullptr);
+    CgEngine::Logging::init();
 
-    glfwMakeContextCurrent(win);
-    gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-    glClearColor(1, 0, 1, 1);
+    CG_LOGGING_INFO("Starting Application");
+    CgEngine::Application* application = new CgEngine::Application("assets/settings.ini");
 
-    glm::vec3 v = glm::vec3(1,1,1);
-    std::vector<int> vec{};
+    application->run();
 
-
-    while (!glfwWindowShouldClose(win)) {
-        glfwPollEvents();
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glfwSwapBuffers(win);
-    }
-
-
+    CG_LOGGING_INFO("Shutting Down!");
     return 0;
 }
