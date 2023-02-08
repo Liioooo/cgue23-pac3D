@@ -2,6 +2,8 @@
 
 #include <INIReader.h>
 #include "Window.h"
+#include "Events/Event.h"
+#include "Events/WindowCloseEvent.h"
 
 namespace CgEngine {
 
@@ -11,11 +13,14 @@ namespace CgEngine {
         ~Application();
 
         void run();
+        void onEvent(Event& event);
 
     private:
         INIReader* iniReader;
         Window* window;
         bool isRunning = true;
+
+        void onWindowClose(WindowCloseEvent& event);
     };
 
 }

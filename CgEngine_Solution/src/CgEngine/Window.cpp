@@ -1,8 +1,16 @@
 #include "Window.h"
 #include "Logging.h"
+#include "Events/KeyPressedEvent.h"
+#include "Events/KeyReleasedEvent.h"
+#include "Events/MouseButtonPressedEvent.h"
+#include "Events/MouseButtonReleasedEvent.h"
+#include "Events/MouseMovedEvent.h"
+#include "Events/MouseScrolledEvent.h"
+#include "Events/WindowCloseEvent.h"
+#include "Events/WindowResizeEvent.h"
 
 namespace CgEngine {
-    Window::Window(int width, int height, bool fullScreen, int refreshRate, const std::string& title) {
+    Window::Window(int width, int height, bool fullScreen, int refreshRate, const std::string& title, std::function<void(Event&)>&& eventCallback) : eventCallback(std::move(eventCallback)) {
         if (!glfwInit()) {
             CG_LOGGING_ERROR("Failed to init GLFW");
         }
@@ -38,6 +46,58 @@ namespace CgEngine {
             glDebugMessageCallback(&Window::debugCallback, nullptr);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         #endif
+
+        glfwSetWindowUserPointer(window, this);
+
+        glfwSetWindowCloseCallback(window, [](GLFWwindow* w) {
+            WindowCloseEvent e;
+            static_cast<Window*>(glfwGetWindowUserPointer(w))->eventCallback(e);
+        });
+
+        glfwSetWindowSizeCallback(window, [](GLFWwindow* w, int width, int height) {
+            WindowResizeEvent e(width, height);
+            static_cast<Window*>(glfwGetWindowUserPointer(w))->eventCallback(e);
+        });
+
+        glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int button, int action, int mods) {
+            switch (action) {
+                case GLFW_PRESS: {
+                    MouseButtonPressedEvent e(button);
+                    static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
+                    break;
+                }
+                case GLFW_RELEASE: {
+                    MouseButtonReleasedEvent e(button);
+                    static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
+                    break;
+                }
+            }
+        });
+
+        glfwSetCursorPosCallback(window, [](GLFWwindow* w, double x, double y) {
+            MouseMovedEvent e(static_cast<float>(x), static_cast<float>(y));
+            static_cast<Window*>(glfwGetWindowUserPointer(w))->eventCallback(e);
+        });
+
+        glfwSetScrollCallback(window, [](GLFWwindow* w, double offsetX, double offsetY) {
+            MouseScrolledEvent e(static_cast<float>(offsetX), static_cast<float>(offsetY));
+            static_cast<Window*>(glfwGetWindowUserPointer(w))->eventCallback(e);
+        });
+
+        glfwSetKeyCallback(window, [](GLFWwindow* w, int key, int scancode, int action, int mods) {
+            switch (action) {
+                case GLFW_PRESS: {
+                    KeyPressedEvent e(key, mods);
+                    static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
+                    break;
+                }
+                case GLFW_RELEASE: {
+                    KeyReleasedEvent e(key, mods);
+                    static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
+                    break;
+                }
+            }
+        });
     }
 
     Window::~Window() {
@@ -157,4 +217,5 @@ namespace CgEngine {
 
         CG_LOGGING_WARNING(stringStream.str());
     }
+
 }
