@@ -26,7 +26,7 @@ namespace CgEngine {
         void stopPropagation() {
             handled = true;
         }
-        bool wasHandled() const {
+        inline bool wasHandled() const {
             return handled;
         }
 
@@ -36,7 +36,7 @@ namespace CgEngine {
 
     class EventDispatcher {
     public:
-        EventDispatcher(Event& event) : event(event) {};
+        explicit EventDispatcher(Event& event) : event(event) {};
 
         template<typename E>
         void dispatch(const std::function<void(E& event)>& handler) {

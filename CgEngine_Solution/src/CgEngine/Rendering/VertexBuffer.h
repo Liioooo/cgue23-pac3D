@@ -1,0 +1,66 @@
+#pragma once
+
+#include "ShaderDataType.h"
+
+namespace CgEngine {
+
+    enum class VertexBufferUsage {
+        Static, Dynamic
+    };
+
+    static GLenum openGLUsage(VertexBufferUsage usage) {
+        switch (usage) {
+            case VertexBufferUsage::Static:    return GL_STATIC_DRAW;
+            case VertexBufferUsage::Dynamic:   return GL_DYNAMIC_DRAW;
+        }
+        return 0;
+    }
+
+    struct VertexBufferElement {
+        ShaderDataType dataType;
+        int size;
+        size_t offset{};
+        bool normalized;
+
+        VertexBufferElement(ShaderDataType dataType, bool normalized) : dataType(dataType), normalized(normalized), size(getSizeForShaderDataType(dataType)) {};
+
+        int getComponentCount() const {
+            switch (dataType) {
+                case ShaderDataType::Float:   return 1;
+                case ShaderDataType::Float2:  return 2;
+                case ShaderDataType::Float3:  return 3;
+                case ShaderDataType::Float4:  return 4;
+                case ShaderDataType::Mat3:    return 3;
+                case ShaderDataType::Mat4:    return 4;
+                case ShaderDataType::Int:     return 1;
+                case ShaderDataType::Int2:    return 2;
+                case ShaderDataType::Int3:    return 3;
+                case ShaderDataType::Int4:    return 4;
+                case ShaderDataType::Bool:    return 1;
+            }
+
+            return 0;
+        }
+    };
+
+    class VertexBuffer {
+    public:
+        explicit VertexBuffer(uint32_t size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
+        VertexBuffer(void* data, uint32_t size, VertexBufferUsage usage = VertexBufferUsage::Static);
+        ~VertexBuffer();
+
+        void bind() const;
+        void unbind() const;
+        void setData(void* data, uint32_t size);
+        void setLayout(std::initializer_list<VertexBufferElement> bufferElements);
+
+        const std::vector<VertexBufferElement>& getLayout() const;
+        int getStride() const;
+
+    private:
+        uint32_t vbo{};
+        std::vector<VertexBufferElement> bufferElements;
+        int stride = 0;
+    };
+
+}

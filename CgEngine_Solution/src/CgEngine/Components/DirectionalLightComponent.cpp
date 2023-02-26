@@ -1,0 +1,35 @@
+#include "DirectionalLightComponent.h"
+
+namespace CgEngine {
+    void DirectionalLightComponent::onAttach(Scene &scene, DirectionalLightComponentParams &params) {
+        color = params.color;
+        intensity = params.intensity;
+        castShadows = params.castShadows;
+    }
+
+    glm::vec3 DirectionalLightComponent::getColor() {
+        return color;
+    }
+
+    void DirectionalLightComponent::setColor(const glm::vec3& value) {
+        color = value;
+    }
+
+    float DirectionalLightComponent::getIntensity() {
+        return intensity;
+    }
+
+    void DirectionalLightComponent::setIntensity(float value) {
+        intensity = value;
+    }
+
+    bool DirectionalLightComponent::getCastShadows() {
+        return castShadows;
+    }
+
+    void DirectionalLightComponent::setCastShadows(bool value) {
+        castShadows = value;
+    }
+
+
+}

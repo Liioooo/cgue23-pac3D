@@ -116,9 +116,22 @@ list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/spdlog/
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/inih")
 ################################################################################
 
+# PUGIXML ######################################################################
+set(PUGIXML_STATIC_CRT ON CACHE BOOL "" FORCE)
+add_subdirectory(vendor/pugixml)
+list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES pugixml)
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/pugixml/src")
+################################################################################
+
+# STBI #########################################################################
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/stbi/include")
+################################################################################
+
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
+        "${PROJECT_SOURCE_DIR}/src/CgEngine"
         "${ADDITIONAL_INCLUDE_DIRECTORIES}"
         )
 
@@ -132,4 +145,5 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE "src/pch.h")
 ################################################################################
 # Assets handling
 ################################################################################
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:CgEngine_Solution>/assets)
+add_custom_target(copy_assets COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${PROJECT_BINARY_DIR}/assets)
+add_dependencies(${PROJECT_NAME} copy_assets)

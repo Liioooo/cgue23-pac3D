@@ -1,21 +1,22 @@
 #pragma once
 
 #include "Event.h"
+#include "KeyCodes.h"
 
 namespace CgEngine {
 
     class MouseButtonReleasedEvent : public Event {
     public:
-        MouseButtonReleasedEvent(const int button) : button(button) {}
+        MouseButtonReleasedEvent(const MouseButton button) : button(button) {}
 
-        inline int getButton() const {
+        inline MouseButton getButton() const {
             return button;
         }
 
         EVENT_TYPE_FN(MouseButtonReleased);
 
     private:
-        int button;
+        MouseButton button;
     };
 
 }

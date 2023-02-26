@@ -1,0 +1,9 @@
+<Materials>
+    <Material name="MyMaterial">
+        <Albedo>#ffffff</Albedo>
+        <AlbedoTexture srgb="true">game/rocky_gravel_diff_2k.png</AlbedoTexture>
+    </Material>
+    <Material name="Red">
+        <Albedo>#ff0000</Albedo>
+    </Material>
+</Materials>

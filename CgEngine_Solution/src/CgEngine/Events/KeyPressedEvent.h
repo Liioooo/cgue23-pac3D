@@ -1,25 +1,26 @@
 #pragma once
 
 #include "Event.h"
+#include "KeyCodes.h"
 
 namespace CgEngine {
 
     class KeyPressedEvent : public Event {
     public:
-        KeyPressedEvent(const int keyCode, const int modifierKeys) : keyCode(keyCode), modifierKeys(modifierKeys) {};
+        KeyPressedEvent(const KeyCode keyCode, const ModifierKey modifierKeys) : keyCode(keyCode), modifierKeys(modifierKeys) {};
 
-        inline int getKeyCode() const {
+        inline KeyCode getKeyCode() const {
             return keyCode;
         }
-        inline int getModifierKeys() const {
+        inline ModifierKey getModifierKeys() const {
             return modifierKeys;
         }
 
         EVENT_TYPE_FN(KeyPressed);
 
     private:
-        int keyCode;
-        int modifierKeys;
+        KeyCode keyCode;
+        ModifierKey modifierKeys;
     };
 
 }

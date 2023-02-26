@@ -8,9 +8,10 @@
 #include "Events/MouseScrolledEvent.h"
 #include "Events/WindowCloseEvent.h"
 #include "Events/WindowResizeEvent.h"
+#include "Rendering/Renderer.h"
 
 namespace CgEngine {
-    Window::Window(int width, int height, bool fullScreen, int refreshRate, const std::string& title, std::function<void(Event&)>&& eventCallback) : eventCallback(std::move(eventCallback)) {
+    Window::Window(const WindowSpecification& spec, std::function<void(Event&)>&& eventCallback) : eventCallback(std::move(eventCallback)) {
         if (!glfwInit()) {
             CG_LOGGING_ERROR("Failed to init GLFW");
         }
@@ -22,23 +23,37 @@ namespace CgEngine {
         #endif
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_REFRESH_RATE, refreshRate);
 
-        GLFWmonitor* monitor = nullptr;
-        if (fullScreen) {
-            monitor = glfwGetPrimaryMonitor();
+
+        if (spec.fullScreen) {
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
+            glfwWindowHint(GLFW_RED_BITS, vidMode->redBits);
+            glfwWindowHint(GLFW_GREEN_BITS, vidMode->greenBits);
+            glfwWindowHint(GLFW_BLUE_BITS, vidMode->blueBits);
+            glfwWindowHint(GLFW_REFRESH_RATE, vidMode->refreshRate);
+
+            window = glfwCreateWindow(vidMode->width, vidMode->height, spec.title.c_str(), monitor, nullptr);
+
+            windowWidth = vidMode->width;
+            windowHeight = vidMode->height;
+        } else {
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+            glfwWindowHint(GLFW_REFRESH_RATE, spec.refreshRate);
+            window = glfwCreateWindow(spec.width, spec.height, spec.title.c_str(), nullptr, nullptr);
+
+            windowWidth = spec.width;
+            windowHeight = spec.height;
         }
 
-        window = glfwCreateWindow(width, height, title.c_str(), monitor, nullptr);
         if (!window) {
             CG_LOGGING_ERROR("Failed to create Window");
         }
 
         glfwMakeContextCurrent(window);
-        setVsync(true);
+        setVsync(spec.refreshRate);
 
         gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 
@@ -46,6 +61,8 @@ namespace CgEngine {
             glDebugMessageCallback(&Window::debugCallback, nullptr);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
         #endif
+
+        Renderer::init();
 
         glfwSetWindowUserPointer(window, this);
 
@@ -55,19 +72,24 @@ namespace CgEngine {
         });
 
         glfwSetWindowSizeCallback(window, [](GLFWwindow* w, int width, int height) {
+            auto* self = static_cast<Window*>(glfwGetWindowUserPointer(w));
+
+            self->windowWidth = width;
+            self->windowHeight = height;
+
             WindowResizeEvent e(width, height);
-            static_cast<Window*>(glfwGetWindowUserPointer(w))->eventCallback(e);
+            self->eventCallback(e);
         });
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int button, int action, int mods) {
             switch (action) {
                 case GLFW_PRESS: {
-                    MouseButtonPressedEvent e(button);
+                    MouseButtonPressedEvent e(static_cast<MouseButton>(button));
                     static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
                     break;
                 }
                 case GLFW_RELEASE: {
-                    MouseButtonReleasedEvent e(button);
+                    MouseButtonReleasedEvent e(static_cast<MouseButton>(button));
                     static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
                     break;
                 }
@@ -87,12 +109,12 @@ namespace CgEngine {
         glfwSetKeyCallback(window, [](GLFWwindow* w, int key, int scancode, int action, int mods) {
             switch (action) {
                 case GLFW_PRESS: {
-                    KeyPressedEvent e(key, mods);
+                    KeyPressedEvent e(static_cast<KeyCode>(key), static_cast<ModifierKey>(mods));
                     static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
                     break;
                 }
                 case GLFW_RELEASE: {
-                    KeyReleasedEvent e(key, mods);
+                    KeyReleasedEvent e(static_cast<KeyCode>(key), static_cast<ModifierKey>(mods));
                     static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
                     break;
                 }
@@ -102,6 +124,7 @@ namespace CgEngine {
 
     Window::~Window() {
         glfwDestroyWindow(window);
+        glfwTerminate();
     }
 
     void Window::setVsync(bool enabled) {
@@ -116,6 +139,18 @@ namespace CgEngine {
     void Window::onUpdate() {
         glfwPollEvents();
         glfwSwapBuffers(window);
+    }
+
+    uint32_t Window::getWidth() {
+        return windowWidth;
+    }
+
+    uint32_t Window::getHeight() {
+        return windowHeight;
+    }
+
+    GLFWwindow &Window::getWindowHandle() {
+        return *window;
     }
 
     void Window::errorCallback(int error, const char *description) {

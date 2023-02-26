@@ -9,3 +9,7 @@
 [submodule "CgEngine_Solution/vendor/spdlog"]
 	path = CgEngine_Solution/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "CgEngine_Solution/vendor/pugixml"]
+	path = CgEngine_Solution/vendor/pugixml
+	url = https://github.com/zeux/pugixml.git
+	branch = master

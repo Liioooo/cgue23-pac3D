@@ -1,0 +1,74 @@
+<Scene>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 0 25" rotation="0 0 0" scale="1 1 1" />
+        </Components>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+                <CameraComponent primary="true" projection="perspective" near="0.1" far="100" fov="60" />
+                <ScriptComponent scriptName="cameraScript" />
+            </Components>
+        </Entity>
+    </Entity>
+    <Entity id="floor">
+        <Components>
+            <TransformComponent position="0 -2.5 0" rotation="0 0 0" scale="15 0.1 15" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="15 0.1 15" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="2 2 -2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="-2 2 -2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="2 -2 -2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="-2 -2 -2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="2 2 2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="-2 2 2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="2 -2 2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="-2 -2 2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+        </Components>
+    </Entity>
+</Scene>

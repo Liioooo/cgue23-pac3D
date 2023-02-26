@@ -1,0 +1,58 @@
+#include "CameraScript.h"
+#include "Events/Input.h"
+#include "Events/KeyCodes.h"
+#include "glm/gtx/common.hpp"
+#include "glm/gtx/quaternion.hpp"
+
+namespace Game {
+    void CameraScript::update() {
+        if (CgEngine::Input::isMouseButtonPressed(CgEngine::MouseButton::MouseButtonLeft) && CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Normal) {
+            CgEngine::Input::setCursorMode(CgEngine::CursorMode::Locked);
+            prevMousePos = CgEngine::Input::getMousePosition();
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Escape)) {
+            CgEngine::Input::setCursorMode(CgEngine::CursorMode::Normal);
+        }
+
+        auto mousePos = CgEngine::Input::getMousePosition();
+
+
+        auto& comp = getComponent<CgEngine::TransformComponent>();
+        glm::vec3 pos = comp.getLocalPosition();
+        glm::vec3 rot = comp.getLocalRotation();
+
+        float mouseDeltaX = (prevMousePos.first - mousePos.first) * 0.001f;
+        float mouseDeltaY = (prevMousePos.second - mousePos.second) * 0.001f;
+
+        prevMousePos = mousePos;
+
+        if (CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Locked) {
+            pitch = glm::clamp(pitch + mouseDeltaY, glm::radians(-80.0f), glm::radians(80.0f));
+            yaw = glm::fmod(yaw + mouseDeltaX, glm::two_pi<float>());
+        }
+
+        glm::vec3 front = glm::normalize(glm::quat({pitch, yaw, 0}) * glm::vec3(0, 0, -1));
+
+        rot.y = yaw;
+
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
+            pos += front * 0.1f;
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::S)) {
+            pos -= front * 0.1f;
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::A)) {
+            pos -= glm::normalize(glm::cross(front, glm::vec3(0, 1, 0))) * 0.1f;
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::D)) {
+            pos += glm::normalize(glm::cross(front, glm::vec3(0, 1, 0))) * 0.1f;
+        }
+
+        comp.setLocalPosition(pos);
+        comp.setYawPitchRoll(yaw, pitch, 0);
+
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
+            destroyEntity(findEntityById("floor"));
+        }
+    }
+}

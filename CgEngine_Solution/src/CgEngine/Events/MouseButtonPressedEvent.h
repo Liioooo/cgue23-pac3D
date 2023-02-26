@@ -6,16 +6,16 @@ namespace CgEngine {
 
     class MouseButtonPressedEvent : public Event {
     public:
-        MouseButtonPressedEvent(const int button) : button(button) {}
+        MouseButtonPressedEvent(const MouseButton button) : button(button) {}
 
-        inline int getButton() const {
+        inline MouseButton getButton() const {
             return button;
         }
 
         EVENT_TYPE_FN(MouseButtonPressed);
 
     private:
-        float button;
+        MouseButton button;
     };
 
 }
