@@ -45,6 +45,10 @@ namespace CgEngine {
             createScriptComponent(scene, entity, node);
         } else if (name == "DirectionalLightComponent") {
             createDirectionalLightComponent(scene, entity, node);
+        } else if (name == "PointLightComponent") {
+            createPointLightComponent(scene, entity, node);
+        } else if (name == "SpotLightComponent") {
+            createSpotLightComponent(scene, entity, node);
         }
     }
 
@@ -78,18 +82,40 @@ namespace CgEngine {
 
     void SceneLoader::createScriptComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         ScriptComponentParams params{
-            node.attribute("scriptName").as_string()
+            node.attribute("script-name").as_string()
         };
         scene->attachComponent<ScriptComponent>(entity, params);
     }
 
     void SceneLoader::createDirectionalLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         DirectionalLightComponentParams params{
-                stringTupleToVec3(node.attribute("color").as_string()),
+                hexStringToColor(node.attribute("color").as_string()),
                 node.attribute("intensity").as_float(1.0f),
                 node.attribute("cast-shadows").as_bool(true)
         };
         scene->attachComponent<DirectionalLightComponent>(entity, params);
+    }
+
+    void SceneLoader::createPointLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
+        PointLightComponentParams params{
+                hexStringToColor(node.attribute("color").as_string()),
+                node.attribute("intensity").as_float(1.0f),
+                node.attribute("radius").as_float(5.0f),
+                node.attribute("falloff").as_float(1.0f),
+        };
+        scene->attachComponent<PointLightComponent>(entity, params);
+    }
+
+    void SceneLoader::createSpotLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
+        SpotLightComponentParams params{
+                hexStringToColor(node.attribute("color").as_string()),
+                node.attribute("intensity").as_float(1.0f),
+                node.attribute("radius").as_float(5.0f),
+                node.attribute("falloff").as_float(1.0f),
+                glm::radians(node.attribute("inner-angle").as_float(30.0f)),
+                glm::radians(node.attribute("outer-angle").as_float(35.0f)),
+        };
+        scene->attachComponent<SpotLightComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {
@@ -102,5 +128,13 @@ namespace CgEngine {
         float z = std::stof(s.substr(p1 + 1));
 
         return {x, y, z};
+    }
+
+    glm::vec3 SceneLoader::hexStringToColor(const std::string &s) {
+        uint64_t color = std::stoul(s.substr(1), nullptr, 16);
+        float r = ((color >> 16) & 0xFF) / 255.0f;
+        float g = ((color >> 8) & 0xFF) / 255.0f;
+        float b = (color & 0xFF) / 255.0f;
+        return {r, g, b};
     }
 }

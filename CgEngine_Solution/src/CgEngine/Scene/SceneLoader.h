@@ -17,8 +17,11 @@ namespace CgEngine {
         static void createCameraComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createScriptComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createDirectionalLightComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
+        static void createPointLightComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
+        static void createSpotLightComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
 
         static glm::vec3 stringTupleToVec3(const std::string& s);
+        static glm::vec3 hexStringToColor(const std::string& s);
 
     };
 

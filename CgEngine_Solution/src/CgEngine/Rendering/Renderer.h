@@ -15,12 +15,13 @@ namespace CgEngine {
         static void init();
         static void shutdown();
         static void beginRenderPass(RenderPass& renderPass);
-        static void endRenderPass(RenderPass& renderPass);
-        static void renderFullScreenQuad(RenderPass& renderPass, Material& material);
+        static void endRenderPass();
+        static void renderFullScreenQuad(Material& material);
 
         static Texture2D& getWhiteTexture();
 
     private:
+        static RenderPass* currentRenderPass;
         static RendererData* rendererData;
         static bool isWireframe;
         static bool isBackfaceCulling;

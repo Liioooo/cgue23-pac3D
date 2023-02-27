@@ -93,6 +93,33 @@ namespace CgEngine {
         lightData.dirLightDirection = lightEnvironment.dirLightDirection;
         lightData.dirLightIntensity = lightEnvironment.dirLightIntensity;
         lightData.dirLightColor = lightEnvironment.dirLightColor;
+        lightData.pointLightCount = lightEnvironment.pointLights.size();
+        lightData.spotLightCount = lightEnvironment.spotLights.size();
+
+        size_t indexPL = 0;
+        for (const auto &pointLight: lightEnvironment.pointLights) {
+            lightData.pointLights[indexPL].color = pointLight.color;
+            lightData.pointLights[indexPL].falloff = pointLight.falloff;
+            lightData.pointLights[indexPL].intensity = pointLight.intensity;
+            lightData.pointLights[indexPL].radius = pointLight.radius;
+            lightData.pointLights[indexPL].position = pointLight.position;
+            indexPL++;
+        }
+
+        size_t indexSL = 0;
+        for (const auto &spotLight: lightEnvironment.spotLights) {
+            lightData.spotLights[indexSL].color = spotLight.color;
+            lightData.spotLights[indexSL].falloff = spotLight.falloff;
+            lightData.spotLights[indexSL].intensity = spotLight.intensity;
+            lightData.spotLights[indexSL].radius = spotLight.radius;
+            lightData.spotLights[indexSL].position = spotLight.position;
+            lightData.spotLights[indexSL].position = spotLight.position;
+            lightData.spotLights[indexSL].direction = spotLight.direction;
+            lightData.spotLights[indexSL].innerAngle = spotLight.innerAngle;
+            lightData.spotLights[indexSL].outerAngle = spotLight.outerAngle;
+            indexSL++;
+        }
+
         ubLightData->setData(lightData);
     }
 
@@ -120,17 +147,17 @@ namespace CgEngine {
         }
         geoQueue.clear();
 
-        Renderer::endRenderPass(*geometryRenderPass);
+        Renderer::endRenderPass();
     }
 
     void SceneRenderer::screenPass() {
         Renderer::beginRenderPass(*screenRenderPass);
-        Renderer::renderFullScreenQuad(*screenRenderPass, *screenMaterial);
-        Renderer::endRenderPass(*screenRenderPass);
+        Renderer::renderFullScreenQuad(*screenMaterial);
+        Renderer::endRenderPass();
     }
 
     void SceneRenderer::clearPass(RenderPass &renderPass) {
         Renderer::beginRenderPass(renderPass);
-        Renderer::endRenderPass(renderPass);
+        Renderer::endRenderPass();
     }
 }

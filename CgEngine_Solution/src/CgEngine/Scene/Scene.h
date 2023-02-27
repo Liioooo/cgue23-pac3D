@@ -8,11 +8,32 @@ namespace CgEngine {
 
     class SceneRenderer;
 
+    struct SceneSpotLight {
+        glm::vec3 position;
+        glm::vec3 direction;
+        glm::vec3 color;
+        float intensity;
+        float radius;
+        float falloff;
+        float innerAngle;
+        float outerAngle;
+    };
+
+    struct ScenePointLight {
+        glm::vec3 position;
+        glm::vec3 color;
+        float intensity;
+        float radius;
+        float falloff;
+    };
+
     struct SceneLightEnvironment {
         glm::vec3 dirLightDirection;
         float dirLightIntensity = 0.0f;
         glm::vec3 dirLightColor;
         bool dirLightCastShadows;
+        std::vector<ScenePointLight> pointLights;
+        std::vector<SceneSpotLight> spotLights;
     };
 
     class Scene {

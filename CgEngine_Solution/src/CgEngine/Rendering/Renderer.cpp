@@ -1,7 +1,9 @@
 #include "Renderer.h"
 #include "glad/glad.h"
+#include "Asserts.h"
 
 namespace CgEngine {
+    RenderPass* Renderer::currentRenderPass = nullptr;
     RendererData* Renderer::rendererData;
     bool Renderer::isWireframe;
     bool Renderer::isBackfaceCulling;
@@ -57,14 +59,17 @@ namespace CgEngine {
     }
 
     void Renderer::beginRenderPass(RenderPass& renderPass) {
+        CG_ASSERT(currentRenderPass == nullptr, "There already is an active RenderPass!")
+
+        currentRenderPass = &renderPass;
         RenderPassSpecification& spec = renderPass.getSpecification();
 
         spec.shader->bind();
         spec.framebuffer->bind();
 
-        glm::vec4& clearColor = spec.framebuffer->getSpecification().clearColor;
-        glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
         if (spec.clearColorBuffer) {
+            glm::vec4& clearColor = spec.framebuffer->getSpecification().clearColor;
+            glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
             glClear(GL_COLOR_BUFFER_BIT);
         }
         if (spec.clearDepthBuffer) {
@@ -112,13 +117,16 @@ namespace CgEngine {
         }
     }
 
-    void Renderer::endRenderPass(RenderPass &renderPass) {
-        renderPass.getSpecification().framebuffer->unbind();
-        renderPass.getSpecification().shader->unbind();
+    void Renderer::endRenderPass() {
+        CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
+
+        currentRenderPass = nullptr;
     }
 
-    void Renderer::renderFullScreenQuad(RenderPass& renderPass, Material &material) {
-        material.uploadToShader(*renderPass.getSpecification().shader);
+    void Renderer::renderFullScreenQuad(Material &material) {
+        CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
+
+        material.uploadToShader(*currentRenderPass->getSpecification().shader);
 
         rendererData->quadVAO->bind();
         glDrawElements(GL_TRIANGLES, rendererData->quadVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);

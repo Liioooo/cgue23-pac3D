@@ -145,11 +145,33 @@ namespace CgEngine {
 
         auto dirLightComponentIt = componentManager->cbegin<DirectionalLightComponent>();
         if (dirLightComponentIt != componentManager->cend<DirectionalLightComponent>()) {
-            glm::vec3 direction = glm::normalize(glm::mat3(componentManager->getComponent<TransformComponent>(dirLightComponentIt->getEntity()).getModelMatrix()) * glm::vec3(0.0f, 1.0f, 0.0f));
+            lightEnvironment.dirLightDirection = glm::normalize(glm::mat3(componentManager->getComponent<TransformComponent>(dirLightComponentIt->getEntity()).getModelMatrix()) * glm::vec3(0.0f, 1.0f, 0.0f));
             lightEnvironment.dirLightColor = dirLightComponentIt->getColor();
             lightEnvironment.dirLightIntensity = dirLightComponentIt->getIntensity();
             lightEnvironment.dirLightCastShadows = dirLightComponentIt->getCastShadows();
-            lightEnvironment.dirLightDirection = direction;
+        }
+
+        for(auto it = componentManager->cbegin<PointLightComponent>(); it != componentManager->cend<PointLightComponent>(); it++) {
+            ScenePointLight pointLight{};
+            pointLight.position = componentManager->getComponent<TransformComponent>(it->getEntity()).getGlobalPosition();
+            pointLight.color = it->getColor();
+            pointLight.falloff = it->getFalloff();
+            pointLight.radius = it->getRadius();
+            pointLight.intensity = it->getIntensity();
+            lightEnvironment.pointLights.push_back(pointLight);
+        }
+
+        for(auto it = componentManager->cbegin<SpotLightComponent>(); it != componentManager->cend<SpotLightComponent>(); it++) {
+            SceneSpotLight spotLight{};
+            spotLight.position = componentManager->getComponent<TransformComponent>(it->getEntity()).getGlobalPosition();
+            spotLight.direction = glm::normalize(glm::mat3(componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix()) * glm::vec3(0.0f, -1.0f, 0.0f));
+            spotLight.color = it->getColor();
+            spotLight.falloff = it->getFalloff();
+            spotLight.radius = it->getRadius();
+            spotLight.intensity = it->getIntensity();
+            spotLight.innerAngle = it->getInnerAngle();
+            spotLight.outerAngle = it->getOuterAngle();
+            lightEnvironment.spotLights.push_back(spotLight);
         }
 
         renderer.setActiveScene(this);

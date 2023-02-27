@@ -7,14 +7,32 @@
             <Components>
                 <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
                 <CameraComponent primary="true" projection="perspective" near="0.1" far="100" fov="60" />
-                <ScriptComponent scriptName="cameraScript" />
+                <ScriptComponent script-name="cameraScript" />
             </Components>
         </Entity>
     </Entity>
     <Entity>
         <Components>
             <TransformComponent position="0 0 0" rotation="45 0 45" scale="1 1 1" />
-            <DirectionalLightComponent color="1 1 1" intensity="1" />
+            <DirectionalLightComponent color="#ffffff" intensity="0.2" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 4 0" rotation="0 0 0" scale="1 1 1" />
+            <PointLightComponent color="#ff0000" intensity="1" falloff="1" radius="6" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+            <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" inner-angle="30" outer-angle="90" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="4 0 0" rotation="180 0 0" scale="1 1 1" />
+            <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" inner-angle="30" outer-angle="40" />
         </Components>
     </Entity>
     <Entity id="floor">

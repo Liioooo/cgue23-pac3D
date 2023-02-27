@@ -4,8 +4,9 @@
         <AlbedoTexture srgb="true">game/rocky_gravel_diff_2k.png</AlbedoTexture>
     </Material>
     <Material name="Red">
-        <Albedo>#ff0000</Albedo>
-        <Roughness>1</Roughness>
+        <Albedo>#ffffff</Albedo>
+        <Roughness>0.8</Roughness>
+        <Metalness>0</Metalness>
         <Emission>0.01</Emission>
     </Material>
 </Materials>

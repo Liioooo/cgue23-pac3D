@@ -46,11 +46,36 @@ namespace CgEngine {
         };
         UniformBuffer<UBCameraData>* ubCameraData;
 
+        struct UBPointLight {
+            glm::vec3 position;
+            float intensity;
+            glm::vec3 color;
+            float radius;
+            float falloff;
+            glm::vec3 _padding0_;
+        };
+
+        struct UBSpotLight {
+            glm::vec3 position;
+            float intensity;
+            glm::vec3 color;
+            float radius;
+            glm::vec3 direction;
+            float falloff;
+            float innerAngle;
+            float outerAngle;
+            glm::vec2 _padding0_;
+        };
+
         struct UBLightData {
             glm::vec3 dirLightDirection;
             float dirLightIntensity;
             glm::vec3 dirLightColor;
-            float _padding0_;
+            int pointLightCount;
+            int spotLightCount;
+            glm::vec3 _padding0_;
+            UBPointLight pointLights[100];
+            UBSpotLight spotLights[100];
         };
         UniformBuffer<UBLightData>* ubLightData;
 

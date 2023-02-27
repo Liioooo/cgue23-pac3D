@@ -6,9 +6,9 @@
 #include "Components/MeshRendererComponent.h"
 #include "Components/CameraComponent.h"
 #include "Components/DirectionalLightComponent.h"
+#include "Components/PointLightComponent.h"
+#include <Components/SpotLightComponent.h>
 #include "ComponentArray.h"
-#include <unordered_map>
-#include <memory>
 
 namespace CgEngine {
 
@@ -20,6 +20,8 @@ namespace CgEngine {
             registerComponentType<MeshRendererComponent>();
             registerComponentType<CameraComponent>();
             registerComponentType<DirectionalLightComponent>();
+            registerComponentType<PointLightComponent>();
+            registerComponentType<SpotLightComponent>();
         }
 
         template<typename C>

@@ -52,5 +52,7 @@ namespace Game {
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
             destroyEntity(findEntityById("floor"));
         }
+
+//        CG_LOGGING_INFO(ts.getMillis())
     }
 }
