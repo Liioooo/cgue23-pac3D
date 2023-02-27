@@ -123,14 +123,14 @@ namespace CgEngine {
         postUpdateFunctions.emplace_back(function);
     }
 
-    void Scene::onUpdate() {
+    void Scene::onUpdate(TimeStep ts) {
         for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
-            it->update();
+            it->update(ts);
         }
         executePostUpdateFunctions();
         updateTransforms();
         for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
-            it->lateUpdate();
+            it->lateUpdate(ts);
         }
         executePostUpdateFunctions();
         updateTransforms();

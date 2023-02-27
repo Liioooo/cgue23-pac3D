@@ -5,7 +5,7 @@
 #include "glm/gtx/quaternion.hpp"
 
 namespace Game {
-    void CameraScript::update() {
+    void CameraScript::update(CgEngine::TimeStep ts) {
         if (CgEngine::Input::isMouseButtonPressed(CgEngine::MouseButton::MouseButtonLeft) && CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Normal) {
             CgEngine::Input::setCursorMode(CgEngine::CursorMode::Locked);
             prevMousePos = CgEngine::Input::getMousePosition();
@@ -36,16 +36,16 @@ namespace Game {
         rot.y = yaw;
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
-            pos += front * 0.1f;
+            pos += front * 10.0f * ts.getSeconds();
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::S)) {
-            pos -= front * 0.1f;
+            pos -= front * 10.0f * ts.getSeconds();
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::A)) {
-            pos -= glm::normalize(glm::cross(front, glm::vec3(0, 1, 0))) * 0.1f;
+            pos -= glm::normalize(glm::cross(front, glm::vec3(0, 1, 0))) * 10.0f * ts.getSeconds();
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::D)) {
-            pos += glm::normalize(glm::cross(front, glm::vec3(0, 1, 0))) * 0.1f;
+            pos += glm::normalize(glm::cross(front, glm::vec3(0, 1, 0))) * 10.0f * ts.getSeconds();
         }
 
         comp.setLocalPosition(pos);

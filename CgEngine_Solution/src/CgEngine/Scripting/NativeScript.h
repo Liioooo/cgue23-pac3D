@@ -16,8 +16,8 @@ namespace CgEngine {
         virtual void onAttach() {};
         virtual void onDetach() {};
 
-        virtual void update() {};
-        virtual void lateUpdate() {};
+        virtual void update(TimeStep ts) {};
+        virtual void lateUpdate(TimeStep ts) {};
 
 
     protected:

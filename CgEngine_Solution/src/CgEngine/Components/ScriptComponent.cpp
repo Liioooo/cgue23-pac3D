@@ -13,11 +13,11 @@ namespace CgEngine {
         script->onDetach();
     }
 
-    void ScriptComponent::update() {
-        script->update();
+    void ScriptComponent::update(TimeStep ts) {
+        script->update(ts);
     }
 
-    void ScriptComponent::lateUpdate() {
-        script->lateUpdate();
+    void ScriptComponent::lateUpdate(TimeStep ts) {
+        script->lateUpdate(ts);
     }
 }

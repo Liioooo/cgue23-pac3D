@@ -8,6 +8,7 @@
 #include "Events/WindowResizeEvent.h"
 #include "GlobalObjectManager.h"
 #include "Scene/SceneManager.h"
+#include "TimeStep.h"
 
 namespace CgEngine {
 
@@ -22,6 +23,7 @@ namespace CgEngine {
         void run();
         void onEvent(Event& event);
         Window& getWindow();
+        float getTime();
 
         template<typename S>
         void registerNativeScript(const std::string& name) {
@@ -34,6 +36,8 @@ namespace CgEngine {
         SceneRenderer* sceneRenderer;
         Window* window;
         bool isRunning = true;
+        float lastFrameTime = getTime();
+        TimeStep timeStep{};
 
         void onWindowClose(WindowCloseEvent& event);
         void onWindowResize(WindowResizeEvent& event);

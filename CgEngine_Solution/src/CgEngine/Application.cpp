@@ -31,6 +31,7 @@ namespace CgEngine {
         windowSpecification.title = iniReader->Get("window", "title", "CG Engine");
         windowSpecification.fullScreen = iniReader->GetBoolean("window", "fullscreen", false);
         windowSpecification.refreshRate = iniReader->GetInteger("window", "refresh_rate", 60);
+        windowSpecification.vSync = iniReader->GetBoolean("window", "v_sync", true);
 
         window = new Window(windowSpecification, EVENT_BIND_FN(onEvent));
 
@@ -45,9 +46,12 @@ namespace CgEngine {
             window->onUpdate();
 
             Scene& activeScene = *sceneManager->getActiveScene();
-            activeScene.onUpdate();
+            activeScene.onUpdate(timeStep);
             activeScene.onRender(*sceneRenderer);
 
+            float time = getTime();
+            timeStep = time - lastFrameTime;
+            lastFrameTime = time;
         }
     }
 
@@ -60,6 +64,10 @@ namespace CgEngine {
 
     Window &Application::getWindow() {
         return *window;
+    }
+
+    float Application::getTime() {
+        return static_cast<float>(glfwGetTime());
     }
 
     void Application::onWindowClose(WindowCloseEvent &event) {

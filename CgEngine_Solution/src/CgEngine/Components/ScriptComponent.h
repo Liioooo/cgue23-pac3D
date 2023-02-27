@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "TimeStep.h"
 
 namespace CgEngine {
 
@@ -17,8 +18,8 @@ namespace CgEngine {
         void onAttach(Scene& scene, ScriptComponentParams& params);
         void onDetach() override;
 
-        void update();
-        void lateUpdate();
+        void update(TimeStep ts);
+        void lateUpdate(TimeStep ts);
 
     private:
         std::shared_ptr<NativeScript> script;

@@ -3,6 +3,7 @@
 #include <Rendering/SceneRenderer.h>
 #include "Entity.h"
 #include "ComponentManager.h"
+#include "TimeStep.h"
 
 namespace CgEngine {
 
@@ -25,7 +26,7 @@ namespace CgEngine {
         int getViewportWidth() const;
         int getViewportHeight() const;
         void submitPostUpdateFunction(std::function<void()>&& function);
-        void onUpdate();
+        void onUpdate(TimeStep ts);
         void onRender(SceneRenderer& renderer);
 
         template<typename C>

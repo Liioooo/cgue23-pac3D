@@ -53,7 +53,7 @@ namespace CgEngine {
         }
 
         glfwMakeContextCurrent(window);
-        setVsync(spec.refreshRate);
+        setVsync(spec.vSync);
 
         gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 

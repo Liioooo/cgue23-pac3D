@@ -11,7 +11,7 @@ namespace Game {
             return std::make_shared<CameraScript>();
         }
 
-        void update() override;
+        void update(CgEngine::TimeStep ts) override;
 
     private:
         std::pair<float, float> prevMousePos;
