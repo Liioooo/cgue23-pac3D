@@ -7,7 +7,7 @@ namespace CgEngine {
         castShadows = params.castShadows;
     }
 
-    glm::vec3 DirectionalLightComponent::getColor() {
+    glm::vec3 DirectionalLightComponent::getColor() const {
         return color;
     }
 
@@ -15,7 +15,7 @@ namespace CgEngine {
         color = value;
     }
 
-    float DirectionalLightComponent::getIntensity() {
+    float DirectionalLightComponent::getIntensity() const {
         return intensity;
     }
 
@@ -23,7 +23,7 @@ namespace CgEngine {
         intensity = value;
     }
 
-    bool DirectionalLightComponent::getCastShadows() {
+    bool DirectionalLightComponent::getCastShadows() const {
         return castShadows;
     }
 

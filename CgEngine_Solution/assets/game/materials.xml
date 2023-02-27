@@ -5,5 +5,7 @@
     </Material>
     <Material name="Red">
         <Albedo>#ff0000</Albedo>
+        <Roughness>1</Roughness>
+        <Emission>0.01</Emission>
     </Material>
 </Materials>

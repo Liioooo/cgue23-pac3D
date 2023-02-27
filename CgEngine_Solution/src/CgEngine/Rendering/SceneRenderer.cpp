@@ -43,7 +43,8 @@ namespace CgEngine {
             screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
         }
 
-        ubCamera = new UniformBuffer<UBCamera>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
+        ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
+        ubLightData = new UniformBuffer<UBLightData>("LightData", 1, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
     }
 
     SceneRenderer::~SceneRenderer() {
@@ -51,7 +52,8 @@ namespace CgEngine {
         delete screenRenderPass;
         delete screenMaterial;
 
-        delete ubCamera;
+        delete ubCameraData;
+        delete ubLightData;
     }
 
     void SceneRenderer::setActiveScene(Scene* scene) {
@@ -67,7 +69,7 @@ namespace CgEngine {
         }
     }
 
-    void SceneRenderer::beginScene(const Camera& camera, glm::mat4 cameraTransform) {
+    void SceneRenderer::beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment) {
         CG_ASSERT(!activeRendering, "Already Rendering Scene!")
         CG_ASSERT(activeScene, "No active Scene!")
 
@@ -80,13 +82,18 @@ namespace CgEngine {
             screenRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
         }
 
-        UBCamera cameraData{};
+        UBCameraData cameraData{};
         cameraData.projection = camera.getProjectionMatrix();
         cameraData.view = glm::inverse(cameraTransform);
         cameraData.viewProjection = cameraData.projection * cameraData.view;
         cameraData.position = cameraTransform[3];
+        ubCameraData->setData(cameraData);
 
-        ubCamera->setData(cameraData);
+        UBLightData lightData{};
+        lightData.dirLightDirection = lightEnvironment.dirLightDirection;
+        lightData.dirLightIntensity = lightEnvironment.dirLightIntensity;
+        lightData.dirLightColor = lightEnvironment.dirLightColor;
+        ubLightData->setData(lightData);
     }
 
     void SceneRenderer::endScene() {

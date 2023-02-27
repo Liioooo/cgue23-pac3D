@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Asserts.h"
+#include "Rendering/SceneRenderer.h"
 
 namespace CgEngine {
     Scene::Scene(int viewportWidth, int viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {}
@@ -140,8 +141,19 @@ namespace CgEngine {
         auto cameraComponent = std::find_if(componentManager->begin<CameraComponent>(), componentManager->end<CameraComponent>(), [](auto&& c) { return c.isPrimary();});
         auto cameraTransform = componentManager->getComponent<TransformComponent>(cameraComponent->getEntity());
 
+        SceneLightEnvironment lightEnvironment{};
+
+        auto dirLightComponentIt = componentManager->cbegin<DirectionalLightComponent>();
+        if (dirLightComponentIt != componentManager->cend<DirectionalLightComponent>()) {
+            glm::vec3 direction = glm::normalize(glm::mat3(componentManager->getComponent<TransformComponent>(dirLightComponentIt->getEntity()).getModelMatrix()) * glm::vec3(0.0f, 1.0f, 0.0f));
+            lightEnvironment.dirLightColor = dirLightComponentIt->getColor();
+            lightEnvironment.dirLightIntensity = dirLightComponentIt->getIntensity();
+            lightEnvironment.dirLightCastShadows = dirLightComponentIt->getCastShadows();
+            lightEnvironment.dirLightDirection = direction;
+        }
+
         renderer.setActiveScene(this);
-        renderer.beginScene(cameraComponent->getCamera(), cameraTransform.getModelMatrix());
+        renderer.beginScene(cameraComponent->getCamera(), cameraTransform.getModelMatrix(), lightEnvironment);
 
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
             renderer.submitMesh(*it->getMeshVertices().getVAO(), it->getMaterial(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());

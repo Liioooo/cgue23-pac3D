@@ -33,8 +33,6 @@ namespace Game {
 
         glm::vec3 front = glm::normalize(glm::quat({pitch, yaw, 0}) * glm::vec3(0, 0, -1));
 
-        rot.y = yaw;
-
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
             pos += front * 10.0f * ts.getSeconds();
         }

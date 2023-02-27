@@ -23,7 +23,7 @@ namespace CgEngine {
         auto * material = new Material(name);
 
         if (albedo.empty()) {
-            material->set("u_Mat_AlbedoColor", {0.0f, 0.0f, 0.0f});
+            material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
         } else {
             uint64_t color = std::stoul(albedo.substr(1), nullptr, 16);
             float r = ((color >> 16) & 0xFF) / 255.0f;

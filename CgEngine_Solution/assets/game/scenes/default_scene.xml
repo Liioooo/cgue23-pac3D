@@ -11,6 +11,12 @@
             </Components>
         </Entity>
     </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 0 0" rotation="45 0 45" scale="1 1 1" />
+            <DirectionalLightComponent color="1 1 1" intensity="1" />
+        </Components>
+    </Entity>
     <Entity id="floor">
         <Components>
             <TransformComponent position="0 -2.5 0" rotation="0 0 0" scale="15 0.1 15" />

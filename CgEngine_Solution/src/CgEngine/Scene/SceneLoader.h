@@ -16,6 +16,7 @@ namespace CgEngine {
         static void createMeshRendererComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createCameraComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createScriptComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
+        static void createDirectionalLightComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
 
         static glm::vec3 stringTupleToVec3(const std::string& s);
 

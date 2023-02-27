@@ -43,6 +43,8 @@ namespace CgEngine {
             createCameraComponent(scene, entity, node);
         } else if (name == "ScriptComponent") {
             createScriptComponent(scene, entity, node);
+        } else if (name == "DirectionalLightComponent") {
+            createDirectionalLightComponent(scene, entity, node);
         }
     }
 
@@ -50,7 +52,7 @@ namespace CgEngine {
         glm::vec3 position = stringTupleToVec3(node.attribute("position").as_string());
         glm::vec3 rotation = stringTupleToVec3(node.attribute("rotation").as_string());
         glm::vec3 scale = stringTupleToVec3(node.attribute("scale").as_string());
-        TransformComponentParams params{position, rotation, scale};
+        TransformComponentParams params{position, glm::radians(rotation), scale};
         scene->attachComponent<TransformComponent>(entity, params);
     }
 
@@ -79,6 +81,15 @@ namespace CgEngine {
             node.attribute("scriptName").as_string()
         };
         scene->attachComponent<ScriptComponent>(entity, params);
+    }
+
+    void SceneLoader::createDirectionalLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
+        DirectionalLightComponentParams params{
+                stringTupleToVec3(node.attribute("color").as_string()),
+                node.attribute("intensity").as_float(1.0f),
+                node.attribute("cast-shadows").as_bool(true)
+        };
+        scene->attachComponent<DirectionalLightComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {

@@ -16,11 +16,11 @@ namespace CgEngine {
 
         void onAttach(Scene& scene, DirectionalLightComponentParams& params);
 
-        glm::vec3 getColor();
+        glm::vec3 getColor() const;
         void setColor(const glm::vec3& value);
-        float getIntensity();
+        float getIntensity() const;
         void setIntensity(float value);
-        bool getCastShadows();
+        bool getCastShadows() const;
         void setCastShadows(bool value);
 
     private:

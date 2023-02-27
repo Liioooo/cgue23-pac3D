@@ -1,11 +1,19 @@
 #pragma once
 
-#include <Rendering/SceneRenderer.h>
 #include "Entity.h"
 #include "ComponentManager.h"
 #include "TimeStep.h"
 
 namespace CgEngine {
+
+    class SceneRenderer;
+
+    struct SceneLightEnvironment {
+        glm::vec3 dirLightDirection;
+        float dirLightIntensity = 0.0f;
+        glm::vec3 dirLightColor;
+        bool dirLightCastShadows;
+    };
 
     class Scene {
     public:
