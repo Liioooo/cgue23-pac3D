@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.24)
 
 function(find_additional_cmake_file outputVariableName filename)
     if (NOT DEFINED outputVariableName OR NOT DEFINED filename)
@@ -128,6 +128,19 @@ list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/pugixml
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/stbi/include")
 ################################################################################
 
+# ASSIMP #######################################################################
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+set(USE_STATIC_CRT ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_VIEW  OFF CACHE BOOL "" FORCE)
+add_subdirectory(vendor/assimp)
+list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES assimp)
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/assimp/include")
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/vendor/assimp/include")
+################################################################################
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -137,6 +150,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
+
+################################################################################
+# Copy DLLs
+################################################################################
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:CgEngine_Solution> $<TARGET_FILE_DIR:CgEngine_Solution>
+        COMMAND_EXPAND_LISTS
+        )
 
 ################################################################################
 # Precompiled Header

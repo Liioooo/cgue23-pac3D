@@ -1,12 +1,16 @@
 #include "MeshVertices.h"
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/Renderer.h"
+#include <assimp/Importer.hpp>
 
 namespace CgEngine {
     MeshVertices* MeshVertices::createResource(const std::string& name) {
         if (name == "CG_CubeMesh") {
             return createCubeMesh();
         }
+
+        auto i = Assimp::Importer();
+
         return nullptr;
     }
 
