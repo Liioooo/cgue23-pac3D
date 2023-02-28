@@ -9,6 +9,7 @@ namespace CgEngine {
     struct MeshRendererComponentParams {
         std::string mesh;
         std::string material;
+        std::vector<uint32_t> submeshIndices;
     };
 
     class MeshRendererComponent : public Component {
@@ -18,11 +19,13 @@ namespace CgEngine {
         void onAttach(Scene& scene, MeshRendererComponentParams& params);
 
         MeshVertices& getMeshVertices();
-        Material& getMaterial();
+        Material* getMaterial();
+        const std::vector<uint32_t>& getSubmeshIndices();
 
     private:
         MeshVertices* mesh;
         Material* material;
+        std::vector<uint32_t> submeshIndices;
     };
 
 }

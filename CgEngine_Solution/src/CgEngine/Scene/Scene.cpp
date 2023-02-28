@@ -178,7 +178,7 @@ namespace CgEngine {
         renderer.beginScene(cameraComponent->getCamera(), cameraTransform.getModelMatrix(), lightEnvironment);
 
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
-            renderer.submitMesh(*it->getMeshVertices().getVAO(), it->getMaterial(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
+            renderer.submitMesh(it->getMeshVertices(), it->getSubmeshIndices(), it->getMaterial(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
         }
 
         renderer.endScene();

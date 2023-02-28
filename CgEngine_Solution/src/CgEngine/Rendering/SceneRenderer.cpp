@@ -132,20 +132,33 @@ namespace CgEngine {
         activeRendering = false;
     }
 
-    void SceneRenderer::submitMesh(VertexArrayObject& vao, const Material& material, const glm::mat4& transform) {
-        geoQueue.push_back({vao, material, transform});
+    void SceneRenderer::submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, const glm::mat4& transform) {
+        auto& submeshes = mesh.getSubmeshes();
+
+        for (const auto &index: submeshIndices) {
+            const Submesh& submesh = submeshes.at(index);
+
+            DrawCommand drawCommand;
+            drawCommand.vao = mesh.getVAO();
+            drawCommand.material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterials().at(submesh.materialIndex);
+            drawCommand.transform = submesh.transform * transform;
+            drawCommand.baseIndex = submesh.baseIndex;
+            drawCommand.indexCount = submesh.indexCount;
+
+            drawCommandQueue.push_back(drawCommand);
+        }
     }
 
     void SceneRenderer::geometryPass() {
         Renderer::beginRenderPass(*geometryRenderPass);
 
-        for (const auto &item: geoQueue) {
-            item.material.uploadToShader(*geometryRenderPass->getSpecification().shader);
-            geometryRenderPass->getSpecification().shader->setMat4("u_model", item.transform);
-            item.vao.bind();
-            glDrawElements(GL_TRIANGLES, item.vao.getIndexCount(), GL_UNSIGNED_INT, nullptr);
+        for (const auto &command: drawCommandQueue) {
+            command.material->uploadToShader(*geometryRenderPass->getSpecification().shader);
+            geometryRenderPass->getSpecification().shader->setMat4("u_model", command.transform);
+            command.vao->bind();
+            glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (void*)(command.baseIndex * sizeof(uint32_t)));
         }
-        geoQueue.clear();
+        drawCommandQueue.clear();
 
         Renderer::endRenderPass();
     }

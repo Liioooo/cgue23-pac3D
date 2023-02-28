@@ -20,7 +20,7 @@ namespace CgEngine {
         void setViewportSize(uint32_t width, uint32_t height);
         void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment);
         void endScene();
-        void submitMesh(VertexArrayObject& vao, const Material& material, const glm::mat4& transform);
+        void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, const glm::mat4& transform);
 
     private:
         Scene* activeScene;
@@ -79,12 +79,14 @@ namespace CgEngine {
         };
         UniformBuffer<UBLightData>* ubLightData;
 
-        struct RenderData {
-            VertexArrayObject& vao;
-            const Material& material;
-            const glm::mat4& transform;
+        struct DrawCommand {
+            VertexArrayObject* vao;
+            const Material* material;
+            glm::mat4 transform;
+            uint32_t baseIndex;
+            uint32_t indexCount;
         };
-        std::vector<RenderData> geoQueue{};
+        std::vector<DrawCommand> drawCommandQueue{};
     };
 
 }

@@ -1,5 +1,6 @@
 #include "MeshVertices.h"
 #include "Rendering/VertexBuffer.h"
+#include "Rendering/Renderer.h"
 
 namespace CgEngine {
     MeshVertices* MeshVertices::createResource(const std::string& name) {
@@ -23,6 +24,14 @@ namespace CgEngine {
 
     const std::vector<uint32_t>& MeshVertices::getIndexBuffer() const {
         return indexBuffer;
+    }
+
+    const std::vector<Submesh> &MeshVertices::getSubmeshes() const {
+        return submeshes;
+    }
+
+    const std::vector<Material *> &MeshVertices::getMaterials() const {
+        return materials;
     }
 
     MeshVertices *MeshVertices::createCubeMesh() {
@@ -93,10 +102,23 @@ namespace CgEngine {
         auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(), mesh->vertices.size() * sizeof(Vertex));
         vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
                                  VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float2, true)});
+                                 VertexBufferElement(ShaderDataType::Float2, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true)});
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
+
+        Submesh submesh;
+        submesh.baseVertex = 0;
+        submesh.baseIndex = 0;
+        submesh.vertexCount = mesh->vertices.size();
+        submesh.indexCount = mesh->indexBuffer.size();
+        submesh.materialIndex = 0;
+        submesh.transform = glm::mat4(1.0f);
+
+        mesh->submeshes.push_back(submesh);
+        mesh->materials.push_back(&Renderer::getDefaultPBRMaterial());
 
         return mesh;
     }
