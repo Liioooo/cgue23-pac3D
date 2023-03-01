@@ -1,3 +1,4 @@
+#include <numeric>
 #include "MeshRendererComponent.h"
 #include "GlobalObjectManager.h"
 
@@ -8,8 +9,18 @@ namespace CgEngine {
             material = GlobalObjectManager::getInstance().getResourceManager().getResource<Material>(params.material);
             submeshIndices.push_back(0);
         } else {
-            // TODO: get MeshVert from 3D-Model, get Material from 3d-Model
-            // + Override Material
+            mesh = GlobalObjectManager::getInstance().getResourceManager().getResource<MeshVertices>(params.assetFile);
+            if (params.material.empty()) {
+                material = nullptr;
+            } else {
+                material = GlobalObjectManager::getInstance().getResourceManager().getResource<Material>(params.material);
+            }
+            if (params.submeshIndices.empty()) {
+                submeshIndices = std::vector<uint32_t>(mesh->getSubmeshes().size());
+                std::iota(submeshIndices.begin(), submeshIndices.end(), 0);
+            } else {
+                submeshIndices = params.submeshIndices;
+            }
         }
     }
 

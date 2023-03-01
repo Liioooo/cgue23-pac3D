@@ -138,11 +138,12 @@ namespace CgEngine {
         for (const auto &index: submeshIndices) {
             const Submesh& submesh = submeshes.at(index);
 
-            DrawCommand drawCommand;
+            DrawCommand drawCommand{};
             drawCommand.vao = mesh.getVAO();
-            drawCommand.material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterials().at(submesh.materialIndex);
-            drawCommand.transform = submesh.transform * transform;
+            drawCommand.material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
+            drawCommand.transform = transform * submesh.transform;
             drawCommand.baseIndex = submesh.baseIndex;
+            drawCommand.baseVertex = submesh.baseVertex;
             drawCommand.indexCount = submesh.indexCount;
 
             drawCommandQueue.push_back(drawCommand);
@@ -156,7 +157,7 @@ namespace CgEngine {
             command.material->uploadToShader(*geometryRenderPass->getSpecification().shader);
             geometryRenderPass->getSpecification().shader->setMat4("u_model", command.transform);
             command.vao->bind();
-            glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (void*)(command.baseIndex * sizeof(uint32_t)));
+            glDrawElementsBaseVertex(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (void*)(command.baseIndex * sizeof(uint32_t)), command.baseVertex);
         }
         drawCommandQueue.clear();
 

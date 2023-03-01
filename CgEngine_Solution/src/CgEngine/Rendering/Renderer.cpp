@@ -11,7 +11,6 @@ namespace CgEngine {
     bool Renderer::depthTest;
     bool Renderer::depthWrite;
     Texture2D* Renderer::whiteTexture;
-    Material* Renderer::defaultPBRMaterial;
 
     void Renderer::init() {
         rendererData = new RendererData();
@@ -53,23 +52,11 @@ namespace CgEngine {
 
         uint32_t whiteTextureData = 0xffffffff;
         whiteTexture = new Texture2D(TextureFormat::RGBA, 1, 1, TextureWrap::Clamp, &whiteTextureData);
-
-        defaultPBRMaterial = new Material("defaultPBRMaterial");
-        defaultPBRMaterial->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
-        defaultPBRMaterial->set("u_Mat_Metalness", 0.0f);
-        defaultPBRMaterial->set("u_Mat_Roughness", 1.0f);
-        defaultPBRMaterial->set("u_Mat_Emission", 0.0f);
-        defaultPBRMaterial->setTexture("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
-        defaultPBRMaterial->setTexture("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
-        defaultPBRMaterial->setTexture("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
-        defaultPBRMaterial->setTexture("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
-        defaultPBRMaterial->set("u_Mat_UseNormals", false);
     }
 
     void Renderer::shutdown() {
         delete rendererData;
         delete whiteTexture;
-        delete defaultPBRMaterial;
     }
 
     void Renderer::beginRenderPass(RenderPass& renderPass) {
@@ -150,7 +137,17 @@ namespace CgEngine {
         return *whiteTexture;
     }
 
-    Material &Renderer::getDefaultPBRMaterial() {
-        return *defaultPBRMaterial;
+    Material* Renderer::getDefaultPBRMaterial() {
+        auto* defaultPBRMaterial = new Material("defaultPBRMaterial");
+        defaultPBRMaterial->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
+        defaultPBRMaterial->set("u_Mat_Metalness", 0.0f);
+        defaultPBRMaterial->set("u_Mat_Roughness", 1.0f);
+        defaultPBRMaterial->set("u_Mat_Emission", 0.0f);
+        defaultPBRMaterial->setTexture("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
+        defaultPBRMaterial->setTexture("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
+        defaultPBRMaterial->setTexture("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
+        defaultPBRMaterial->setTexture("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
+        defaultPBRMaterial->set("u_Mat_UseNormals", false);
+        return defaultPBRMaterial;
     }
 }

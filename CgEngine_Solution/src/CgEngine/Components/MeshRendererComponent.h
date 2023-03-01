@@ -7,6 +7,7 @@
 namespace CgEngine {
 
     struct MeshRendererComponentParams {
+        std::string assetFile;
         std::string mesh;
         std::string material;
         std::vector<uint32_t> submeshIndices;

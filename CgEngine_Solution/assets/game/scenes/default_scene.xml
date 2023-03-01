@@ -20,19 +20,25 @@
     <Entity>
         <Components>
             <TransformComponent position="0 4 0" rotation="0 0 0" scale="1 1 1" />
-            <PointLightComponent color="#ff0000" intensity="1" falloff="1" radius="6" />
+            <PointLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" />
         </Components>
     </Entity>
     <Entity>
         <Components>
-            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" inner-angle="30" outer-angle="90" />
+            <TransformComponent position="0 16 -2" rotation="45 0 0" scale="1 1 1" />
+            <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="15" inner-angle="60" outer-angle="120" />
         </Components>
     </Entity>
     <Entity>
         <Components>
             <TransformComponent position="4 0 0" rotation="180 0 0" scale="1 1 1" />
             <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" inner-angle="30" outer-angle="40" />
+        </Components>
+    </Entity>
+    <Entity id="model">
+        <Components>
+            <TransformComponent position="0 3.15 0" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent asset-file="table.fbx" submesh-indices="0,1,2" />
         </Components>
     </Entity>
     <Entity id="floor">

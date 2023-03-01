@@ -38,6 +38,8 @@ namespace CgEngine {
         GLenum type = internalFormat == GL_RGBA16F ? GL_FLOAT : GL_UNSIGNED_BYTE;
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, internalFormat, type, data);
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        loaded = true;
     }
 
     Texture2D::Texture2D(const std::string &path, bool srgb) {
@@ -53,7 +55,11 @@ namespace CgEngine {
             format = TextureFormat::RGBA;
         }
 
-        CG_ASSERT(data, "Could not read Image! : " + path);
+        if (data) {
+            loaded = true;
+        } else {
+            return;
+        }
 
         width = loadWidth;
         height = loadHeight;
@@ -117,6 +123,10 @@ namespace CgEngine {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
+    bool Texture2D::isLoaded() const {
+        return loaded;
+    }
+
     TextureCube::TextureCube(TextureFormat format, uint32_t width, uint32_t height) : format(format), width(width), height(height) {
         glGenTextures(1, &id);
         glBindTexture(GL_TEXTURE_CUBE_MAP, id);
@@ -172,5 +182,9 @@ namespace CgEngine {
     void TextureCube::bind(uint32_t slot) {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+    }
+
+    bool TextureCube::isLoaded() const {
+        return loaded;
     }
 }

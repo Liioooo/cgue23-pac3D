@@ -84,6 +84,7 @@ namespace CgEngine {
             const Material* material;
             glm::mat4 transform;
             uint32_t baseIndex;
+            uint32_t baseVertex;
             uint32_t indexCount;
         };
         std::vector<DrawCommand> drawCommandQueue{};

@@ -22,6 +22,7 @@ namespace CgEngine {
 
         static glm::vec3 stringTupleToVec3(const std::string& s);
         static glm::vec3 hexStringToColor(const std::string& s);
+        static std::vector<uint32_t> getListFromString(const std::string& s);
 
     };
 

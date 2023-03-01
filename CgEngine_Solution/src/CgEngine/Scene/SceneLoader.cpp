@@ -62,8 +62,10 @@ namespace CgEngine {
 
     void SceneLoader::createMeshRendererComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         MeshRendererComponentParams params{
+            node.attribute("asset-file").as_string(),
             node.attribute("mesh").as_string(),
-            node.attribute("material").as_string()
+            node.attribute("material").as_string(),
+            getListFromString(node.attribute("submesh-indices").as_string())
         };
         scene->attachComponent<MeshRendererComponent>(entity, params);
     }
@@ -136,5 +138,17 @@ namespace CgEngine {
         float g = ((color >> 8) & 0xFF) / 255.0f;
         float b = (color & 0xFF) / 255.0f;
         return {r, g, b};
+    }
+
+    std::vector<uint32_t> SceneLoader::getListFromString(const std::string &s) {
+        std::vector<uint32_t> result{};
+        std::stringstream ss(s);
+        std::string item;
+
+        while (std::getline(ss, item, ',')) {
+            result.emplace_back(std::stoi(item));
+        }
+
+        return result;
     }
 }

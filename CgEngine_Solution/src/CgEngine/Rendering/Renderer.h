@@ -19,7 +19,7 @@ namespace CgEngine {
         static void renderFullScreenQuad(Material& material);
 
         static Texture2D& getWhiteTexture();
-        static Material& getDefaultPBRMaterial();
+        static Material* getDefaultPBRMaterial();
 
     private:
         static RenderPass* currentRenderPass;
@@ -31,7 +31,6 @@ namespace CgEngine {
         static bool depthWrite;
 
         static Texture2D* whiteTexture;
-        static Material* defaultPBRMaterial;
     };
 
 }

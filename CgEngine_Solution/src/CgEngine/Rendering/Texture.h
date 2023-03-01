@@ -29,6 +29,7 @@ namespace CgEngine {
         virtual TextureFormat getFormat() const = 0;
         virtual uint32_t getRendererId() const = 0;
         virtual void bind(uint32_t slot) = 0;
+        virtual bool isLoaded() const = 0;
     };
 
     class Texture2D : public Texture {
@@ -45,12 +46,14 @@ namespace CgEngine {
         TextureFormat getFormat() const override;
         uint32_t getRendererId() const override;
         void bind(uint32_t slot) override;
+        bool isLoaded() const override;
 
     private:
         uint32_t id;
         uint32_t width;
         uint32_t height;
         TextureFormat format;
+        bool loaded = false;
     };
 
     class TextureCube : public Texture {
@@ -64,12 +67,14 @@ namespace CgEngine {
         TextureFormat getFormat() const override;
         uint32_t getRendererId() const override;
         void bind(uint32_t slot) override;
+        bool isLoaded() const override;
 
     private:
         uint32_t id;
         uint32_t width;
         uint32_t height;
         TextureFormat format;
+        bool loaded = false;
     };
 
 }
