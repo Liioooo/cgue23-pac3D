@@ -136,8 +136,11 @@ namespace CgEngine {
         return vsync;
     }
 
-    void Window::onUpdate() {
+    void Window::pollEvents() {
         glfwPollEvents();
+    }
+
+    void Window::swapBuffers() {
         glfwSwapBuffers(window);
     }
 

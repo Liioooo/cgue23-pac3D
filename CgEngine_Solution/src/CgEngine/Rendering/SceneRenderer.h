@@ -18,7 +18,7 @@ namespace CgEngine {
 
         void setActiveScene(Scene* scene);
         void setViewportSize(uint32_t width, uint32_t height);
-        void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment);
+        void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment, const SceneEnvironment& sceneEnvironment);
         void endScene();
         void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, const glm::mat4& transform);
 
@@ -31,9 +31,12 @@ namespace CgEngine {
 
         RenderPass* geometryRenderPass;
         RenderPass* screenRenderPass;
+        RenderPass* skyboxRenderPass;
         Material* screenMaterial;
+        Material* skyboxMaterial;
 
         void geometryPass();
+        void skyboxPass();
         void screenPass();
         void clearPass(RenderPass& renderPass);
 
@@ -88,6 +91,13 @@ namespace CgEngine {
             uint32_t indexCount;
         };
         std::vector<DrawCommand> drawCommandQueue{};
+
+        struct CurrentSceneEnvironment {
+            uint32_t prefilterMapId;
+            uint32_t irradianceMapId;
+            float environmentIntensity;
+        } currentSceneEnvironment;
+
     };
 
 }

@@ -13,6 +13,12 @@
     </Entity>
     <Entity>
         <Components>
+            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+            <SkyboxComponent hdri-path="rooitou_park_4k.hdr" lod="1" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
             <TransformComponent position="0 0 0" rotation="45 0 45" scale="1 1 1" />
             <DirectionalLightComponent color="#ffffff" intensity="0.2" />
         </Components>

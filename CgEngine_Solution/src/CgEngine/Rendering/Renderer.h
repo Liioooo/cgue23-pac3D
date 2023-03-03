@@ -7,7 +7,8 @@
 namespace CgEngine {
 
     struct RendererData {
-        VertexArrayObject* quadVAO;
+        std::unique_ptr<VertexArrayObject> quadVAO;
+        std::unique_ptr<VertexArrayObject> unitCubeVAO;
     };
 
     class Renderer {
@@ -17,13 +18,17 @@ namespace CgEngine {
         static void beginRenderPass(RenderPass& renderPass);
         static void endRenderPass();
         static void renderFullScreenQuad(Material& material);
+        static void renderUnitCube(Material& material);
 
         static Texture2D& getWhiteTexture();
+        static Texture2D& getBrdfLUTTexture();
+        static TextureCube& getBlackCubeTexture();
         static Material* getDefaultPBRMaterial();
+        static std::pair<TextureCube*, TextureCube*> createEnvironmentMap(const std::string& hdriPath);
 
     private:
         static RenderPass* currentRenderPass;
-        static RendererData* rendererData;
+        static RendererData rendererData;
         static bool isWireframe;
         static bool isBackfaceCulling;
         static DepthCompareOperator depthCompareOperator;
@@ -31,6 +36,8 @@ namespace CgEngine {
         static bool depthWrite;
 
         static Texture2D* whiteTexture;
+        static Texture2D* brdfLUT;
+        static TextureCube* blackCubeTexture;
     };
 
 }

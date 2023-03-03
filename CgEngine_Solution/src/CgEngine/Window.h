@@ -22,7 +22,8 @@ namespace CgEngine {
 
         void setVsync(bool enabled);
         inline bool isVsync();
-        void onUpdate();
+        void pollEvents();
+        void swapBuffers();
         uint32_t getWidth();
         uint32_t getHeight();
         GLFWwindow& getWindowHandle();

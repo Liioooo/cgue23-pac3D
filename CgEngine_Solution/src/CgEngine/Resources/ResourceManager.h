@@ -36,8 +36,10 @@ namespace CgEngine {
             registerResourceType<XMLFile>();
             registerResourceType<MeshVertices>();
             registerResourceType<Shader>();
+            registerResourceType<ComputeShader>();
             registerResourceType<Material>();
             registerResourceType<Texture2D>();
+            registerResourceType<TextureCube>();
         }
 
         template<typename R>

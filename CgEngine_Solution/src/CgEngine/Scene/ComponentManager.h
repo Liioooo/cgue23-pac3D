@@ -8,6 +8,7 @@
 #include "Components/DirectionalLightComponent.h"
 #include "Components/PointLightComponent.h"
 #include <Components/SpotLightComponent.h>
+#include <Components/SkyboxComponent.h>
 #include "ComponentArray.h"
 
 namespace CgEngine {
@@ -22,6 +23,7 @@ namespace CgEngine {
             registerComponentType<DirectionalLightComponent>();
             registerComponentType<PointLightComponent>();
             registerComponentType<SpotLightComponent>();
+            registerComponentType<SkyboxComponent>();
         }
 
         template<typename C>

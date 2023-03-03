@@ -49,6 +49,8 @@ namespace CgEngine {
             createPointLightComponent(scene, entity, node);
         } else if (name == "SpotLightComponent") {
             createSpotLightComponent(scene, entity, node);
+        } else if (name == "SkyboxComponent") {
+            createSkyboxComponent(scene, entity, node);
         }
     }
 
@@ -118,6 +120,15 @@ namespace CgEngine {
                 glm::radians(node.attribute("outer-angle").as_float(35.0f)),
         };
         scene->attachComponent<SpotLightComponent>(entity, params);
+    }
+
+    void SceneLoader::createSkyboxComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
+        SkyboxComponentParams params{
+            node.attribute("hdri-path").as_string(),
+            node.attribute("intensity").as_float(1.0f),
+            node.attribute("lod").as_float(1.0f)
+        };
+        scene->attachComponent<SkyboxComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {

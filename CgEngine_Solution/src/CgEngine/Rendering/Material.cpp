@@ -1,12 +1,13 @@
 #include "Material.h"
 #include "Renderer.h"
 #include "GlobalObjectManager.h"
+#include "FileSystem.h"
 
 namespace CgEngine {
     Material *Material::createResource(const std::string &name) {
         auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
 
-        const pugi::xml_document& materialsXML = resourceManager.getResource<XMLFile>("game/materials.xml")->getXMLDocument();
+        const pugi::xml_document& materialsXML = resourceManager.getResource<XMLFile>(FileSystem::getAsGamePath("materials.xml"))->getXMLDocument();
         const auto& materials = materialsXML.child("Materials");
         const auto& materialNode = materials.find_child_by_attribute("Material", "name", name.c_str());
         std::string albedo = materialNode.child("Albedo").child_value();
@@ -49,29 +50,31 @@ namespace CgEngine {
         if (albedoTexture.empty()) {
             material->setTexture("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
         } else {
-            if (resourceManager.hasResource<Texture2D>(albedoTexture)) {
-                material->setTexture("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(albedoTexture), 0);
+            std::string albedoTexturePath = FileSystem::getAsGamePath(albedoTexture);
+
+            if (resourceManager.hasResource<Texture2D>(albedoTexturePath)) {
+                material->setTexture("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(albedoTexturePath), 0);
             } else {
-                auto* texture = new Texture2D("assets/" + albedoTexture, albedoTextureSRGB);
-                resourceManager.insertResource(albedoTexture, texture);
+                auto* texture = new Texture2D(albedoTexturePath, albedoTextureSRGB);
+                resourceManager.insertResource(albedoTexturePath, texture);
                 material->setTexture("u_Mat_AlbedoTexture", *texture, 0);
             }
         }
         if (metalnessTexture.empty()) {
             material->setTexture("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
         } else {
-            material->setTexture("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(metalnessTexture), 2);
+            material->setTexture("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(metalnessTexture)), 2);
         }
         if (roughnessTexture.empty()) {
             material->setTexture("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
         } else {
-            material->setTexture("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(roughnessTexture), 3);
+            material->setTexture("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(roughnessTexture)), 3);
         }
         if (normalTexture.empty()) {
             material->setTexture("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
             material->set("u_Mat_UseNormals", false);
         } else {
-            material->setTexture("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(normalTexture), 1);
+            material->setTexture("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(normalTexture)), 1);
             material->set("u_Mat_UseNormals", useNormals);
         }
 

@@ -22,6 +22,19 @@ namespace CgEngine {
             geometryRenderPass = new RenderPass(geoRenderPassSpec);
         }
         {
+            RenderPassSpecification skyboxRenderPassSpec;
+            skyboxRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("skybox");
+            skyboxRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
+            skyboxRenderPassSpec.depthCompareOperator = DepthCompareOperator::LessOrEqual;
+            skyboxRenderPassSpec.clearColorBuffer = false;
+            skyboxRenderPassSpec.clearDepthBuffer = false;
+            skyboxRenderPassSpec.clearStencilBuffer = false;
+
+            skyboxRenderPass = new RenderPass(skyboxRenderPassSpec);
+
+            skyboxMaterial = new Material("skyboxMaterial");
+        }
+        {
             FramebufferSpecification screenFramebufferSpec;
             screenFramebufferSpec.height = viewportHeight;
             screenFramebufferSpec.width = viewportHeight;
@@ -50,7 +63,9 @@ namespace CgEngine {
     SceneRenderer::~SceneRenderer() {
         delete geometryRenderPass;
         delete screenRenderPass;
+        delete skyboxRenderPass;
         delete screenMaterial;
+        delete skyboxMaterial;
 
         delete ubCameraData;
         delete ubLightData;
@@ -69,7 +84,7 @@ namespace CgEngine {
         }
     }
 
-    void SceneRenderer::beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment) {
+    void SceneRenderer::beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment, const SceneEnvironment& sceneEnvironment) {
         CG_ASSERT(!activeRendering, "Already Rendering Scene!")
         CG_ASSERT(activeScene, "No active Scene!")
 
@@ -121,12 +136,21 @@ namespace CgEngine {
         }
 
         ubLightData->setData(lightData);
+
+        skyboxMaterial->setTextureCube("u_Texture", sceneEnvironment.prefilterMap->getRendererId(), 0);
+        skyboxMaterial->set("u_Intensity", sceneEnvironment.environmentIntensity);
+        skyboxMaterial->set("u_Lod", sceneEnvironment.environmentLod);
+
+        currentSceneEnvironment.environmentIntensity = sceneEnvironment.environmentIntensity;
+        currentSceneEnvironment.irradianceMapId = sceneEnvironment.irradianceMap->getRendererId();
+        currentSceneEnvironment.prefilterMapId = sceneEnvironment.prefilterMap->getRendererId();
     }
 
     void SceneRenderer::endScene() {
         CG_ASSERT(activeRendering, "Not actively rendering!")
 
         geometryPass();
+        skyboxPass();
         screenPass();
 
         activeRendering = false;
@@ -156,11 +180,23 @@ namespace CgEngine {
         for (const auto &command: drawCommandQueue) {
             command.material->uploadToShader(*geometryRenderPass->getSpecification().shader);
             geometryRenderPass->getSpecification().shader->setMat4("u_model", command.transform);
+
+            geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.irradianceMapId, 4);
+            geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 5);
+            geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 6);
+            geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
+
             command.vao->bind();
             glDrawElementsBaseVertex(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (void*)(command.baseIndex * sizeof(uint32_t)), command.baseVertex);
         }
         drawCommandQueue.clear();
 
+        Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::skyboxPass() {
+        Renderer::beginRenderPass(*skyboxRenderPass);
+        Renderer::renderUnitCube(*skyboxMaterial);
         Renderer::endRenderPass();
     }
 

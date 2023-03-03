@@ -4,7 +4,7 @@
 
 namespace CgEngine {
     std::string FileSystem::readFileToString(const std::string &path) {
-        std::ifstream file("assets/" + path);
+        std::ifstream file(path);
 
         if (file.is_open()) {
             std::stringstream stringStream;
@@ -19,11 +19,27 @@ namespace CgEngine {
     }
 
     bool FileSystem::checkFileExists(const std::string &path) {
-        std::ifstream file("assets/" + path);
+        std::ifstream file(path);
         if (file.is_open()) {
             file.close();
             return true;
         }
         return false;
+    }
+
+    std::string FileSystem::getAsGamePath(const std::string &path) {
+        if (path.rfind("assets/game/", 0) == 0) {
+            return path;
+        }
+
+        return "assets/game/" + path;
+    }
+
+    std::string FileSystem::getAsEnginePath(const std::string &path) {
+        if (path.rfind("assets/engine/", 0) == 0) {
+            return path;
+        }
+
+        return "assets/engine/" + path;
     }
 }

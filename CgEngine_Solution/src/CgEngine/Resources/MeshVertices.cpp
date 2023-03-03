@@ -3,6 +3,7 @@
 #include "Rendering/Renderer.h"
 #include "Asserts.h"
 #include <filesystem>
+#include "FileSystem.h"
 #include <GlobalObjectManager.h>
 
 namespace CgEngine {
@@ -153,7 +154,7 @@ namespace CgEngine {
     MeshVertices *MeshVertices::loadMeshAsset(const std::string &path) {
         auto importer = Assimp::Importer();
 
-        std::string modelPath = "assets/" + path;
+        std::string modelPath = FileSystem::getAsGamePath(path);
 
         const aiScene *scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_SortByPType |
                                                             aiProcess_GenNormals  | aiProcess_FlipUVs |

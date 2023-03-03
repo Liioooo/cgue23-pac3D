@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "ComponentManager.h"
 #include "TimeStep.h"
+#include "Rendering/Texture.h"
 
 namespace CgEngine {
 
@@ -34,6 +35,13 @@ namespace CgEngine {
         bool dirLightCastShadows;
         std::vector<ScenePointLight> pointLights;
         std::vector<SceneSpotLight> spotLights;
+    };
+
+    struct SceneEnvironment {
+        const TextureCube* irradianceMap;
+        const TextureCube* prefilterMap;
+        float environmentLod;
+        float environmentIntensity;
     };
 
     class Scene {

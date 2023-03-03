@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Asserts.h"
 #include "Rendering/SceneRenderer.h"
+#include "Rendering/Renderer.h"
 
 namespace CgEngine {
     Scene::Scene(int viewportWidth, int viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {}
@@ -174,8 +175,23 @@ namespace CgEngine {
             lightEnvironment.spotLights.push_back(spotLight);
         }
 
+        SceneEnvironment sceneEnvironment{};
+
+        auto skyboxComponentIt = componentManager->cbegin<SkyboxComponent>();
+        if (skyboxComponentIt != componentManager->cend<SkyboxComponent>()) {
+            sceneEnvironment.irradianceMap = skyboxComponentIt->getIrradianceMap();
+            sceneEnvironment.prefilterMap = skyboxComponentIt->getPrefilterMap();
+            sceneEnvironment.environmentIntensity = skyboxComponentIt->getIntensity();
+            sceneEnvironment.environmentLod = skyboxComponentIt->getLod();
+        } else {
+            sceneEnvironment.irradianceMap = &Renderer::getBlackCubeTexture();
+            sceneEnvironment.prefilterMap = &Renderer::getBlackCubeTexture();
+            sceneEnvironment.environmentIntensity = 0.0f;
+            sceneEnvironment.environmentLod = 1.0f;
+        }
+
         renderer.setActiveScene(this);
-        renderer.beginScene(cameraComponent->getCamera(), cameraTransform.getModelMatrix(), lightEnvironment);
+        renderer.beginScene(cameraComponent->getCamera(), cameraTransform.getModelMatrix(), lightEnvironment, sceneEnvironment);
 
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
             renderer.submitMesh(it->getMeshVertices(), it->getSubmeshIndices(), it->getMaterial(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());

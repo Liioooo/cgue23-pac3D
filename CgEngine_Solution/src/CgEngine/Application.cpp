@@ -1,6 +1,7 @@
 #include <Rendering/Renderer.h>
 #include "Application.h"
 #include "Logging.h"
+#include "FileSystem.h"
 
 namespace CgEngine {
     Application* Application::instance = nullptr;
@@ -37,17 +38,19 @@ namespace CgEngine {
 
         sceneManager = &GlobalObjectManager::getInstance().getSceneManager();
         sceneManager->setViewportSize(window->getWidth(), window->getHeight());
-        sceneManager->setActiveScene(iniReader->Get("game", "startScene", "game/scenes/default_scene.xml"));
+        sceneManager->setActiveScene(FileSystem::getAsGamePath(iniReader->Get("game", "startScene", "default_scene.xml")));
         sceneRenderer = new SceneRenderer(window->getWidth(), window->getHeight());
     }
 
     void Application::run() {
         while (isRunning) {
-            window->onUpdate();
+            window->pollEvents();
 
             Scene& activeScene = *sceneManager->getActiveScene();
             activeScene.onUpdate(timeStep);
             activeScene.onRender(*sceneRenderer);
+
+            window->swapBuffers();
 
             float time = getTime();
             timeStep = time - lastFrameTime;
