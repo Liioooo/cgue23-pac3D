@@ -8,7 +8,7 @@ namespace CgEngine {
         falloff = params.falloff;
     }
 
-    glm::vec3 PointLightComponent::getColor() const {
+    const glm::vec3& PointLightComponent::getColor() const {
         return color;
     }
 

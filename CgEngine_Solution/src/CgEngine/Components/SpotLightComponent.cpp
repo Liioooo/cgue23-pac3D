@@ -10,7 +10,7 @@ namespace CgEngine {
         outerAngle = params.outerAngle;
     }
 
-    glm::vec3 SpotLightComponent::getColor() const {
+    const glm::vec3& SpotLightComponent::getColor() const {
         return color;
     }
 

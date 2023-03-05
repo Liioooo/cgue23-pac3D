@@ -1,9 +1,11 @@
 #include <Asserts.h>
+
+#include <utility>
 #include "Framebuffer.h"
 #include "glad/glad.h"
 
 namespace CgEngine {
-    Framebuffer::Framebuffer(FramebufferSpecification spec) : specification(spec) {
+    Framebuffer::Framebuffer(FramebufferSpecification spec) : specification(std::move(spec)) {
         resize(specification.width, specification.height, true);
     }
 

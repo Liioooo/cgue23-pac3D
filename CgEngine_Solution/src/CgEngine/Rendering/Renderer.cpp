@@ -15,6 +15,7 @@ namespace CgEngine {
     Texture2D* Renderer::whiteTexture;
     Texture2D* Renderer::brdfLUT;
     TextureCube* Renderer::blackCubeTexture;
+    ShaderStorageBuffer* Renderer::transformsBuffer;
 
     void Renderer::init() {
         rendererData = RendererData();
@@ -96,6 +97,8 @@ namespace CgEngine {
         blackCubeTexture = new TextureCube(TextureFormat::RGBA, 1, 1, &blackCubeMapTextureData, MipMapFiltering::Nearest);
 
         brdfLUT = new Texture2D(FileSystem::getAsEnginePath("ibl_brdf_lut.png"), true, MipMapFiltering::Bilinear);
+
+        transformsBuffer = new ShaderStorageBuffer(0);
     }
 
     void Renderer::shutdown() {
@@ -168,7 +171,7 @@ namespace CgEngine {
         currentRenderPass = nullptr;
     }
 
-    void Renderer::renderFullScreenQuad(Material &material) {
+    void Renderer::renderFullScreenQuad(const Material &material) {
         CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
 
         material.uploadToShader(*currentRenderPass->getSpecification().shader);
@@ -177,13 +180,20 @@ namespace CgEngine {
         glDrawElements(GL_TRIANGLES, rendererData.quadVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
     }
 
-    void Renderer::renderUnitCube(Material &material) {
+    void Renderer::renderUnitCube(const Material &material) {
         CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
 
         material.uploadToShader(*currentRenderPass->getSpecification().shader);
 
         rendererData.unitCubeVAO->bind();
         glDrawElements(GL_TRIANGLES, rendererData.unitCubeVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount) {
+        material.uploadToShader(*currentRenderPass->getSpecification().shader);
+        vao.bind();
+        transformsBuffer->setData(transforms.data(), transforms.size() * sizeof(glm::mat4));
+        glDrawElementsInstancedBaseVertex(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)(baseIndex * sizeof(uint32_t)), instanceCount, baseVertex);
     }
 
     Texture2D& Renderer::getWhiteTexture() {
@@ -204,10 +214,10 @@ namespace CgEngine {
         defaultPBRMaterial->set("u_Mat_Metalness", 0.0f);
         defaultPBRMaterial->set("u_Mat_Roughness", 1.0f);
         defaultPBRMaterial->set("u_Mat_Emission", 0.0f);
-        defaultPBRMaterial->setTexture("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
-        defaultPBRMaterial->setTexture("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
-        defaultPBRMaterial->setTexture("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
-        defaultPBRMaterial->setTexture("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
+        defaultPBRMaterial->setTexture2D("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
+        defaultPBRMaterial->setTexture2D("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
+        defaultPBRMaterial->setTexture2D("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
+        defaultPBRMaterial->setTexture2D("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
         defaultPBRMaterial->set("u_Mat_UseNormals", false);
         return defaultPBRMaterial;
     }
@@ -222,6 +232,10 @@ namespace CgEngine {
         }
         if (resourceManager.hasResource<TextureCube>(hdriPath + "-prefilter")) {
             prefilterMap = resourceManager.getResource<TextureCube>(hdriPath + "-prefilter");
+        }
+
+        if (irradianceMap != nullptr && prefilterMap != nullptr) {
+            return {irradianceMap, prefilterMap};
         }
 
         const uint32_t MAP_SIZE = 1024;
@@ -268,6 +282,9 @@ namespace CgEngine {
             prefilterMapShader.dispatch(numGroups, numGroups, 6);
             prefilterMapShader.waitForMemoryBarrier();
         }
+
+        resourceManager.insertResource(hdriPath + "-irradiance", irradianceMap);
+        resourceManager.insertResource(hdriPath + "-prefilter", prefilterMap);
 
         return {irradianceMap, prefilterMap};
     }

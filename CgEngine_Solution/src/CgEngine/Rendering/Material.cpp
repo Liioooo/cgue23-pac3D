@@ -48,43 +48,47 @@ namespace CgEngine {
             material->set("u_Mat_Emission", std::stof(emission));
         }
         if (albedoTexture.empty()) {
-            material->setTexture("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
+            material->setTexture2D("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
         } else {
             std::string albedoTexturePath = FileSystem::getAsGamePath(albedoTexture);
 
             if (resourceManager.hasResource<Texture2D>(albedoTexturePath)) {
-                material->setTexture("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(albedoTexturePath), 0);
+                material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(albedoTexturePath), 0);
             } else {
                 auto* texture = new Texture2D(albedoTexturePath, albedoTextureSRGB);
                 resourceManager.insertResource(albedoTexturePath, texture);
-                material->setTexture("u_Mat_AlbedoTexture", *texture, 0);
+                material->setTexture2D("u_Mat_AlbedoTexture", *texture, 0);
             }
         }
         if (metalnessTexture.empty()) {
-            material->setTexture("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
+            material->setTexture2D("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
         } else {
-            material->setTexture("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(metalnessTexture)), 2);
+            material->setTexture2D("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(metalnessTexture)), 2);
         }
         if (roughnessTexture.empty()) {
-            material->setTexture("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
+            material->setTexture2D("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
         } else {
-            material->setTexture("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(roughnessTexture)), 3);
+            material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(roughnessTexture)), 3);
         }
         if (normalTexture.empty()) {
-            material->setTexture("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
+            material->setTexture2D("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
             material->set("u_Mat_UseNormals", false);
         } else {
-            material->setTexture("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(normalTexture)), 1);
+            material->setTexture2D("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(normalTexture)), 1);
             material->set("u_Mat_UseNormals", useNormals);
         }
 
         return material;
     }
 
-    Material::Material(std::string name) : materialName(std::move(name)) {}
+    Material::Material(std::string name) : materialName(std::move(name)), uuid(Uuid()) {}
 
     const std::string &Material::getName() const {
         return materialName;
+    }
+
+    const Uuid &Material::getUuid() const {
+        return uuid;
     }
 
     void Material::set(const std::string& name, bool value) {
@@ -119,18 +123,17 @@ namespace CgEngine {
         mat4Values[name] = value;
     }
 
-    void Material::setTexture(const std::string &name, Texture &texture, uint32_t textureSlot) {
-        if (typeid(Texture2D) == typeid(texture)) {
-            tex2DValues[name] = {texture.getRendererId(), textureSlot};
-            return;
-        }
-        if (typeid(TextureCube) == typeid(texture)) {
-            texCubeValues[name] = {texture.getRendererId(), textureSlot};
-        }
+    void Material::setTexture2D(const std::string &name, const Texture2D& texture, uint32_t textureSlot) {
+        tex2DValues[name] = {texture.getRendererId(), textureSlot};
+        return;
     }
 
     void Material::setTexture2D(const std::string &name, uint32_t textureRenderId, uint32_t textureSlot) {
         tex2DValues[name] = {textureRenderId, textureSlot};
+    }
+
+    void Material::setTextureCube(const std::string &name, const TextureCube& texture, uint32_t textureSlot) {
+        texCubeValues[name] = {texture.getRendererId(), textureSlot};
     }
 
     void Material::setTextureCube(const std::string &name, uint32_t textureRenderId, uint32_t textureSlot) {

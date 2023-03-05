@@ -153,6 +153,8 @@ namespace CgEngine {
         skyboxPass();
         screenPass();
 
+        meshTransforms.clear();
+
         activeRendering = false;
     }
 
@@ -162,32 +164,34 @@ namespace CgEngine {
         for (const auto &index: submeshIndices) {
             const Submesh& submesh = submeshes.at(index);
 
-            DrawCommand drawCommand{};
+            const Material* material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
+
+            MeshKey mk = {mesh.getVAO()->getRendererId(), index, material->getUuid().getUuid()};
+
+            meshTransforms[mk].emplace_back(transform * submesh.transform);
+
+            DrawCommand& drawCommand = drawCommandQueue[mk];
             drawCommand.vao = mesh.getVAO();
-            drawCommand.material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
-            drawCommand.transform = transform * submesh.transform;
+            drawCommand.material = material;
             drawCommand.baseIndex = submesh.baseIndex;
             drawCommand.baseVertex = submesh.baseVertex;
             drawCommand.indexCount = submesh.indexCount;
-
-            drawCommandQueue.push_back(drawCommand);
+            drawCommand.instanceCount++;
         }
     }
 
     void SceneRenderer::geometryPass() {
         Renderer::beginRenderPass(*geometryRenderPass);
 
-        for (const auto &command: drawCommandQueue) {
-            command.material->uploadToShader(*geometryRenderPass->getSpecification().shader);
-            geometryRenderPass->getSpecification().shader->setMat4("u_model", command.transform);
+        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.irradianceMapId, 4);
+        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 5);
+        geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 6);
+        geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
 
-            geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.irradianceMapId, 4);
-            geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 5);
-            geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 6);
-            geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
+        for (const auto [mk, command]: drawCommandQueue) {
+            const auto& transforms = meshTransforms[mk];
+            Renderer::executeDrawCommand(*command.vao, *command.material, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
 
-            command.vao->bind();
-            glDrawElementsBaseVertex(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (void*)(command.baseIndex * sizeof(uint32_t)), command.baseVertex);
         }
         drawCommandQueue.clear();
 

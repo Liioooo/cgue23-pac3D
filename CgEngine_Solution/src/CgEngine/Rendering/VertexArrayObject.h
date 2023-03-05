@@ -18,6 +18,7 @@ namespace CgEngine {
 
         std::vector<std::shared_ptr<VertexBuffer>>& getVertexBuffers();
         size_t getIndexCount() const;
+        uint32_t getRendererId() const;
 
     private:
         uint32_t vao{};

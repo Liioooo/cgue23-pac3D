@@ -58,33 +58,21 @@ namespace CgEngine {
         }
     }
 
-    class Texture {
-    public:
-        virtual ~Texture() = default;
-
-        virtual uint32_t getWidth() const = 0;
-        virtual uint32_t getHeight() const = 0;
-        virtual TextureFormat getFormat() const = 0;
-        virtual uint32_t getRendererId() const = 0;
-        virtual void bind(uint32_t slot) = 0;
-        virtual void generateMipMaps() = 0;
-    };
-
-    class Texture2D : public Texture {
+    class Texture2D {
     public:
         static Texture2D* createResource(const std::string& name);
 
         Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
         Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, const void* data, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
         Texture2D(const std::string& path, bool srgb, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
-        ~Texture2D() override;
+        ~Texture2D();
 
-        uint32_t getWidth() const override;
-        uint32_t getHeight() const override;
-        TextureFormat getFormat() const override;
-        uint32_t getRendererId() const override;
-        void bind(uint32_t slot) override;
-        void generateMipMaps() override;
+        uint32_t getWidth() const;
+        uint32_t getHeight() const;
+        TextureFormat getFormat() const;
+        uint32_t getRendererId() const;
+        void bind(uint32_t slot);
+        void generateMipMaps();
         bool isLoaded() const;
 
     private:
@@ -95,20 +83,20 @@ namespace CgEngine {
         bool loaded = false;
     };
 
-    class TextureCube : public Texture {
+    class TextureCube {
     public:
         static TextureCube* createResource(const std::string& name);
 
         TextureCube(TextureFormat format, uint32_t width, uint32_t height, MipMapFiltering mipMapFiltering = MipMapFiltering::Bilinear);
         TextureCube(TextureFormat format, uint32_t width, uint32_t height, const void* data, MipMapFiltering mipMapFiltering = MipMapFiltering::Bilinear);
-        ~TextureCube() override;
+        ~TextureCube();
 
-        uint32_t getWidth() const override;
-        uint32_t getHeight() const override;
-        TextureFormat getFormat() const override;
-        uint32_t getRendererId() const override;
-        void bind(uint32_t slot) override;
-        void generateMipMaps() override;
+        uint32_t getWidth() const;
+        uint32_t getHeight() const;
+        TextureFormat getFormat() const;
+        uint32_t getRendererId() const;
+        void bind(uint32_t slot);
+        void generateMipMaps();
 
     private:
         uint32_t id;

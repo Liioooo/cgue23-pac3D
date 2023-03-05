@@ -51,7 +51,7 @@ namespace CgEngine {
 
         void bind() const;
         void unbind() const;
-        void setData(void* data, uint32_t size);
+        void setData(const void* data, uint32_t size);
         void setLayout(std::initializer_list<VertexBufferElement> bufferElements);
 
         const std::vector<VertexBufferElement>& getLayout() const;

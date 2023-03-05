@@ -26,7 +26,7 @@ namespace CgEngine {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void VertexBuffer::setData(void *data, uint32_t size) {
+    void VertexBuffer::setData(const void *data, uint32_t size) {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
     }

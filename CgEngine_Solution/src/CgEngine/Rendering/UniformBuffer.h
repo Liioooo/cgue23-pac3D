@@ -21,12 +21,11 @@ namespace CgEngine {
             glDeleteBuffers(1, &bufferId);
         }
 
-        void setData(D& data) {
+        void setData(const D& data) {
             CG_ASSERT(sizeof(data) == bufferSize, "Buffer size mismatch!")
 
             glBindBuffer(GL_UNIFORM_BUFFER, bufferId);
             glBufferData(GL_UNIFORM_BUFFER, bufferSize, &data, GL_DYNAMIC_DRAW);
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
     private:

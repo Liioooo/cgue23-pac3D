@@ -92,4 +92,8 @@ namespace CgEngine {
     size_t VertexArrayObject::getIndexCount() const {
         return indexCount;
     }
+
+    uint32_t VertexArrayObject::getRendererId() const {
+        return vao;
+    }
 }

@@ -82,15 +82,32 @@ namespace CgEngine {
         };
         UniformBuffer<UBLightData>* ubLightData;
 
+        struct MeshKey {
+            const uint32_t voaId;
+            const uint32_t submeshIndex;
+            const uint32_t materialUuid;
+
+            bool operator<(const MeshKey& other) const {
+                if (voaId < other.voaId) return true;
+                if (voaId > other.voaId) return false;
+                if (submeshIndex < other.submeshIndex) return true;
+                if (submeshIndex > other.submeshIndex) return false;
+                return materialUuid < other.materialUuid;
+            }
+        };
+
         struct DrawCommand {
             VertexArrayObject* vao;
             const Material* material;
-            glm::mat4 transform;
             uint32_t baseIndex;
             uint32_t baseVertex;
             uint32_t indexCount;
+            uint32_t instanceCount;
         };
-        std::vector<DrawCommand> drawCommandQueue{};
+
+        std::map<MeshKey, DrawCommand> drawCommandQueue{};
+
+        std::map<MeshKey, std::vector<glm::mat4>> meshTransforms;
 
         struct CurrentSceneEnvironment {
             uint32_t prefilterMapId;

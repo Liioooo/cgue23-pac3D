@@ -243,12 +243,12 @@ namespace CgEngine {
                 if (hasAlbedoTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiAlbedoTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(path), 0);
+                        material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(path), 0);
                         material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
                     } else {
                         auto *texture = new Texture2D(texturePath, true);
                         if (texture->isLoaded()) {
-                            material->setTexture("u_Mat_AlbedoTexture", *texture, 0);
+                            material->setTexture2D("u_Mat_AlbedoTexture", *texture, 0);
                             material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
                             resourceManager.insertResource<Texture2D>(texturePath, texture);
                         } else {
@@ -258,7 +258,7 @@ namespace CgEngine {
                     }
                 }
                 if (useAlbedoColor) {
-                    material->setTexture("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
+                    material->setTexture2D("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
                     material->set("u_Mat_AlbedoColor", {aiAlbedo.r, aiAlbedo.g, aiAlbedo.b});
                 }
 
@@ -275,13 +275,13 @@ namespace CgEngine {
                 if (hasRoughnessTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiRoughnessTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(path),
+                        material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(path),
                                              3);
                         material->set("u_Mat_Roughness", 1.0f);
                     } else {
                         auto *texture = new Texture2D(texturePath, false);
                         if (texture->isLoaded()) {
-                            material->setTexture("u_Mat_RoughnessTexture", *texture, 3);
+                            material->setTexture2D("u_Mat_RoughnessTexture", *texture, 3);
                             material->set("u_Mat_Roughness", 1.0f);
                             resourceManager.insertResource<Texture2D>(texturePath, texture);
                         } else {
@@ -291,7 +291,7 @@ namespace CgEngine {
                     }
                 }
                 if (useRoughnessValue) {
-                    material->setTexture("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
+                    material->setTexture2D("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
                     material->set("u_Mat_Roughness", roughness);
                 }
 
@@ -301,12 +301,12 @@ namespace CgEngine {
                 if (hasNormalMap) {
                     std::string texturePath = getTexturePath(modelPath, aiNormalTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(path), 1);
+                        material->setTexture2D("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(path), 1);
                         material->set("u_Mat_UseNormals", true);
                     } else {
                         auto *texture = new Texture2D(texturePath, false);
                         if (texture->isLoaded()) {
-                            material->setTexture("u_Mat_NormalTexture", *texture, 1);
+                            material->setTexture2D("u_Mat_NormalTexture", *texture, 1);
                             material->set("u_Mat_UseNormals", true);
                             resourceManager.insertResource<Texture2D>(texturePath, texture);
                         } else {
@@ -316,7 +316,7 @@ namespace CgEngine {
                     }
                 }
                 if (dontUseNormals) {
-                    material->setTexture("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
+                    material->setTexture2D("u_Mat_NormalTexture", Renderer::getWhiteTexture(), 1);
                     material->set("u_Mat_UseNormals", false);
                 }
 
@@ -326,7 +326,7 @@ namespace CgEngine {
                     metalness = 0.0f;
                 }
                 material->set("u_Mat_Metalness", metalness);
-                material->setTexture("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
+                material->setTexture2D("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
             }
         } else {
             mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());

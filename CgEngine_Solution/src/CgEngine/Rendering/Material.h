@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Uuid.h>
 #include "ShaderDataType.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -18,6 +19,7 @@ namespace CgEngine {
         explicit Material(std::string name);
 
         const std::string& getName() const;
+        const Uuid& getUuid() const;
 
         void set(const std::string& name, bool value);
         void set(const std::string& name, int value);
@@ -27,9 +29,10 @@ namespace CgEngine {
         void set(const std::string& name, glm::vec4 value);
         void set(const std::string& name, glm::mat3 value);
         void set(const std::string& name, glm::mat4 value);
-        void setTexture(const std::string& name, Texture& texture, uint32_t textureSlot);
+        void setTexture2D(const std::string& name, const Texture2D& texture, uint32_t textureSlot);
         void setTexture2D(const std::string& name, uint32_t textureRenderId, uint32_t textureSlot);
         void setTextureCube(const std::string& name, uint32_t textureRenderId, uint32_t textureSlot);
+        void setTextureCube(const std::string& name, const TextureCube& texture, uint32_t textureSlot);
 
         bool getBool(const std::string& name) const;
         int getInt(const std::string& name) const;
@@ -46,6 +49,7 @@ namespace CgEngine {
 
     private:
         std::string materialName;
+        Uuid uuid;
 
         std::unordered_map<std::string, bool> boolValues{};
         std::unordered_map<std::string, int> intValues{};

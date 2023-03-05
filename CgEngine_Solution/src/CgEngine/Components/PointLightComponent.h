@@ -17,7 +17,7 @@ namespace CgEngine {
 
         void onAttach(Scene& scene, PointLightComponentParams& params);
 
-        glm::vec3 getColor() const;
+        const glm::vec3& getColor() const;
         void setColor(const glm::vec3& value);
         float getIntensity() const;
         void setIntensity(float value);

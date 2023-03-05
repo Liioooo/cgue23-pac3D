@@ -7,7 +7,7 @@ namespace CgEngine {
         castShadows = params.castShadows;
     }
 
-    glm::vec3 DirectionalLightComponent::getColor() const {
+    const glm::vec3& DirectionalLightComponent::getColor() const {
         return color;
     }
 

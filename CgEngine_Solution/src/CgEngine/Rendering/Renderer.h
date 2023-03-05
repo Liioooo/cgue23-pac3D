@@ -3,6 +3,7 @@
 #include "RenderPass.h"
 #include "Material.h"
 #include "VertexArrayObject.h"
+#include "ShaderStorageBuffer.h"
 
 namespace CgEngine {
 
@@ -17,8 +18,9 @@ namespace CgEngine {
         static void shutdown();
         static void beginRenderPass(RenderPass& renderPass);
         static void endRenderPass();
-        static void renderFullScreenQuad(Material& material);
-        static void renderUnitCube(Material& material);
+        static void renderFullScreenQuad(const Material& material);
+        static void renderUnitCube(const Material& material);
+        static void executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount);
 
         static Texture2D& getWhiteTexture();
         static Texture2D& getBrdfLUTTexture();
@@ -38,6 +40,8 @@ namespace CgEngine {
         static Texture2D* whiteTexture;
         static Texture2D* brdfLUT;
         static TextureCube* blackCubeTexture;
+
+        static ShaderStorageBuffer* transformsBuffer;
     };
 
 }
