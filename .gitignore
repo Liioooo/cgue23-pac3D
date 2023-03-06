@@ -1,5 +1,3 @@
 .idea
 .vs
 /bin/**
-
-CgEngine_Solution/vendor/glfw
