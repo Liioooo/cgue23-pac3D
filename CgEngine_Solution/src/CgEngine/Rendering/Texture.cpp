@@ -50,8 +50,8 @@ namespace CgEngine {
             data = (unsigned char*)(stbi_loadf(path.c_str(), &loadWidth, &loadHeight, &channels, 0));
             format = TextureFormat::Float32;
         } else {
-            data = stbi_load(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb_alpha);
-            format = TextureFormat::RGBA;
+            data = stbi_load(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb);
+            format = TextureFormat::RGB;
         }
 
         if (data) {
@@ -73,7 +73,7 @@ namespace CgEngine {
 
             GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
             GLenum type = TextureUtils::getTextureFormatType(format);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, width, height, 0, internalFormat, type, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, internalFormat, type, data);
 
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {

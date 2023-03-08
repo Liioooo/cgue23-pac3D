@@ -157,7 +157,7 @@ namespace CgEngine {
         std::string modelPath = FileSystem::getAsGamePath(path);
 
         const aiScene *scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_SortByPType |
-                                                            aiProcess_GenNormals  | aiProcess_FlipUVs |
+                                                            aiProcess_GenNormals | aiProcess_FlipUVs |
                                                             aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices);
 
         CG_ASSERT(scene && scene->HasMeshes() && scene->mRootNode,
@@ -237,8 +237,7 @@ namespace CgEngine {
                     aiAlbedo = {1.0f, 1.0f, 1.0f};
                 }
                 aiString aiAlbedoTexPath;
-                bool hasAlbedoTexture =
-                        aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiAlbedoTexPath) == AI_SUCCESS;
+                bool hasAlbedoTexture = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiAlbedoTexPath) == AI_SUCCESS;
                 bool useAlbedoColor = !hasAlbedoTexture;
                 if (hasAlbedoTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiAlbedoTexPath.C_Str());
@@ -269,14 +268,12 @@ namespace CgEngine {
                     roughness = 1.0f - glm::sqrt(shininess / 100.0f);
                 }
                 aiString aiRoughnessTexPath;
-                bool hasRoughnessTexture =
-                        aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiRoughnessTexPath) == AI_SUCCESS;
+                bool hasRoughnessTexture = aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiRoughnessTexPath) == AI_SUCCESS;
                 bool useRoughnessValue = !hasRoughnessTexture;
                 if (hasRoughnessTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiRoughnessTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(path),
-                                             3);
+                        material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(path), 3);
                         material->set("u_Mat_Roughness", 1.0f);
                     } else {
                         auto *texture = new Texture2D(texturePath, false);

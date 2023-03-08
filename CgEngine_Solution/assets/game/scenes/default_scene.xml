@@ -20,7 +20,7 @@
     <Entity>
         <Components>
             <TransformComponent position="0 0 0" rotation="45 0 45" scale="1 1 1" />
-            <DirectionalLightComponent color="#ffffff" intensity="0.2" />
+            <DirectionalLightComponent color="#ffffff" intensity="1" />
         </Components>
     </Entity>
     <Entity>
@@ -43,8 +43,14 @@
     </Entity>
     <Entity id="model">
         <Components>
-            <TransformComponent position="0 3.15 0" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent asset-file="table.fbx" submesh-indices="0,1,2" />
+            <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="0.04 0.04 0.04" />
+            <MeshRendererComponent asset-file="wood_table.fbx" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="3 3 0" rotation="0 0 0" scale="0.1 0.1 0.1" />
+<!--            <MeshRendererComponent asset-file="gohst_b.fbx" />-->
         </Components>
     </Entity>
     <Entity id="floor">

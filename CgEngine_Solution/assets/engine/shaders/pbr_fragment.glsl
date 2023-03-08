@@ -39,6 +39,7 @@ layout (binding = 1, std140) uniform LightData {
 in VS_OUT {
     vec3 WorldPosition;
     vec3 Normal;
+    mat3 TBN;
     vec2 TexCoord;
 } fs_in;
 
@@ -209,7 +210,8 @@ void main() {
 
     vec3 mat_Normal = normalize(fs_in.Normal);
     if (u_Mat_UseNormals) {
-        mat_Normal = (texture(u_Mat_NormalTexture, fs_in.TexCoord).rgb * 2.0f - 1.0f);
+        mat_Normal = normalize(texture(u_Mat_NormalTexture, fs_in.TexCoord).rgb * 2.0f - 1.0f);
+        mat_Normal = normalize(fs_in.TBN * mat_Normal);
     }
 
     vec3 V = normalize(u_CameraData.position - fs_in.WorldPosition);

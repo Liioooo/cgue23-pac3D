@@ -20,6 +20,7 @@ layout (location = 4) in vec3 a_Bitangent;
 out VS_OUT {
     vec3 WorldPosition;
     vec3 Normal;
+    mat3 TBN;
     vec2 TexCoord;
 } vs_out;
 
@@ -32,6 +33,7 @@ void main()
     vs_out.TexCoord = a_TexCoord;
     vs_out.WorldPosition = worldPosition.xyz;
     vs_out.Normal = mat3(transpose(inverse(model))) * a_Normal;
+    vs_out.TBN = mat3(model) * mat3(a_Tangent, a_Bitangent, a_Normal);
 
     gl_Position = u_CameraData.viewProjection * worldPosition;
 }
