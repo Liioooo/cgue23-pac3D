@@ -88,23 +88,5 @@
                 "CMAKE_CXX_FLAGS_INIT": "/GL /O2 /std:c++17 /W3 /sdl"
             }
         }
-    ],
-    "buildPresets": [
-        {
-            "name": "debug",
-            "configurePreset": "debug"
-        },
-        {
-            "name": "release",
-            "configurePreset": "release"
-        },
-        {
-            "name": "linux-debug",
-            "configurePreset": "linux-debug"
-        },
-        {
-            "name": "linux-release",
-            "configurePreset": "linux-release"
-        }
     ]
 }

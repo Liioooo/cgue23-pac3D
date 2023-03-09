@@ -2,8 +2,17 @@
 #include "Application.h"
 #include "Logging.h"
 #include "FileSystem.h"
+#include "PxPhysicsAPI.h"
 
 namespace CgEngine {
+
+    class PhysXError : public physx::PxErrorCallback {
+    public:
+        void reportError(physx::PxErrorCode::Enum code, const char *message, const char *file, int line) override {
+            CG_LOGGING_ERROR(message)
+        }
+    };
+
     Application* Application::instance = nullptr;
 
     Application::Application(const std::string &settingsIni) {
@@ -40,6 +49,14 @@ namespace CgEngine {
         sceneManager->setViewportSize(window->getWidth(), window->getHeight());
         sceneManager->setActiveScene(FileSystem::getAsGamePath(iniReader->Get("game", "startScene", "default_scene.xml")));
         sceneRenderer = new SceneRenderer(window->getWidth(), window->getHeight());
+
+        physx::PxDefaultAllocator gDefaultAllocatorCallback;
+        auto errorCallback = PhysXError();
+
+        auto foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, errorCallback);
+        if (!foundation) {
+            CG_LOGGING_ERROR("PhysX error")
+        }
     }
 
     void Application::run() {

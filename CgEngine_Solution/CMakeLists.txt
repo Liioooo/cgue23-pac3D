@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.23)
 
 function(find_additional_cmake_file outputVariableName filename)
     if (NOT DEFINED outputVariableName OR NOT DEFINED filename)
@@ -46,10 +46,10 @@ string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
         $<$<CONFIG:Debug>:
         MultiThreadedDebug
         >
-        $<$<OR:$<CONFIG:Release>,$<CONFIG:ReleaseExe>>:
+        $<$<CONFIG:Release>:
         MultiThreaded
         >
-        $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>,$<CONFIG:ReleaseExe>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
+        $<$<NOT:$<OR:$<CONFIG:Debug>,$<CONFIG:Release>>>:${MSVC_RUNTIME_LIBRARY_DEFAULT}>
         )
 set_target_properties(${PROJECT_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR})
 
@@ -73,9 +73,6 @@ else ()
             _DEBUG
             >
             $<$<CONFIG:Release>:
-            NDEBUG
-            >
-            $<$<CONFIG:ReleaseExe>:
             NDEBUG
             >
             )
@@ -140,6 +137,37 @@ add_subdirectory(vendor/assimp)
 list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES assimp)
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/assimp/include")
 list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/vendor/assimp/include")
+################################################################################
+
+# PHYSX ########################################################################
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/PhysX/include")
+target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysX_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXCommon_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXFoundation_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXCooking_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysX_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXCommon_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXFoundation_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXCooking_64.lib")
+
+set(PHYSX_DLLS)
+list(APPEND PHYSX_DEBUG_DLLS
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysX_64.dll"
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXCommon_64.dll"
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXFoundation_64.dll"
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXCooking_64.dll"
+        )
+set(PHYSX_RELEASE_DLLS)
+list(APPEND PHYSX_RELEASE_DLLS
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysX_64.dll"
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXCommon_64.dll"
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXFoundation_64.dll"
+        "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXCooking_64.dll"
+        )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<IF:$<CONFIG:Release>,${PHYSX_RELEASE_DLLS},${PHYSX_DEBUG_DLLS}>" $<TARGET_FILE_DIR:CgEngine_Solution>
+        COMMAND_EXPAND_LISTS
+        )
 ################################################################################
 
 
