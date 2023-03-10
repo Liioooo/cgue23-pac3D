@@ -1,6 +1,7 @@
 # cgue23-pac3D
 
 Leo Preissegger (12122526)
+Enisa Azizovic (01228809)
 
 ## Hardware
 The Game was tested on the following Hardware:
