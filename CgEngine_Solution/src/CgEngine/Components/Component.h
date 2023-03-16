@@ -12,7 +12,7 @@ namespace CgEngine {
         virtual ~Component() = default;
 
         virtual void onAttach(Scene& scene) {};
-        virtual void onDetach() {};
+        virtual void onDetach(Scene& scene) {};
 
         inline Entity getEntity() const {
             return entity;

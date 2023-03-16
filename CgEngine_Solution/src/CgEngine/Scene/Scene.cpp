@@ -4,10 +4,13 @@
 #include "Rendering/Renderer.h"
 
 namespace CgEngine {
-    Scene::Scene(int viewportWidth, int viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {}
+    Scene::Scene(int viewportWidth, int viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
+        physicsScene = new PhysicsScene();
+    }
 
     Scene::~Scene() {
         delete componentManager;
+        delete physicsScene;
     }
 
     Entity Scene::createEntity() {
@@ -73,6 +76,7 @@ namespace CgEngine {
 
     Entity Scene::findEntityById(const std::string &id) {
         if (idToEntity.count(id) == 0) {
+            CG_LOGGING_WARNING("Entity {0} doesn't exist!", id)
             return CG_ENTITY_UNAVAILABLE;
         }
         return idToEntity[id];
@@ -87,6 +91,10 @@ namespace CgEngine {
             return CG_ENTITY_UNAVAILABLE;
         }
         return parents[entity];
+    }
+
+    bool Scene::hasParent(Entity entity) {
+        return parents.count(entity) != 0;
     }
 
     bool Scene::hasEntity(Entity entity) {
@@ -126,6 +134,8 @@ namespace CgEngine {
     }
 
     void Scene::onUpdate(TimeStep ts) {
+        physicsScene->simulate(ts);
+
         for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
             it->update(ts);
         }
@@ -222,7 +232,7 @@ namespace CgEngine {
             idToEntity.erase(idIter->first);
         }
 
-        componentManager->destroyEntity(entity);
+        componentManager->destroyEntity(entity, *this);
         parents.erase(entity);
         children.erase(entity);
         entityCount--;

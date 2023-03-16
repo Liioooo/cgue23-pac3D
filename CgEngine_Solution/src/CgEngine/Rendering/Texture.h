@@ -1,5 +1,4 @@
 #pragma once
-#include "glad/glad.h"
 
 namespace CgEngine {
 
@@ -16,46 +15,10 @@ namespace CgEngine {
     };
 
     namespace TextureUtils {
-        static GLint getOpenGLTextureFormat(TextureFormat format) {
-            switch (format) {
-                case TextureFormat::RGB:     return GL_RGB;
-                case TextureFormat::RGBA:    return GL_RGBA;
-                case TextureFormat::Float16: return GL_RGBA16F;
-                case TextureFormat::Float32: return GL_RGBA32F;
-            }
-            return 0;
-        }
-
-        static GLint getTextureFormatType(TextureFormat format) {
-            if (format == TextureFormat::Float16 || format == TextureFormat::Float32) {
-                return GL_FLOAT;
-            }
-            return GL_UNSIGNED_BYTE;
-        }
-
-        static void applyMipMapFiltering(MipMapFiltering mipMapFiltering, GLenum textureType) {
-            switch (mipMapFiltering) {
-                case MipMapFiltering::Nearest: {
-                    glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    return;
-                }
-                case MipMapFiltering::Bilinear: {
-                    glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    return;
-                }
-                case MipMapFiltering::Trilinear: {
-                    glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                    glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    return;
-                }
-            }
-        }
-
-        static uint32_t calculateMipCount(uint32_t width, uint32_t height) {
-            return static_cast<uint32_t>(std::floor(std::log2(glm::min(width, height))) + 1);
-        }
+        int getOpenGLTextureFormat(TextureFormat format);
+        int getTextureFormatType(TextureFormat format);
+        void applyMipMapFiltering(MipMapFiltering mipMapFiltering, unsigned int textureType);
+        uint32_t calculateMipCount(uint32_t width, uint32_t height);
     }
 
     class Texture2D {

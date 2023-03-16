@@ -2,6 +2,7 @@
 #include "CgEngine/Application.h"
 
 #include "Game/CameraScript.h"
+#include "Game/CubeTestScript.h"
 
 int main(int argc, char **argv) {
     CgEngine::Logging::init();
@@ -10,6 +11,7 @@ int main(int argc, char **argv) {
     CgEngine::Application* application = new CgEngine::Application("assets/settings.ini");
 
     application->registerNativeScript<Game::CameraScript>("cameraScript");
+    application->registerNativeScript<Game::CubeTestScript>("cubeTestScript");
 
     application->init();
     application->run();

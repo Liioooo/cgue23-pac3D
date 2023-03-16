@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glad/glad.h>
 #include "VertexBuffer.h"
 
 namespace CgEngine {

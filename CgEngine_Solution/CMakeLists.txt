@@ -145,10 +145,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendo
 target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXCommon_64.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXFoundation_64.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXCooking_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXExtensions_static_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE debug "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/checked/PhysXPvdSDK_static_64.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysX_64.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXCommon_64.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXFoundation_64.lib")
 target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXCooking_64.lib")
+target_link_libraries(${PROJECT_NAME} PRIVATE optimized "${PROJECT_SOURCE_DIR}/vendor/PhysX/lib/release/PhysXExtensions_static_64.lib")
 
 set(PHYSX_DLLS)
 list(APPEND PHYSX_DEBUG_DLLS

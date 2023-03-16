@@ -190,6 +190,8 @@ namespace CgEngine {
     }
 
     void Renderer::executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount) {
+        CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
+
         material.uploadToShader(*currentRenderPass->getSpecification().shader);
         vao.bind();
         transformsBuffer->setData(transforms.data(), transforms.size() * sizeof(glm::mat4));
@@ -244,23 +246,23 @@ namespace CgEngine {
 
         CG_ASSERT(sphereMap.isLoaded(), "HDRI could not be loaded!");
 
-        TextureCube* cubeMap = new TextureCube(TextureFormat::Float32, 1024, 1024, MipMapFiltering::Bilinear);
+        TextureCube cubeMap(TextureFormat::Float32, 1024, 1024, MipMapFiltering::Bilinear);
 
         auto& sphereToCubeShader = *resourceManager.getResource<ComputeShader>("sphereToCube");
         sphereToCubeShader.bind();
         sphereToCubeShader.setTexture2D(sphereMap, 0);
-        sphereToCubeShader.setImageCube(*cubeMap, 1, ShaderStorageAccess::WriteOnly, 0);
+        sphereToCubeShader.setImageCube(cubeMap, 1, ShaderStorageAccess::WriteOnly, 0);
         sphereToCubeShader.dispatch(MAP_SIZE / 32, MAP_SIZE / 32, 6);
         sphereToCubeShader.waitForMemoryBarrier();
 
-        cubeMap->generateMipMaps();
+        cubeMap.generateMipMaps();
         TextureUtils::applyMipMapFiltering(MipMapFiltering::Trilinear, GL_TEXTURE_CUBE_MAP);
 
         irradianceMap = new TextureCube(TextureFormat::Float32, 32, 32, MipMapFiltering::Bilinear);
 
         auto& irradianceMapShader = *resourceManager.getResource<ComputeShader>("irradianceMap");
         irradianceMapShader.bind();
-        irradianceMapShader.setTextureCube(*cubeMap, 0);
+        irradianceMapShader.setTextureCube(cubeMap, 0);
         irradianceMapShader.setImageCube(*irradianceMap, 1, ShaderStorageAccess::WriteOnly);
         irradianceMapShader.dispatch(irradianceMap->getWidth() / 2, irradianceMap->getWidth() / 2, 6);
         irradianceMapShader.waitForMemoryBarrier();
@@ -272,7 +274,7 @@ namespace CgEngine {
 
         auto& prefilterMapShader = *resourceManager.getResource<ComputeShader>("prefilterMap");
         prefilterMapShader.bind();
-        prefilterMapShader.setTextureCube(*cubeMap, 0);
+        prefilterMapShader.setTextureCube(cubeMap, 0);
 
         for (uint32_t i = 0, size = MAP_SIZE; i < mipCount; i++, size /= 2) {
             uint32_t numGroups = glm::max(1u, size / 32);

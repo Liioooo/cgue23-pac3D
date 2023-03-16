@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ShaderDataType.h"
+#include "Shader.h"
 
 namespace CgEngine {
 
@@ -8,13 +8,7 @@ namespace CgEngine {
         Static, Dynamic
     };
 
-    static GLenum openGLUsage(VertexBufferUsage usage) {
-        switch (usage) {
-            case VertexBufferUsage::Static:    return GL_STATIC_DRAW;
-            case VertexBufferUsage::Dynamic:   return GL_DYNAMIC_DRAW;
-        }
-        return 0;
-    }
+    static unsigned int openGLUsage(VertexBufferUsage usage);
 
     struct VertexBufferElement {
         ShaderDataType dataType;
@@ -22,7 +16,7 @@ namespace CgEngine {
         size_t offset{};
         bool normalized;
 
-        VertexBufferElement(ShaderDataType dataType, bool normalized) : dataType(dataType), normalized(normalized), size(getSizeForShaderDataType(dataType)) {};
+        VertexBufferElement(ShaderDataType dataType, bool normalized) : dataType(dataType), normalized(normalized), size(ShaderUtils::getSizeForShaderDataType(dataType)) {};
 
         int getComponentCount() const {
             switch (dataType) {

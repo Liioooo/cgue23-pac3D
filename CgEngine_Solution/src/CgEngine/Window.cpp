@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <glad/glad.h>
 #include "Logging.h"
 #include "Events/KeyPressedEvent.h"
 #include "Events/KeyReleasedEvent.h"
@@ -160,7 +161,7 @@ namespace CgEngine {
         CG_LOGGING_ERROR("GlFW ERROR {0}: {1}", error, description);
     }
 
-    void Window::debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void* userParam) {
+    void Window::debugCallback(unsigned int source, unsigned int type, unsigned int id, unsigned int severity, int length, const char *message, const void* userParam) {
         if (id == 131185 || id == 131218) {
             return; // ignore performance warnings (buffer uses GPU memory, shader recompilation) from nvidia
         }

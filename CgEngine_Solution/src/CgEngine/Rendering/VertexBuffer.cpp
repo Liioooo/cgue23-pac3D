@@ -2,6 +2,14 @@
 #include "glad/glad.h"
 
 namespace CgEngine {
+    static unsigned int openGLUsage(VertexBufferUsage usage) {
+        switch (usage) {
+            case VertexBufferUsage::Static:    return GL_STATIC_DRAW;
+            case VertexBufferUsage::Dynamic:   return GL_DYNAMIC_DRAW;
+        }
+        return 0;
+    }
+
     VertexBuffer::VertexBuffer(uint32_t size, VertexBufferUsage usage) {
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);

@@ -9,6 +9,8 @@
 #include "Components/PointLightComponent.h"
 #include <Components/SpotLightComponent.h>
 #include <Components/SkyboxComponent.h>
+#include <Components/BoxColliderComponent.h>
+#include <Components/RigidBodyComponent.h>
 #include "ComponentArray.h"
 
 namespace CgEngine {
@@ -24,6 +26,8 @@ namespace CgEngine {
             registerComponentType<PointLightComponent>();
             registerComponentType<SpotLightComponent>();
             registerComponentType<SkyboxComponent>();
+            registerComponentType<BoxColliderComponent>();
+            registerComponentType<RigidBodyComponent>();
         }
 
         template<typename C>
@@ -71,10 +75,10 @@ namespace CgEngine {
             return getComponentArray<C>()->cend();
         }
 
-        void destroyEntity(Entity entity) {
+        void destroyEntity(Entity entity, Scene& scene) {
             for (const auto &pair: componentArrays) {
                 auto const& compArray = pair.second;
-                compArray->checkedDetachComponent(entity);
+                compArray->checkedDetachComponent(entity, scene);
             }
         }
 

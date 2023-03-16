@@ -10,14 +10,20 @@ namespace CgEngine {
         NativeScript() = default;
         ~NativeScript() = default;
 
-        void setScene(Scene* scene);
-        void setEntity(Entity entity);
+        void _setScene(Scene* scene);
+        void _setEntity(Entity entity);
 
         virtual void onAttach() {};
         virtual void onDetach() {};
 
         virtual void update(TimeStep ts) {};
         virtual void lateUpdate(TimeStep ts) {};
+
+        virtual void onCollisionEnter(Entity other) {}
+        virtual void onCollisionExit(Entity other) {}
+
+        virtual void onTriggerEnter(Entity other) {};
+        virtual void onTriggerExit(Entity other) {};
 
 
     protected:
@@ -48,18 +54,18 @@ namespace CgEngine {
         }
 
         template<typename C>
-        bool attachComponent() {
+        C& attachComponent() {
             return owningScene->attachComponent<C>(owningEntity);
         }
 
         template<typename C, typename P>
-        bool attachComponent(P componentPrams) {
+        C& attachComponent(P componentPrams) {
             return owningScene->attachComponent<C>(owningEntity, componentPrams);
         }
 
         template<typename C>
-        bool detachComponent() {
-            return owningScene->detachComponent<C>(owningEntity);
+        void detachComponent() {
+            owningScene->detachComponent<C>(owningEntity);
         }
 
     private:

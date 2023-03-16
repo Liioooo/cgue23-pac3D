@@ -160,8 +160,7 @@ namespace CgEngine {
                                                             aiProcess_GenNormals | aiProcess_FlipUVs |
                                                             aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices);
 
-        CG_ASSERT(scene && scene->HasMeshes() && scene->mRootNode,
-                  "3D-Asset could not be loaded: " + path + ", " + importer.GetErrorString());
+        CG_ASSERT(scene && scene->HasMeshes() && scene->mRootNode, "3D-Asset could not be loaded: " + path + ", " + importer.GetErrorString());
 
         auto* mesh = new MeshVertices();
 

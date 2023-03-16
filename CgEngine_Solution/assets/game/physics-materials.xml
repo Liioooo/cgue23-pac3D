@@ -1,0 +1,7 @@
+<Materials>
+    <Material name="bounce">
+        <StaticFriction>0.6</StaticFriction>
+        <DynamicFricion>0.6</DynamicFricion>
+        <Restitution>0.5</Restitution>
+    </Material>
+</Materials>

@@ -1,23 +1,28 @@
 #pragma once
 
-#include "glad/glad.h"
-
 namespace CgEngine {
 
     class Texture2D;
     class TextureCube;
 
+    enum class ShaderStorageAccess {
+        WriteOnly = 0x88B9, // GL_WRITE_ONLY
+        ReadOnly = 0x88B8, // GL_READ_ONLY
+        ReadWrite = 0x88BA, // GL_READ_WRITE
+    };
+
+    enum class ShaderDataType {
+        Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
+    };
+
     namespace ShaderUtils {
         static std::string loadShaderSourceCode(const std::string& name, const std::string& type);
         static void checkErrors(uint32_t id, const std::string &type);
         static int32_t getUniformLocation(uint32_t programId, std::unordered_map<std::string, int32_t>& uniformLocations, const std::string& name);
-    }
 
-    enum class ShaderStorageAccess {
-        WriteOnly = GL_WRITE_ONLY,
-        ReadOnly = GL_READ_ONLY,
-        ReadWrite = GL_READ_WRITE
-    };
+        int getSizeForShaderDataType(ShaderDataType type);
+        unsigned int shaderDataTypeToOpenGLBaseType(ShaderDataType type);
+    }
 
     class Shader {
     public:

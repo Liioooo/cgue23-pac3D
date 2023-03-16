@@ -1,5 +1,5 @@
 #include "VertexArrayObject.h"
-#include "ShaderDataType.h"
+#include "Shader.h"
 #include "glad/glad.h"
 
 namespace CgEngine {
@@ -35,7 +35,7 @@ namespace CgEngine {
                     glVertexAttribPointer(
                             vertexBufferIndex,
                             element.getComponentCount(),
-                            shaderDataTypeToOpenGLBaseType(element.dataType),
+                            ShaderUtils::shaderDataTypeToOpenGLBaseType(element.dataType),
                             element.normalized ? GL_TRUE : GL_FALSE,
                             buffer->getStride(),
                             (const void*)(element.offset));
@@ -51,7 +51,7 @@ namespace CgEngine {
                     glVertexAttribIPointer(
                             vertexBufferIndex,
                             element.getComponentCount(),
-                            shaderDataTypeToOpenGLBaseType(element.dataType),
+                            ShaderUtils::shaderDataTypeToOpenGLBaseType(element.dataType),
                             buffer->getStride(),
                             (const void*)(element.offset));
                     vertexBufferIndex++;
@@ -64,7 +64,7 @@ namespace CgEngine {
                         glEnableVertexAttribArray(vertexBufferIndex);
                         glVertexAttribPointer(vertexBufferIndex,
                                               count,
-                                              shaderDataTypeToOpenGLBaseType(element.dataType),
+                                              ShaderUtils::shaderDataTypeToOpenGLBaseType(element.dataType),
                                               element.normalized ? GL_TRUE : GL_FALSE,
                                               buffer->getStride(),
                                               (const void*)(element.offset + sizeof(float) * count * i));

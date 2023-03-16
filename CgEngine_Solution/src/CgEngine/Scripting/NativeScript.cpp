@@ -2,11 +2,11 @@
 #include "Scene/Scene.h"
 
 namespace CgEngine {
-    void NativeScript::setScene(Scene* scene) {
+    void NativeScript::_setScene(Scene* scene) {
         owningScene = scene;
     }
 
-    void NativeScript::setEntity(Entity entity) {
+    void NativeScript::_setEntity(Entity entity) {
         owningEntity = entity;
     }
 

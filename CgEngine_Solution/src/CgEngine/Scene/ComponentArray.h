@@ -5,9 +5,11 @@
 
 namespace CgEngine {
 
+    class Scene;
+
     class IComponentArray {
     public:
-        virtual void checkedDetachComponent(Entity entity) = 0;
+        virtual void checkedDetachComponent(Entity entity, Scene& scene) = 0;
     };
 
     template<typename C>
@@ -30,7 +32,6 @@ namespace CgEngine {
 
             size_t indexRemovedEntity = entityToComponentsIndex[entity];
 
-            components[indexRemovedEntity].onDetach();
             components[indexRemovedEntity] = components.back();
             components.pop_back();
 
@@ -42,8 +43,9 @@ namespace CgEngine {
             componentsIndexToEntity.erase(components.size());
         }
 
-        void checkedDetachComponent(Entity entity) override {
+        void checkedDetachComponent(Entity entity, Scene& scene) override {
             if (hasComponent(entity)) {
+                components[entityToComponentsIndex[entity]].onDetach(scene);
                 detachComponent(entity);
             }
         }

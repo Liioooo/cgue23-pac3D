@@ -17,7 +17,6 @@ namespace CgEngine {
     void SceneManager::setActiveScene(const std::string &name) {
         auto* xmlSceneFile = GlobalObjectManager::getInstance().getResourceManager().getResource<XMLFile>(name);
         nextScene = SceneLoader::loadScene(xmlSceneFile, viewportWidth, viewportHeight);
-        nextScene->updateTransforms();
     }
 
     void SceneManager::setViewportSize(uint32_t width, uint32_t height) {

@@ -2,7 +2,6 @@
 #include "Events/Input.h"
 #include "Events/KeyCodes.h"
 #include "glm/gtx/common.hpp"
-#include "glm/gtx/quaternion.hpp"
 
 namespace Game {
     void CameraScript::update(CgEngine::TimeStep ts) {
@@ -19,7 +18,6 @@ namespace Game {
 
         auto& comp = getComponent<CgEngine::TransformComponent>();
         glm::vec3 pos = comp.getLocalPosition();
-        glm::vec3 rot = comp.getLocalRotation();
 
         float mouseDeltaX = (prevMousePos.first - mousePos.first) * 0.001f;
         float mouseDeltaY = (prevMousePos.second - mousePos.second) * 0.001f;
@@ -51,6 +49,19 @@ namespace Game {
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
             destroyEntity(findEntityById("floor"));
+        }
+
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Up)) {
+            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
+            rigid.addForce({0, 10, 0});
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Left)) {
+            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
+            rigid.addTorque({0, 1, 0});
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Down)) {
+            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
+            rigid.addTorque({1, 0, 0});
         }
 
 //        CG_LOGGING_INFO(ts.getMillis())

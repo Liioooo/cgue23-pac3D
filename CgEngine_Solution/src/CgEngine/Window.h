@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Events/Event.h"
 
@@ -36,7 +35,7 @@ namespace CgEngine {
         const std::function<void(Event&)> eventCallback;
 
         static void errorCallback(int error, const char* description);
-        static void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char* message, const void* userParam);
+        static void debugCallback(unsigned int source, unsigned int type, unsigned int id, unsigned int severity, int length, const char* message, const void* userParam);
     };
 
 }

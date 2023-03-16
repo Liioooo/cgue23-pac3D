@@ -4,6 +4,7 @@
 #include "ComponentManager.h"
 #include "TimeStep.h"
 #include "Rendering/Texture.h"
+#include "Physics/PhysicsScene.h"
 
 namespace CgEngine {
 
@@ -57,6 +58,7 @@ namespace CgEngine {
         Entity findEntityById(const std::string& id);
         const std::unordered_set<Entity>& getChildren(Entity entity);
         Entity getParent(Entity entity);
+        bool hasParent(Entity entity);
         bool hasEntity(Entity entity);
         void updateTransforms();
         void onViewportResize(int width, int height);
@@ -86,6 +88,7 @@ namespace CgEngine {
 
         template<typename C>
         void detachComponent(Entity entity) {
+            componentManager->getComponent<C>(entity).detach(*this);
             componentManager->detachComponent<C>(entity);
         }
 
@@ -136,6 +139,10 @@ namespace CgEngine {
             return entityCount;
         }
 
+        PhysicsScene& getPhysicsScene() {
+            return *physicsScene;
+        }
+
     private:
         Entity nextEntityId = 1;
         uint32_t entityCount = 0;
@@ -146,6 +153,8 @@ namespace CgEngine {
         ComponentManager* componentManager = new ComponentManager();
         int viewportWidth;
         int viewportHeight;
+        PhysicsScene* physicsScene;
+
 
         void recursiveDestroyEntity(Entity entity);
         void recursiveUpdateChildTransforms(Entity entity, const glm::mat4& parentModelMatrix, bool parentDirty);

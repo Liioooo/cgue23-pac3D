@@ -4,12 +4,12 @@
 namespace CgEngine {
     void ScriptComponent::onAttach(Scene &scene, ScriptComponentParams &params) {
         script = GlobalObjectManager::getInstance().getScriptManager().getScriptInstance(params.scriptName);
-        script->setEntity(entity);
-        script->setScene(&scene);
+        script->_setEntity(entity);
+        script->_setScene(&scene);
         script->onAttach();
     }
 
-    void ScriptComponent::onDetach() {
+    void ScriptComponent::onDetach(Scene& scene) {
         script->onDetach();
     }
 
@@ -19,5 +19,21 @@ namespace CgEngine {
 
     void ScriptComponent::lateUpdate(TimeStep ts) {
         script->lateUpdate(ts);
+    }
+
+    void ScriptComponent::onCollisionEnter(Entity other) {
+        script->onCollisionEnter(other);
+    }
+
+    void ScriptComponent::onCollisionExit(Entity other) {
+        script->onCollisionExit(other);
+    }
+
+    void ScriptComponent::onTriggerEnter(Entity other) {
+        script->onTriggerEnter(other);
+    }
+
+    void ScriptComponent::onTriggerExit(Entity other) {
+        script->onTriggerExit(other);
     }
 }

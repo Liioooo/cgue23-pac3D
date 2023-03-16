@@ -3,6 +3,7 @@
 #include <Scripting/ScriptManager.h>
 #include "Scene/SceneManager.h"
 #include "Resources/ResourceManager.h"
+#include "Physics/PhysicsSystem.h"
 
 
 namespace CgEngine {
@@ -18,6 +19,7 @@ namespace CgEngine {
         SceneManager& getSceneManager() const;
         ResourceManager& getResourceManager() const;
         ScriptManager& getScriptManager() const;
+        PhysicsSystem& getPhysicsSystem() const;
 
     private:
         GlobalObjectManager();
@@ -25,6 +27,7 @@ namespace CgEngine {
         SceneManager* sceneManager;
         ResourceManager* resourceManager;
         ScriptManager* scriptManager;
+        PhysicsSystem* physicsSystem;
     };
 }
 

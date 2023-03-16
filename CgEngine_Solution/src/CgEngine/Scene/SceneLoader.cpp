@@ -51,6 +51,10 @@ namespace CgEngine {
             createSpotLightComponent(scene, entity, node);
         } else if (name == "SkyboxComponent") {
             createSkyboxComponent(scene, entity, node);
+        } else if (name == "RigidBodyComponent") {
+            createRigidBodyComponent(scene, entity, node);
+        } else if (name == "BoxColliderComponent") {
+            createBoxColliderComponent(scene, entity, node);
         }
     }
 
@@ -129,6 +133,29 @@ namespace CgEngine {
             node.attribute("lod").as_float(1.0f)
         };
         scene->attachComponent<SkyboxComponent>(entity, params);
+    }
+
+    void SceneLoader::createRigidBodyComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
+        RigidBodyComponentParams params{
+            node.attribute("dynamic").as_bool(false),
+            node.attribute("kinematic").as_bool(false),
+            node.attribute("disable-gravity").as_bool(false),
+            node.attribute("mass").as_float(1.0f),
+            node.attribute("linear-drag").as_float(0.0f),
+            node.attribute("angular-drag").as_float(0.0f),
+            std::strcmp(node.attribute("collision-detection").as_string("discrete"), "discrete") ? PhysicsCollisionDetection::Discrete : PhysicsCollisionDetection::Continuous,
+        };
+        scene->attachComponent<RigidBodyComponent>(entity, params);
+    }
+
+    void SceneLoader::createBoxColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
+        BoxColliderComponentParams params{
+                stringTupleToVec3(node.attribute("half-size").as_string("0.5 0.5 0.5")),
+                stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
+                node.attribute("trigger").as_bool(false),
+                node.attribute("material").as_string("default-physics-material"),
+        };
+        scene->attachComponent<BoxColliderComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {

@@ -1,4 +1,15 @@
 <Scene>
+    <Entity id="model">
+        <Components>
+            <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="1 1 1" />
+        </Components>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 4.5 0" rotation="90 0 45" scale="0.04 0.04 0.04" />
+                <MeshRendererComponent asset-file="wood_table.fbx" />
+            </Components>
+        </Entity>
+    </Entity>
     <Entity>
         <Components>
             <TransformComponent position="0 0 25" rotation="0 0 0" scale="1 1 1" />
@@ -35,16 +46,10 @@
             <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="15" inner-angle="60" outer-angle="120" />
         </Components>
     </Entity>
-    <Entity>
+    <Entity id="licht">
         <Components>
             <TransformComponent position="4 0 0" rotation="180 0 0" scale="1 1 1" />
             <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" inner-angle="30" outer-angle="40" />
-        </Components>
-    </Entity>
-    <Entity id="model">
-        <Components>
-            <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="0.04 0.04 0.04" />
-            <MeshRendererComponent asset-file="wood_table.fbx" />
         </Components>
     </Entity>
     <Entity>
@@ -57,18 +62,25 @@
         <Components>
             <TransformComponent position="0 -2.5 0" rotation="0 0 0" scale="15 0.1 15" />
             <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
+            <RigidBodyComponent dynamic="false" />
+            <BoxColliderComponent />
         </Components>
     </Entity>
     <Entity>
         <Components>
             <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="15 0.1 15" />
             <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
+            <RigidBodyComponent dynamic="false" />
+            <BoxColliderComponent trigger="true" />
         </Components>
     </Entity>
-    <Entity>
+    <Entity id="cube">
         <Components>
-            <TransformComponent position="2 2 -2" rotation="0 0 0" scale="1 1 1" />
+            <TransformComponent position="1 2 -1" rotation="0 0 0" scale="1 1 1" />
             <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+            <RigidBodyComponent dynamic="true" mass="10" collision-detection="continuous" />
+            <BoxColliderComponent material="bounce"  />
+            <ScriptComponent script-name="cubeTestScript" />
         </Components>
     </Entity>
     <Entity>

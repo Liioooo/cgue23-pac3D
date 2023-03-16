@@ -17,32 +17,37 @@ namespace CgEngine {
         void onAttach(Scene& scene, TransformComponentParams& params);
 
         const glm::vec3& getLocalPosition() const;
-        const glm::vec3& getLocalRotation() const;
+        const glm::vec3& getLocalRotationVec() const;
+        const glm::quat & getLocalRotationQuat() const;
         const glm::vec3& getLocalScale() const;
 
         const glm::vec3& getGlobalPosition() const;
-        const glm::vec3& getGlobalRotation() const;
+        const glm::vec3& getGlobalRotationVec() const;
+        const glm::quat& getGlobalRotationQuat() const;
         const glm::vec3& getGlobalScale() const;
 
         const glm::mat4& getModelMatrix() const;
 
         void setLocalPosition(glm::vec3 position);
-        void setLocalRotation(glm::vec3 rotation);
+        void setLocalRotationVec(glm::vec3 rotation);
+        void setLocalRotationQuat(glm::quat rotation);
         void setLocalScale(glm::vec3 scale);
         void setYawPitchRoll(float yaw, float pitch, float roll);
 
-        void _physicsUpdate();
+        void _physicsUpdate(glm::vec3 pos, glm::quat rot);
         bool _calculateTopLevelTransforms();
         bool _calculateChildTransformsWithParent(const glm::mat4& parentModelMatrix, bool parentDirty);
 
     private:
         glm::vec3 localPosition;
-        glm::vec3 localRotation;
+        glm::vec3 localRotationVec;
+        glm::quat localRotationQuat;
         glm::vec3 localScale;
         glm::vec3 yawPitchRoll{0, 0, 0};
 
         glm::vec3 globalPosition;
-        glm::vec3 globalRotation;
+        glm::vec3 globalRotationVec;
+        glm::quat globalRotationQuat;
         glm::vec3 globalScale;
 
         glm::mat4 localModelMatrix;
@@ -52,6 +57,8 @@ namespace CgEngine {
         bool physicsDirty = false;
 
         glm::mat4 calculateModelMatrix(glm::vec3& pos, glm::vec3& rot, glm::vec3& scale);
+        glm::mat4 calculateModelMatrix(glm::vec3& pos, glm::quat& rot, glm::vec3& scale);
+        void decomposeModelToGlobals();
     };
 
 }
