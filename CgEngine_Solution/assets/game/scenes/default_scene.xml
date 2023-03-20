@@ -37,7 +37,7 @@
     <Entity>
         <Components>
             <TransformComponent position="0 4 0" rotation="0 0 0" scale="1 1 1" />
-            <PointLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" />
+            <PointLightComponent color="#ffffff" intensity="4" falloff="1" radius="6" />
         </Components>
     </Entity>
     <Entity>
