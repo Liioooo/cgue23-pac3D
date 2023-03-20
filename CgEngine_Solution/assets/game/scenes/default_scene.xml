@@ -85,8 +85,8 @@
     </Entity>
     <Entity>
         <Components>
-            <TransformComponent position="-2 2 -2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+            <TransformComponent position="-2 1 -2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_SphereMesh_16_16" material="MyMaterial" />
         </Components>
     </Entity>
     <Entity>

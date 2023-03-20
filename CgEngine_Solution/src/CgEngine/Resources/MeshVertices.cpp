@@ -10,6 +10,18 @@ namespace CgEngine {
     MeshVertices *MeshVertices::createResource(const std::string &name) {
         if (name == "CG_CubeMesh") {
             return createCubeMesh();
+        } else if (name.rfind("CG_SphereMesh", 0) == 0) {
+            uint32_t latSegments = 16;
+            uint32_t lonSegments = 16;
+
+            std::string params = name.substr(14);
+            if (!params.empty()) {
+                size_t splitPoint = params.find('_');
+                lonSegments = std::stoi(params.substr(0, splitPoint));
+                latSegments = std::stoi(params.substr(splitPoint + 1));
+            }
+
+            return createSphereMesh(latSegments, lonSegments);
         } else {
             return loadMeshAsset(name);
         }
@@ -125,6 +137,98 @@ namespace CgEngine {
         mesh->indexBuffer.push_back(22);
         mesh->indexBuffer.push_back(21);
         mesh->indexBuffer.push_back(23);
+
+        mesh->vao = new VertexArrayObject();
+
+        auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(),
+                                                           mesh->vertices.size() * sizeof(Vertex));
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float2, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true)});
+
+        mesh->vao->addVertexBuffer(vertexBuffer);
+        mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
+
+        Submesh &submesh = mesh->submeshes.emplace_back();
+        submesh.baseVertex = 0;
+        submesh.baseIndex = 0;
+        submesh.vertexCount = mesh->vertices.size();
+        submesh.indexCount = mesh->indexBuffer.size();
+        submesh.materialIndex = 0;
+
+        mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());
+
+        return mesh;
+    }
+
+    MeshVertices* MeshVertices::createSphereMesh(uint32_t latSegments, uint32_t lonSegments) {
+        auto *mesh = new MeshVertices();
+
+        mesh->vertices.emplace_back(0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f);
+        mesh->vertices.emplace_back(0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f);
+
+        // latitude
+        for (uint32_t i = 1; i < latSegments; i++) {
+            float latAngle = glm::pi<float>() * i / latSegments;
+            float xz = glm::sin(latAngle);
+            float y = glm::cos(latAngle);
+
+            // longitude
+            for (uint32_t j = 0; j < lonSegments; j++) {
+                float lonAngle = glm::two_pi<float>() * j / lonSegments;
+                glm::vec3 vertexPos(xz * glm::sin(lonAngle), y, xz * glm::cos(lonAngle));
+                mesh->vertices.emplace_back(
+                        vertexPos.x, vertexPos.y, vertexPos.z,
+                        vertexPos.x, vertexPos.y, vertexPos.z,
+                        glm::atan(vertexPos.x, vertexPos.z) / glm::two_pi<float>() + 0.5f, 0.5f + glm::asin(vertexPos.y) / glm::pi<float>()
+                );
+            }
+        }
+
+        for (uint32_t i = 2; i < 2 + lonSegments; i++) {
+            mesh->indexBuffer.push_back(0);
+            mesh->indexBuffer.push_back(i);
+            if (i == 1 + lonSegments) {
+                mesh->indexBuffer.push_back(2);
+            } else {
+                mesh->indexBuffer.push_back(i + 1);
+            }
+        }
+
+        for (uint32_t i = 2 + (latSegments - 2) * lonSegments; i < 2 + (latSegments - 1) * lonSegments; i++) {
+            mesh->indexBuffer.push_back(1);
+            if (i == 1 + (latSegments - 1) * lonSegments) {
+                mesh->indexBuffer.push_back(2 + (latSegments - 2) * lonSegments);
+            } else {
+                mesh->indexBuffer.push_back(i + 1);
+            }
+            mesh->indexBuffer.push_back(i);
+        }
+
+        for (uint32_t i = 0; i < latSegments - 2; i++) {
+            for (int j = 2 + i * lonSegments; j < 2 + i * lonSegments + lonSegments; j++) {
+                mesh->indexBuffer.push_back(j);
+                mesh->indexBuffer.push_back(j + lonSegments);
+                if (j == 1 + i * lonSegments + lonSegments) {
+                    mesh->indexBuffer.push_back(2 + i * lonSegments);
+                } else {
+                    mesh->indexBuffer.push_back(j + 1);
+                }
+
+                if (j == 1 + i * lonSegments + lonSegments) {
+                    mesh->indexBuffer.push_back(j + lonSegments);
+                    mesh->indexBuffer.push_back(2 + i * lonSegments + lonSegments);
+                    mesh->indexBuffer.push_back(2 + i * lonSegments);
+                } else {
+                    mesh->indexBuffer.push_back(j + lonSegments);
+                    mesh->indexBuffer.push_back(j + lonSegments + 1);
+                    mesh->indexBuffer.push_back(j + 1);
+                }
+            }
+
+        }
 
         mesh->vao = new VertexArrayObject();
 

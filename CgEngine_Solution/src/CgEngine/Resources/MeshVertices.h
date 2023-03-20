@@ -46,6 +46,7 @@ namespace CgEngine {
 
     private:
         static MeshVertices* createCubeMesh();
+        static MeshVertices* createSphereMesh(uint32_t latSegments, uint32_t lonSegments);
         static MeshVertices* loadMeshAsset(const std::string& path);
 
         static std::string getTexturePath(const std::string& modelPath, const std::string& texturePath);
