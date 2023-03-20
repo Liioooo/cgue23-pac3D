@@ -55,6 +55,8 @@ namespace CgEngine {
             createRigidBodyComponent(scene, entity, node);
         } else if (name == "BoxColliderComponent") {
             createBoxColliderComponent(scene, entity, node);
+        } else if (name == "SphereColliderComponent") {
+            createSphereColliderComponent(scene, entity, node);
         }
     }
 
@@ -156,6 +158,16 @@ namespace CgEngine {
                 node.attribute("material").as_string("default-physics-material"),
         };
         scene->attachComponent<BoxColliderComponent>(entity, params);
+    }
+
+    void SceneLoader::createSphereColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
+        SphereColliderComponentParams params{
+                node.attribute("radius").as_float(1.0f),
+                stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
+                node.attribute("trigger").as_bool(false),
+                node.attribute("material").as_string("default-physics-material"),
+        };
+        scene->attachComponent<SphereColliderComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {

@@ -77,6 +77,10 @@ namespace CgEngine {
         return actor->addBoxCollider(material, halfSize, offset, isTrigger);
     }
 
+    uint32_t RigidBodyComponent::addSphereCollider(PhysicsMaterial& material, float radius, glm::vec3 offset, bool isTrigger) {
+        return actor->addSphereCollider(material, radius, offset, isTrigger);
+    }
+
     void RigidBodyComponent::removeCollider(uint32_t colliderUuid) {
         actor->removeCollider(colliderUuid);
     }

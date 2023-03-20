@@ -10,6 +10,7 @@
 #include <Components/SpotLightComponent.h>
 #include <Components/SkyboxComponent.h>
 #include <Components/BoxColliderComponent.h>
+#include <Components/SphereColliderComponent.h>
 #include <Components/RigidBodyComponent.h>
 #include "ComponentArray.h"
 
@@ -27,6 +28,7 @@ namespace CgEngine {
             registerComponentType<SpotLightComponent>();
             registerComponentType<SkyboxComponent>();
             registerComponentType<BoxColliderComponent>();
+            registerComponentType<SphereColliderComponent>();
             registerComponentType<RigidBodyComponent>();
         }
 

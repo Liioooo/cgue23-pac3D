@@ -18,6 +18,7 @@ namespace CgEngine {
 
     class RigidBodyComponent : public Component {
         friend class BoxColliderComponent;
+        friend class SphereColliderComponent;
     public:
         using Component::Component;
 
@@ -43,6 +44,7 @@ namespace CgEngine {
         PhysicsActor* actor;
 
         uint32_t addBoxCollider(PhysicsMaterial& material, glm::vec3 halfSize, glm::vec3 offset, bool isTrigger);
+        uint32_t addSphereCollider(PhysicsMaterial& material, float radius, glm::vec3 offset, bool isTrigger);
         void removeCollider(uint32_t colliderUuid);
     };
 
