@@ -27,7 +27,7 @@ vec3 getSampleDirection() {
     return normalize(direction);
 }
 
-float RadicalInverse_VdC(uint bits) {
+float radicalInverse_VdC(uint bits) {
     bits = (bits << 16u) | (bits >> 16u);
     bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
     bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
@@ -36,11 +36,11 @@ float RadicalInverse_VdC(uint bits) {
     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
 }
 
-vec2 Hammersley(uint i) {
-    return vec2(float(i) * INVERSE_SAMPLE_COUNT, RadicalInverse_VdC(i));
+vec2 hammersley(uint i) {
+    return vec2(float(i) * INVERSE_SAMPLE_COUNT, radicalInverse_VdC(i));
 }
 
-vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
+vec3 importanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
     float a = roughness * roughness;
 
     float phi = TWO_PI * Xi.x;
@@ -72,11 +72,6 @@ float distributionGGX(vec3 N, vec3 H, float roughness) {
 }
 
 void main() {
-    ivec2 outputSize = imageSize(o_prefilterMap);
-    if(gl_GlobalInvocationID.x >= outputSize.x || gl_GlobalInvocationID.y >= outputSize.y) {
-        return;
-    }
-
     vec2 inputSize = vec2(textureSize(u_cubeMap, 0));
     float saTexel = 4.0f * PI / (6.0f * inputSize.x * inputSize.y);
 
@@ -88,23 +83,21 @@ void main() {
     vec3 prefilteredColor = vec3(0.0f);
 
     for (uint i = 0u; i < SAMPLE_COUNT; i++) {
-        vec2 Xi = Hammersley(i);
-        vec3 H = ImportanceSampleGGX(Xi, N, u_Roughness);
+        vec2 Xi = hammersley(i);
+        vec3 H = importanceSampleGGX(Xi, N, u_Roughness);
         vec3 L = normalize(2.0f * dot(V, H) * H - V);
 
-        float NdotL = dot(N, L);
-        if (NdotL > 0.0f) {
-            float D = distributionGGX(N, H, u_Roughness);
-            float NdotH = max(dot(N, H), 0.0f);
-            float HdotV = max(dot(H, V), 0.0f);
-            float pdf = D * NdotH / (4.0f * HdotV) + 0.0001f;
+        float NdotL = max(dot(N, L), 0.0f);
+        float D = distributionGGX(N, H, u_Roughness);
+        float NdotH = max(dot(N, H), 0.0f);
+        float HdotV = max(dot(H, V), 0.0f);
+        float pdf = D * NdotH / (4.0f * HdotV) + 0.0001f;
 
-            float saSample = 1.0f / (float(SAMPLE_COUNT) * pdf);
-            float mipLevel = max(0.5f * log2(saSample / saTexel), 0.0f);
+        float saSample = 1.0f / (float(SAMPLE_COUNT) * pdf);
+        float mipLevel = max(0.5f * log2(saSample / saTexel), 0.0f);
 
-            prefilteredColor += textureLod(u_cubeMap, L, mipLevel).rgb * NdotL;
-            totalWeight += NdotL;
-        }
+        prefilteredColor += textureLod(u_cubeMap, L, mipLevel).rgb * NdotL;
+        totalWeight += NdotL;
     }
     prefilteredColor /= totalWeight;
 

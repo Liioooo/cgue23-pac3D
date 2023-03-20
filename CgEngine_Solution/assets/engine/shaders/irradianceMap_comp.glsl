@@ -1,6 +1,6 @@
 #version 450 core
 
-layout(binding = 0) uniform samplerCube u_cubeMap;
+layout(binding = 0) uniform samplerCube u_prefilterMap;
 layout(binding = 1, rgba32f) restrict writeonly uniform imageCube o_IrradianceMap;
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
@@ -8,10 +8,9 @@ layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 const float PI = 3.14159265359f;
 const float TWO_PI = PI * 2.0f;
 const float HALF_PI = PI * 0.5f;
-
-const float sampleDelta = 0.025f;
-const float totalSamples = (TWO_PI / sampleDelta) * (HALF_PI / sampleDelta);
-const float invTotalSamples = 1.0 / totalSamples;
+const float SAMPLE_DELTA = 0.025f;
+const float SAMPLE_COUNT = (TWO_PI / SAMPLE_DELTA) * (HALF_PI / SAMPLE_DELTA);
+const float INVERSE_SAMPLE_COUNT = 1.0 / SAMPLE_COUNT;
 
 vec3 getSampleDirection() {
     vec2 st = gl_GlobalInvocationID.xy / vec2(imageSize(o_IrradianceMap));
@@ -36,15 +35,15 @@ void main() {
     vec3 right = normalize(cross(up, N));
     up = normalize(cross(N, right));
 
-    for (float phi = 0.0f; phi < TWO_PI; phi += sampleDelta) {
-        for (float theta = 0.0f; theta < HALF_PI; theta += sampleDelta) {
-            vec3 tangentSample = vec3(sin(theta) * cos(phi),  sin(theta) * sin(phi), cos(theta));
+    for (float phi = 0.0f; phi < TWO_PI; phi += SAMPLE_DELTA) {
+        for (float theta = 0.0f; theta < HALF_PI; theta += SAMPLE_DELTA) {
+            vec3 tangentSample = vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
 
-            irradiance += texture(u_cubeMap, sampleVec).rgb * cos(theta) * sin(theta);
+            irradiance += textureLod(u_prefilterMap, sampleVec, 1).rgb * cos(theta) * sin(theta);
         }
     }
-    irradiance = PI * irradiance * invTotalSamples;
+    irradiance = PI * irradiance * INVERSE_SAMPLE_COUNT;
 
     imageStore(o_IrradianceMap, ivec3(gl_GlobalInvocationID), vec4(irradiance, 1.0));
 }

@@ -246,7 +246,7 @@ namespace CgEngine {
 
         CG_ASSERT(sphereMap.isLoaded(), "HDRI could not be loaded!");
 
-        TextureCube cubeMap(TextureFormat::Float32, 1024, 1024, MipMapFiltering::Bilinear);
+        TextureCube cubeMap(TextureFormat::Float32, MAP_SIZE, MAP_SIZE, MipMapFiltering::Bilinear);
 
         auto& sphereToCubeShader = *resourceManager.getResource<ComputeShader>("sphereToCube");
         sphereToCubeShader.bind();
@@ -257,15 +257,6 @@ namespace CgEngine {
 
         cubeMap.generateMipMaps();
         TextureUtils::applyMipMapFiltering(MipMapFiltering::Trilinear, GL_TEXTURE_CUBE_MAP);
-
-        irradianceMap = new TextureCube(TextureFormat::Float32, 32, 32, MipMapFiltering::Bilinear);
-
-        auto& irradianceMapShader = *resourceManager.getResource<ComputeShader>("irradianceMap");
-        irradianceMapShader.bind();
-        irradianceMapShader.setTextureCube(cubeMap, 0);
-        irradianceMapShader.setImageCube(*irradianceMap, 1, ShaderStorageAccess::WriteOnly);
-        irradianceMapShader.dispatch(irradianceMap->getWidth() / 2, irradianceMap->getWidth() / 2, 6);
-        irradianceMapShader.waitForMemoryBarrier();
 
         uint32_t mipCount = TextureUtils::calculateMipCount(MAP_SIZE, MAP_SIZE);
 
@@ -284,6 +275,15 @@ namespace CgEngine {
             prefilterMapShader.dispatch(numGroups, numGroups, 6);
             prefilterMapShader.waitForMemoryBarrier();
         }
+
+        irradianceMap = new TextureCube(TextureFormat::Float32, 32, 32, MipMapFiltering::Bilinear);
+
+        auto& irradianceMapShader = *resourceManager.getResource<ComputeShader>("irradianceMap");
+        irradianceMapShader.bind();
+        irradianceMapShader.setTextureCube(*prefilterMap, 0);
+        irradianceMapShader.setImageCube(*irradianceMap, 1, ShaderStorageAccess::WriteOnly);
+        irradianceMapShader.dispatch(irradianceMap->getWidth() / 2, irradianceMap->getWidth() / 2, 6);
+        irradianceMapShader.waitForMemoryBarrier();
 
         resourceManager.insertResource(hdriPath + "-irradiance", irradianceMap);
         resourceManager.insertResource(hdriPath + "-prefilter", prefilterMap);
