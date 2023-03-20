@@ -35,6 +35,22 @@ namespace CgEngine {
             skyboxMaterial = new Material("skyboxMaterial");
         }
         {
+            RenderPassSpecification physicsCollidersRenderPassSpec;
+            physicsCollidersRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("physicsColliders");
+            physicsCollidersRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
+            physicsCollidersRenderPassSpec.depthTest = false;
+            physicsCollidersRenderPassSpec.depthWrite = false;
+            physicsCollidersRenderPassSpec.clearColorBuffer = false;
+            physicsCollidersRenderPassSpec.clearDepthBuffer = false;
+            physicsCollidersRenderPassSpec.clearStencilBuffer = false;
+            physicsCollidersRenderPassSpec.wireframe = true;
+
+            physicsCollidersRenderPass = new RenderPass(physicsCollidersRenderPassSpec);
+
+            physicsCollidersMaterial = new Material("PhysicsColliderDebugMaterial");
+            physicsCollidersMaterial->set("u_Color", {0.0f, 1.0f, 0.0f});
+        }
+        {
             FramebufferSpecification screenFramebufferSpec;
             screenFramebufferSpec.height = viewportHeight;
             screenFramebufferSpec.width = viewportHeight;
@@ -151,9 +167,14 @@ namespace CgEngine {
 
         geometryPass();
         skyboxPass();
+        physicsCollidersPass();
         screenPass();
 
+        drawCommandQueue.clear();
         meshTransforms.clear();
+
+        physicsCollidersDrawCommandQueue.clear();
+        physicsCollidersMeshTransforms.clear();
 
         activeRendering = false;
     }
@@ -180,6 +201,25 @@ namespace CgEngine {
         }
     }
 
+    void SceneRenderer::submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform) {
+        const auto& submeshes = mesh.getSubmeshes();
+        for (uint32_t i = 0; i < submeshes.size(); i++) {
+            const auto& submesh = submeshes.at(i);
+
+            MeshKey mk = {mesh.getVAO()->getRendererId(), i, physicsCollidersMaterial->getUuid().getUuid()};
+
+            physicsCollidersMeshTransforms[mk].emplace_back(transform * submesh.transform);
+
+            DrawCommand& drawCommand = physicsCollidersDrawCommandQueue[mk];
+            drawCommand.vao = mesh.getVAO();
+            drawCommand.material = physicsCollidersMaterial;
+            drawCommand.baseIndex = submesh.baseIndex;
+            drawCommand.baseVertex = submesh.baseVertex;
+            drawCommand.indexCount = submesh.indexCount;
+            drawCommand.instanceCount++;
+        }
+    }
+
     void SceneRenderer::geometryPass() {
         Renderer::beginRenderPass(*geometryRenderPass);
 
@@ -191,9 +231,7 @@ namespace CgEngine {
         for (const auto [mk, command]: drawCommandQueue) {
             const auto& transforms = meshTransforms[mk];
             Renderer::executeDrawCommand(*command.vao, *command.material, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
-
         }
-        drawCommandQueue.clear();
 
         Renderer::endRenderPass();
     }
@@ -201,6 +239,17 @@ namespace CgEngine {
     void SceneRenderer::skyboxPass() {
         Renderer::beginRenderPass(*skyboxRenderPass);
         Renderer::renderUnitCube(*skyboxMaterial);
+        Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::physicsCollidersPass() {
+        Renderer::beginRenderPass(*physicsCollidersRenderPass);
+
+        for (const auto [mk, command]: physicsCollidersDrawCommandQueue) {
+            const auto& transforms = physicsCollidersMeshTransforms[mk];
+            Renderer::executeDrawCommand(*command.vao, *command.material, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
+        }
+
         Renderer::endRenderPass();
     }
 

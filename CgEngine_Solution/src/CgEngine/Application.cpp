@@ -26,6 +26,8 @@ namespace CgEngine {
     }
 
     void Application::init() {
+        applicationOptions.debugShowPhysicsColliders = iniReader->GetBoolean("application", "debug_show_physics_colliders", false);
+
         WindowSpecification windowSpecification;
         windowSpecification.width = iniReader->GetInteger("window", "width", 1280);
         windowSpecification.width = iniReader->GetInteger("window", "width", 720);
@@ -65,6 +67,7 @@ namespace CgEngine {
 
         eventDispatcher.dispatch<WindowCloseEvent>(EVENT_BIND_FN(onWindowClose));
         eventDispatcher.dispatch<WindowResizeEvent>(EVENT_BIND_FN(onWindowResize));
+        eventDispatcher.dispatch<KeyPressedEvent>(EVENT_BIND_FN(onKeyPressed));
     }
 
     Window &Application::getWindow() {
@@ -75,6 +78,10 @@ namespace CgEngine {
         return static_cast<float>(glfwGetTime());
     }
 
+    ApplicationOptions& Application::getApplicationOptions() {
+        return applicationOptions;
+    }
+
     void Application::onWindowClose(WindowCloseEvent &event) {
         isRunning = false;
     }
@@ -82,5 +89,13 @@ namespace CgEngine {
     void Application::onWindowResize(WindowResizeEvent &event) {
         sceneManager->setViewportSize(event.getWidth(), event.getHeight());
         sceneRenderer->setViewportSize(event.getWidth(), event.getHeight());
+    }
+
+    void Application::onKeyPressed(KeyPressedEvent& event) {
+        switch (event.getKeyCode()) {
+            case KeyCode::F1: {
+                applicationOptions.debugShowPhysicsColliders = !applicationOptions.debugShowPhysicsColliders;
+            }
+        }
     }
 }

@@ -6,11 +6,16 @@
 #include "Events/Event.h"
 #include "Events/WindowCloseEvent.h"
 #include "Events/WindowResizeEvent.h"
+#include "Events/KeyPressedEvent.h"
 #include "GlobalObjectManager.h"
 #include "Scene/SceneManager.h"
 #include "TimeStep.h"
 
 namespace CgEngine {
+
+    struct ApplicationOptions {
+        bool debugShowPhysicsColliders;
+    };
 
     class Application {
     public:
@@ -24,6 +29,7 @@ namespace CgEngine {
         void onEvent(Event& event);
         Window& getWindow();
         float getTime();
+        ApplicationOptions& getApplicationOptions();
 
         template<typename S>
         void registerNativeScript(const std::string& name) {
@@ -32,6 +38,7 @@ namespace CgEngine {
 
     private:
         INIReader* iniReader;
+        ApplicationOptions applicationOptions;
         SceneManager* sceneManager;
         SceneRenderer* sceneRenderer;
         Window* window;
@@ -41,6 +48,7 @@ namespace CgEngine {
 
         void onWindowClose(WindowCloseEvent& event);
         void onWindowResize(WindowResizeEvent& event);
+        void onKeyPressed(KeyPressedEvent& event);
 
         static Application* instance;
     };

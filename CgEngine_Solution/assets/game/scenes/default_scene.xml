@@ -63,7 +63,7 @@
             <TransformComponent position="0 -2.5 0" rotation="1.5 1.5 0" scale="25 0.1 25" />
             <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
             <RigidBodyComponent dynamic="false" />
-            <BoxColliderComponent />
+            <BoxColliderComponent offset="0 0 0" half-size="0.5 0.5 0.5" />
         </Components>
     </Entity>
     <Entity>
@@ -86,8 +86,8 @@
     <Entity>
         <Components>
             <TransformComponent position="-2 1 -2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_SphereMesh_16_16" material="Red" />
-            <RigidBodyComponent dynamic="false" mass="10" collision-detection="continuous" />
+            <MeshRendererComponent mesh="CG_SphereMesh_16_16" material="MyMaterial" />
+            <RigidBodyComponent dynamic="true" mass="10" collision-detection="continuous" />
             <SphereColliderComponent material="bounce"  />
         </Components>
     </Entity>

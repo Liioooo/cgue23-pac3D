@@ -2,6 +2,7 @@
 #include "Asserts.h"
 #include "Rendering/SceneRenderer.h"
 #include "Rendering/Renderer.h"
+#include "Application.h"
 
 namespace CgEngine {
     Scene::Scene(int viewportWidth, int viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
@@ -205,6 +206,25 @@ namespace CgEngine {
 
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
             renderer.submitMesh(it->getMeshVertices(), it->getSubmeshIndices(), it->getMaterial(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
+        }
+
+        auto& applicationOptions = Application::get().getApplicationOptions();
+        if (applicationOptions.debugShowPhysicsColliders) {
+            auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+
+            auto& cubeMesh = *resourceManager.getResource<MeshVertices>("CG_CubeMesh");
+            for (auto it = componentManager->begin<BoxColliderComponent>(); it != componentManager->end<BoxColliderComponent>(); it++) {
+                auto modelMatrix = componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix();
+                glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), it->getOffset()) * modelMatrix * glm::scale(glm::mat4(1.0f), it->getHalfSize() * 2.0f);
+                renderer.submitPhysicsColliderMesh(cubeMesh, colliderTransform);
+            }
+
+            auto& sphereMesh = *resourceManager.getResource<MeshVertices>("CG_SphereMesh_16_16");
+            for (auto it = componentManager->begin<SphereColliderComponent>(); it != componentManager->end<SphereColliderComponent>(); it++) {
+                auto modelMatrix = componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix();
+                glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), it->getOffset()) * modelMatrix * glm::scale(glm::mat4(1.0f), glm::vec3(it->getRadius()));
+                renderer.submitPhysicsColliderMesh(sphereMesh, colliderTransform);
+            }
         }
 
         renderer.endScene();

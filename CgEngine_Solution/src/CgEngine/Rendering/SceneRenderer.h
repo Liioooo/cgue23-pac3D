@@ -21,6 +21,7 @@ namespace CgEngine {
         void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment, const SceneEnvironment& sceneEnvironment);
         void endScene();
         void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, const glm::mat4& transform);
+        void submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform);
 
     private:
         Scene* activeScene;
@@ -32,11 +33,14 @@ namespace CgEngine {
         RenderPass* geometryRenderPass;
         RenderPass* screenRenderPass;
         RenderPass* skyboxRenderPass;
+        RenderPass* physicsCollidersRenderPass;
         Material* screenMaterial;
         Material* skyboxMaterial;
+        Material* physicsCollidersMaterial;
 
         void geometryPass();
         void skyboxPass();
+        void physicsCollidersPass();
         void screenPass();
         void clearPass(RenderPass& renderPass);
 
@@ -105,9 +109,11 @@ namespace CgEngine {
             uint32_t instanceCount;
         };
 
-        std::map<MeshKey, DrawCommand> drawCommandQueue{};
-
+        std::map<MeshKey, DrawCommand> drawCommandQueue;
         std::map<MeshKey, std::vector<glm::mat4>> meshTransforms;
+
+        std::map<MeshKey, DrawCommand> physicsCollidersDrawCommandQueue;
+        std::map<MeshKey, std::vector<glm::mat4>> physicsCollidersMeshTransforms;
 
         struct CurrentSceneEnvironment {
             uint32_t prefilterMapId;
