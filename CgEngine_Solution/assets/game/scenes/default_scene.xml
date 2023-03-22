@@ -87,14 +87,14 @@
         <Components>
             <TransformComponent position="-2 1 -2" rotation="0 0 0" scale="1 1 1" />
             <MeshRendererComponent mesh="CG_SphereMesh_16_16" material="MyMaterial" />
-            <RigidBodyComponent dynamic="true" mass="10" collision-detection="continuous" />
+            <RigidBodyComponent dynamic="false" mass="10" collision-detection="continuous" />
             <SphereColliderComponent material="bounce"  />
         </Components>
     </Entity>
     <Entity>
         <Components>
-            <TransformComponent position="2 -2 -2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+            <TransformComponent position="2 5 -2" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CapsuleMesh" material="Red" />
         </Components>
     </Entity>
     <Entity>

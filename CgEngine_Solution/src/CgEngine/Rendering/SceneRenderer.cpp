@@ -2,6 +2,7 @@
 #include "Asserts.h"
 #include "GlobalObjectManager.h"
 #include "Renderer.h"
+#include "Application.h"
 
 namespace CgEngine {
     SceneRenderer::SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
@@ -51,6 +52,21 @@ namespace CgEngine {
             physicsCollidersMaterial->set("u_Color", {0.0f, 1.0f, 0.0f});
         }
         {
+            RenderPassSpecification mormalsDebugRenderPassSpec;
+            mormalsDebugRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("normalsVisualize");
+            mormalsDebugRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
+            mormalsDebugRenderPassSpec.depthTest = true;
+            mormalsDebugRenderPassSpec.depthWrite = false;
+            mormalsDebugRenderPassSpec.clearColorBuffer = false;
+            mormalsDebugRenderPassSpec.clearDepthBuffer = false;
+            mormalsDebugRenderPassSpec.clearStencilBuffer = false;
+
+            normalsDebugRenderPass = new RenderPass(mormalsDebugRenderPassSpec);
+
+            normalsDebugMaterial = new Material("NormalsDebugMaterial");
+            normalsDebugMaterial->set("u_Color", {1.0f, 0.0f, 0.0f});
+        }
+        {
             FramebufferSpecification screenFramebufferSpec;
             screenFramebufferSpec.height = viewportHeight;
             screenFramebufferSpec.width = viewportHeight;
@@ -78,10 +94,15 @@ namespace CgEngine {
 
     SceneRenderer::~SceneRenderer() {
         delete geometryRenderPass;
-        delete screenRenderPass;
         delete skyboxRenderPass;
-        delete screenMaterial;
+        delete physicsCollidersRenderPass;
+        delete normalsDebugRenderPass;
+        delete screenRenderPass;
+
         delete skyboxMaterial;
+        delete physicsCollidersMaterial;
+        delete normalsDebugMaterial;
+        delete screenMaterial;
 
         delete ubCameraData;
         delete ubLightData;
@@ -165,9 +186,16 @@ namespace CgEngine {
     void SceneRenderer::endScene() {
         CG_ASSERT(activeRendering, "Not actively rendering!")
 
+        ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
+
         geometryPass();
         skyboxPass();
-        physicsCollidersPass();
+        if (applicationOptions.debugShowPhysicsColliders) {
+            physicsCollidersPass();
+        }
+        if (applicationOptions.debugShowNormals) {
+            normalsDebugPass();
+        }
         screenPass();
 
         drawCommandQueue.clear();
@@ -248,6 +276,17 @@ namespace CgEngine {
         for (const auto [mk, command]: physicsCollidersDrawCommandQueue) {
             const auto& transforms = physicsCollidersMeshTransforms[mk];
             Renderer::executeDrawCommand(*command.vao, *command.material, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
+        }
+
+        Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::normalsDebugPass() {
+        Renderer::beginRenderPass(*normalsDebugRenderPass);
+
+        for (const auto [mk, command]: drawCommandQueue) {
+            const auto& transforms = meshTransforms[mk];
+            Renderer::executeDrawCommand(*command.vao, *normalsDebugMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
         }
 
         Renderer::endRenderPass();

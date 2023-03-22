@@ -27,6 +27,7 @@ namespace CgEngine {
 
     void Application::init() {
         applicationOptions.debugShowPhysicsColliders = iniReader->GetBoolean("application", "debug_show_physics_colliders", false);
+        applicationOptions.debugShowPhysicsColliders = iniReader->GetBoolean("application", "debug_show_normals", false);
 
         WindowSpecification windowSpecification;
         windowSpecification.width = iniReader->GetInteger("window", "width", 1280);
@@ -95,6 +96,11 @@ namespace CgEngine {
         switch (event.getKeyCode()) {
             case KeyCode::F1: {
                 applicationOptions.debugShowPhysicsColliders = !applicationOptions.debugShowPhysicsColliders;
+                break;
+            }
+            case KeyCode::F2: {
+                applicationOptions.debugShowNormals = !applicationOptions.debugShowNormals;
+                break;
             }
         }
     }

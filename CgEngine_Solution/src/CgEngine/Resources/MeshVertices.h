@@ -18,6 +18,9 @@ namespace CgEngine {
         Vertex() {};
         Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ, float tU, float tV)
         : position{pX, pY, pZ}, normal{nX, nY, nZ}, uv{tU, tV} {};
+
+        Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ)
+                : position{pX, pY, pZ}, normal{nX, nY, nZ} {};
     };
 
     struct Submesh {
@@ -47,6 +50,7 @@ namespace CgEngine {
     private:
         static MeshVertices* createCubeMesh();
         static MeshVertices* createSphereMesh(uint32_t latSegments, uint32_t lonSegments);
+        static MeshVertices* createCapsuleMesh(float height, float radius);
         static MeshVertices* loadMeshAsset(const std::string& path);
 
         static std::string getTexturePath(const std::string& modelPath, const std::string& texturePath);

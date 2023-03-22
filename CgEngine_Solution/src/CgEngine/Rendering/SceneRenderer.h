@@ -34,13 +34,16 @@ namespace CgEngine {
         RenderPass* screenRenderPass;
         RenderPass* skyboxRenderPass;
         RenderPass* physicsCollidersRenderPass;
+        RenderPass* normalsDebugRenderPass;
         Material* screenMaterial;
         Material* skyboxMaterial;
         Material* physicsCollidersMaterial;
+        Material* normalsDebugMaterial;
 
         void geometryPass();
         void skyboxPass();
         void physicsCollidersPass();
+        void normalsDebugPass();
         void screenPass();
         void clearPass(RenderPass& renderPass);
 

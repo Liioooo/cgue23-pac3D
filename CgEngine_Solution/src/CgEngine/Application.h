@@ -15,6 +15,7 @@ namespace CgEngine {
 
     struct ApplicationOptions {
         bool debugShowPhysicsColliders;
+        bool debugShowNormals;
     };
 
     class Application {
