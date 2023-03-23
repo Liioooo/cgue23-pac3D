@@ -57,6 +57,8 @@ namespace CgEngine {
             createBoxColliderComponent(scene, entity, node);
         } else if (name == "SphereColliderComponent") {
             createSphereColliderComponent(scene, entity, node);
+        } else if (name == "CapsuleColliderComponent") {
+            createCapsuleColliderComponent(scene, entity, node);
         }
     }
 
@@ -152,22 +154,33 @@ namespace CgEngine {
 
     void SceneLoader::createBoxColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
         BoxColliderComponentParams params{
-                stringTupleToVec3(node.attribute("half-size").as_string("0.5 0.5 0.5")),
-                stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
-                node.attribute("trigger").as_bool(false),
-                node.attribute("material").as_string("default-physics-material"),
+            stringTupleToVec3(node.attribute("half-size").as_string("0.5 0.5 0.5")),
+            stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
+            node.attribute("trigger").as_bool(false),
+            node.attribute("material").as_string("default-physics-material"),
         };
         scene->attachComponent<BoxColliderComponent>(entity, params);
     }
 
     void SceneLoader::createSphereColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
         SphereColliderComponentParams params{
-                node.attribute("radius").as_float(1.0f),
-                stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
-                node.attribute("trigger").as_bool(false),
-                node.attribute("material").as_string("default-physics-material"),
+            node.attribute("radius").as_float(1.0f),
+            stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
+            node.attribute("trigger").as_bool(false),
+            node.attribute("material").as_string("default-physics-material"),
         };
         scene->attachComponent<SphereColliderComponent>(entity, params);
+    }
+
+    void SceneLoader::createCapsuleColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
+        CapsuleColliderComponentParams params{
+            node.attribute("radius").as_float(1.0f),
+            node.attribute("half-height").as_float(1.0f),
+            stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
+            node.attribute("trigger").as_bool(false),
+            node.attribute("material").as_string("default-physics-material"),
+        };
+        scene->attachComponent<CapsuleColliderComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {

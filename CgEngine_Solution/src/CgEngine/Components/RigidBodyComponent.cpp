@@ -21,6 +21,18 @@ namespace CgEngine {
             colliderComp.colliderUuid = colliderUuid;
         }
 
+        if (scene.hasComponent<SphereColliderComponent>(entity)) {
+            auto& colliderComp = scene.getComponent<SphereColliderComponent>(entity);
+            uint32_t colliderUuid = addSphereCollider(colliderComp.getPhysicsMaterial(), colliderComp.getRadius(), colliderComp.getOffset(), colliderComp.getIsTrigger());
+            colliderComp.colliderUuid = colliderUuid;
+        }
+
+        if (scene.hasComponent<CapsuleColliderComponent>(entity)) {
+            auto& colliderComp = scene.getComponent<CapsuleColliderComponent>(entity);
+            uint32_t colliderUuid = addCapsuleCollider(colliderComp.getPhysicsMaterial(), colliderComp.getRadius(), colliderComp.getHalfHeight(), colliderComp.getOffset(), colliderComp.getIsTrigger());
+            colliderComp.colliderUuid = colliderUuid;
+        }
+
         scene.getPhysicsScene().addActor(actor);
     }
 
@@ -79,6 +91,10 @@ namespace CgEngine {
 
     uint32_t RigidBodyComponent::addSphereCollider(PhysicsMaterial& material, float radius, glm::vec3 offset, bool isTrigger) {
         return actor->addSphereCollider(material, radius, offset, isTrigger);
+    }
+
+    uint32_t RigidBodyComponent::addCapsuleCollider(PhysicsMaterial& material, float radius, float halfHeight, glm::vec3 offset, bool isTrigger) {
+        return actor->addCapsuleCollider(material, radius, halfHeight, offset, isTrigger);
     }
 
     void RigidBodyComponent::removeCollider(uint32_t colliderUuid) {

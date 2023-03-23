@@ -225,6 +225,13 @@ namespace CgEngine {
                 glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), it->getOffset()) * modelMatrix * glm::scale(glm::mat4(1.0f), glm::vec3(it->getRadius()));
                 renderer.submitPhysicsColliderMesh(sphereMesh, colliderTransform);
             }
+
+            for (auto it = componentManager->begin<CapsuleColliderComponent>(); it != componentManager->end<CapsuleColliderComponent>(); it++) {
+                auto& capsuleMesh = *resourceManager.getResource<MeshVertices>("CG_CapsuleMesh_" + std::to_string(it->getRadius()) + "_" + std::to_string(it->getHalfHeight() * 2.0f));
+                auto modelMatrix = componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix();
+                glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), it->getOffset()) * modelMatrix;
+                renderer.submitPhysicsColliderMesh(capsuleMesh, colliderTransform);
+            }
         }
 
         renderer.endScene();

@@ -2,6 +2,7 @@
 #include "GlobalObjectManager.h"
 #include "PhysicsShapeBox.h"
 #include "PhysicsShapeSphere.h"
+#include "PhysicsShapeCapsule.h"
 #include "Uuid.h"
 
 namespace CgEngine {
@@ -153,6 +154,13 @@ namespace CgEngine {
 
     uint32_t PhysicsActor::addSphereCollider(PhysicsMaterial& material, float radius, glm::vec3 offset, bool isTrigger) {
         auto* collider = new PhysicsShapeSphere(*this, material, radius, offset, isTrigger);
+        uint32_t uuid = Uuid().getUuid();
+        colliders.insert({uuid, collider});
+        return uuid;
+    }
+
+    uint32_t PhysicsActor::addCapsuleCollider(PhysicsMaterial& material, float radius, float halfHeight, glm::vec3 offset, bool isTrigger) {
+        auto* collider = new PhysicsShapeCapsule(*this, material, radius, halfHeight, offset, isTrigger);
         uint32_t uuid = Uuid().getUuid();
         colliders.insert({uuid, collider});
         return uuid;

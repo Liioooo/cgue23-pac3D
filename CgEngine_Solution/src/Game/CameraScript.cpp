@@ -57,11 +57,11 @@ namespace Game {
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Left)) {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addTorque({0, 1, 0});
+            rigid.addForce({-4, 0, 0});
         }
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Down)) {
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Right)) {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addTorque({1, 0, 0});
+            rigid.addForce({4, 0, 0});
         }
 
 //        CG_LOGGING_INFO(ts.getMillis())
