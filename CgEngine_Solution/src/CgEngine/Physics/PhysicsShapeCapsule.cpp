@@ -15,7 +15,7 @@ namespace CgEngine {
 
         physxShape->setSimulationFilterData(actor.getFilterData());
 
-        physx::PxTransform transform(PhysXUtils::glmToPhysXVec(offset));
+        physx::PxTransform transform(PhysXUtils::glmToPhysXVec(offset), PhysXUtils::glmToPhysXQuat(glm::quat(glm::vec3(0.0f, 0.0f, glm::half_pi<float>()))));
         physxShape->setLocalPose(transform);
 
         physxShape->userData = this;

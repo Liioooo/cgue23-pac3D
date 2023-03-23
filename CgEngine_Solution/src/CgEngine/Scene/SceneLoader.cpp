@@ -175,7 +175,7 @@ namespace CgEngine {
     void SceneLoader::createCapsuleColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
         CapsuleColliderComponentParams params{
             node.attribute("radius").as_float(1.0f),
-            node.attribute("half-height").as_float(1.0f),
+            node.attribute("half-height").as_float(0.5f),
             stringTupleToVec3(node.attribute("offset").as_string("0 0 0")),
             node.attribute("trigger").as_bool(false),
             node.attribute("material").as_string("default-physics-material"),
