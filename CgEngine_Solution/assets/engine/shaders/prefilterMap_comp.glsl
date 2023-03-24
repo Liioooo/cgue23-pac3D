@@ -6,7 +6,7 @@ layout(binding = 1, rgba32f) restrict writeonly uniform imageCube o_prefilterMap
 uniform float u_Roughness;
 
 const uint SAMPLE_COUNT = 1024u;
-const float INVERSE_SAMPLE_COUNT = 1.0f / SAMPLE_COUNT;
+const float INVERSE_SAMPLE_COUNT = 1.0f / float(SAMPLE_COUNT);
 const float PI = 3.14159265359f;
 const float TWO_PI = PI * 2.0f;
 const float HALF_PI = PI * 0.5f;
@@ -54,20 +54,19 @@ vec3 importanceSampleGGX(vec2 Xi, vec3 N, float roughness) {
     H.z = cosTheta;
 
     // from tangent-space vector to world-space sample vector
-    vec3 bitangent = cross(N, vec3(0.0, 1.0, 0.0));
-    bitangent = normalize(mix(cross(N, vec3(1.0, 0.0, 0.0)), bitangent, step(0.00001f, dot(bitangent, bitangent))));
+    vec3 bitangent = cross(N, vec3(0.0f, 1.0f, 0.0f));
+    bitangent = normalize(mix(cross(N, vec3(1.0f, 0.0f, 0.0f)), bitangent, step(0.00001f, dot(bitangent, bitangent))));
     vec3 tangent = normalize(cross(N, bitangent));
 
     vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
     return normalize(sampleVec);
 }
 
-float distributionGGX(vec3 N, vec3 H, float roughness) {
+float distributionGGX(float NdotH, float roughness) {
     float alpha = roughness * roughness;
     float alphaSq = alpha * alpha;
-    float NdotH  = max(dot(N, H), 0.0);
 
-    float denom = (NdotH * NdotH) * (alphaSq - 1.0) + 1.0;
+    float denom = (NdotH * NdotH) * (alphaSq - 1.0f) + 1.0f;
     return alphaSq / (PI * denom * denom);
 }
 
@@ -88,13 +87,13 @@ void main() {
         vec3 L = normalize(2.0f * dot(V, H) * H - V);
 
         float NdotL = max(dot(N, L), 0.0f);
-        float D = distributionGGX(N, H, u_Roughness);
         float NdotH = max(dot(N, H), 0.0f);
+        float D = distributionGGX(NdotH, u_Roughness);
         float HdotV = max(dot(H, V), 0.0f);
         float pdf = D * NdotH / (4.0f * HdotV) + 0.0001f;
 
         float saSample = 1.0f / (float(SAMPLE_COUNT) * pdf);
-        float mipLevel = max(0.5f * log2(saSample / saTexel), 0.0f);
+        float mipLevel = u_Roughness == 0.0f ? 0.0f : 0.5f * log2(saSample / saTexel);
 
         prefilteredColor += textureLod(u_cubeMap, L, mipLevel).rgb * NdotL;
         totalWeight += NdotL;
