@@ -7,12 +7,17 @@
 namespace CgEngine {
     SceneRenderer::SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
         {
+            dirShadowMaps = new Texture2DArray(TextureFormat::Depth, 2048, 2048, TextureWrap::ClampBorder, 4, MipMapFiltering::Nearest);
+            dirShadowMaps->setClampBorderColor({1.0f, 1.0f, 1.0f, 1.0f});
+
             FramebufferSpecification shadowMapFramebufferSpec;
             shadowMapFramebufferSpec.height = 2048;
             shadowMapFramebufferSpec.width = 2048;
             shadowMapFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
             shadowMapFramebufferSpec.hasDepthStencilAttachment = false;
-            shadowMapFramebufferSpec.hasDepthAttachment = true;
+            shadowMapFramebufferSpec.hasDepthAttachment = false;
+            shadowMapFramebufferSpec.useExistingDepthAttachment = true;
+            shadowMapFramebufferSpec.existingDepthAttachment = dirShadowMaps->getRendererId();
 
             auto* framebuffer = new Framebuffer(shadowMapFramebufferSpec);
 
@@ -128,6 +133,8 @@ namespace CgEngine {
         delete normalsDebugMaterial;
         delete screenMaterial;
         delete shadowMapMaterial;
+
+        delete dirShadowMaps;
 
         delete ubCameraData;
         delete ubLightData;
@@ -312,7 +319,7 @@ namespace CgEngine {
         geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 5);
         geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 6);
         geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
-        geometryRenderPass->getSpecification().shader->setTexture2D(shadowMapRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId(), 7);
+        geometryRenderPass->getSpecification().shader->setTexture2DArray(dirShadowMaps->getRendererId(), 7);
 
         for (const auto [mk, command]: drawCommandQueue) {
             const auto& transforms = meshTransforms[mk];

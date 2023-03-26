@@ -3,11 +3,11 @@
 namespace CgEngine {
 
     enum class TextureFormat {
-        RGB, RGBA, Float16, Float32
+        RGB, RGBA, Float16, Float32, Depth
     };
 
     enum class TextureWrap {
-        Repeat, Clamp
+        Repeat, Clamp, ClampBorder
     };
 
     enum class MipMapFiltering {
@@ -17,6 +17,8 @@ namespace CgEngine {
     namespace TextureUtils {
         int getOpenGLTextureFormat(TextureFormat format);
         int getTextureFormatType(TextureFormat format);
+        int getTextureWrap(TextureWrap wrap);
+        void setClampBorderColor(const glm::vec4& color, unsigned int textureType);
         void applyMipMapFiltering(MipMapFiltering mipMapFiltering, unsigned int textureType);
         uint32_t calculateMipCount(uint32_t width, uint32_t height);
     }
@@ -36,6 +38,7 @@ namespace CgEngine {
         uint32_t getRendererId() const;
         void bind(uint32_t slot);
         void generateMipMaps();
+        void setClampBorderColor(const glm::vec4& color);
         bool isLoaded() const;
 
     private:
@@ -44,6 +47,28 @@ namespace CgEngine {
         uint32_t height;
         TextureFormat format;
         bool loaded = false;
+    };
+
+    class Texture2DArray {
+    public:
+        Texture2DArray(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, uint32_t count, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
+        ~Texture2DArray();
+
+        uint32_t getWidth() const;
+        uint32_t getHeight() const;
+        uint32_t getCount() const;
+        TextureFormat getFormat() const;
+        uint32_t getRendererId() const;
+        void bind(uint32_t slot);
+        void generateMipMaps();
+        void setClampBorderColor(const glm::vec4& color);
+
+    private:
+        uint32_t id;
+        uint32_t width;
+        uint32_t height;
+        uint32_t count;
+        TextureFormat format;
     };
 
     class TextureCube {

@@ -38,7 +38,7 @@ layout (binding = 1, std140) uniform LightData {
 
 in VS_OUT {
     vec3 WorldPosition;
-    vec4 DirShadowMapPosition;
+    vec4 DirShadowMapPosition[4];
     vec3 Normal;
     mat3 TBN;
     vec2 TexCoord;
@@ -61,7 +61,7 @@ layout(binding = 4) uniform samplerCube u_IrradianceMap;
 layout(binding = 5) uniform samplerCube u_PrefilterMap;
 layout(binding = 6) uniform sampler2D u_BrdfLUT;
 
-layout(binding = 7) uniform sampler2D u_DirShadowMap;
+layout(binding = 7) uniform sampler2DArray u_DirShadowMap;
 
 const float PI = 3.141592;
 
@@ -111,9 +111,9 @@ vec3 fresnelSchlick(vec3 F0, float cosTheta) {
 }
 
 float calcDirShadow(vec3 N, vec3 L) {
-    vec3 projCoords = fs_in.DirShadowMapPosition.xyz / fs_in.DirShadowMapPosition.w;
+    vec3 projCoords = fs_in.DirShadowMapPosition[0].xyz / fs_in.DirShadowMapPosition[0].w;
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(u_DirShadowMap, projCoords.xy).r;
+    float closestDepth = texture(u_DirShadowMap, vec3(projCoords.xy, 0)).r;
     float currentDepth = projCoords.z;
 
     if (currentDepth > 1.0f) {

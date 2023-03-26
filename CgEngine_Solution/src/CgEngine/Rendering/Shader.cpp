@@ -181,6 +181,11 @@ namespace CgEngine {
         glBindTexture(GL_TEXTURE_2D, textureRendererId);
     }
 
+    void Shader::setTexture2DArray(uint32_t textureRendererId, uint32_t textureUnit) {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, textureRendererId);
+    }
+
     void Shader::setTextureCube(uint32_t textureRendererId, uint32_t textureUnit) {
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureRendererId);

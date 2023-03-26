@@ -107,6 +107,8 @@ namespace CgEngine {
     void Renderer::shutdown() {
         delete whiteTexture;
         delete blackCubeTexture;
+        delete brdfLUT;
+        delete transformsBuffer;
     }
 
     void Renderer::beginRenderPass(RenderPass& renderPass) {

@@ -42,8 +42,7 @@ namespace CgEngine {
         Material* normalsDebugMaterial;
         Material* shadowMapMaterial;
 
-        Material* testMat;
-        RenderPass* testPass;
+        Texture2DArray* dirShadowMaps;
 
         void shadowMapPass();
         void geometryPass();

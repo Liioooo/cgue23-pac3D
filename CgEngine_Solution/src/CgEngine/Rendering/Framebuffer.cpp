@@ -15,7 +15,7 @@ namespace CgEngine {
             for (const auto &item: colorAttachments) {
                 glDeleteTextures(1, &item);
             }
-            if (specification.hasDepthStencilAttachment) {
+            if ((specification.hasDepthStencilAttachment || specification.hasDepthAttachment) && (!specification.useExistingDepthAttachment || !specification.useExistingDepthStencilAttachment)) {
                 glDeleteTextures(1, &depthAttachment);
             }
         }
@@ -51,7 +51,7 @@ namespace CgEngine {
             for (const auto &item: colorAttachments) {
                 glDeleteTextures(1, &item);
             }
-            if (specification.hasDepthStencilAttachment) {
+            if ((specification.hasDepthStencilAttachment || specification.hasDepthAttachment) && (!specification.useExistingDepthAttachment || !specification.useExistingDepthStencilAttachment)) {
                 glDeleteTextures(1, &depthAttachment);
             }
         }
@@ -101,6 +101,7 @@ namespace CgEngine {
         }
 
         CG_ASSERT(!(specification.hasDepthStencilAttachment && specification.hasDepthAttachment), "Framebuffer can't have 2 Depth Attachments")
+        CG_ASSERT(!(specification.hasDepthStencilAttachment || specification.hasDepthAttachment) || !(specification.useExistingDepthAttachment || specification.useExistingDepthStencilAttachment), "Already using existing Depth Attachment")
 
         if (specification.hasDepthStencilAttachment) {
             if (multisample) {
@@ -137,7 +138,17 @@ namespace CgEngine {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthAttachment, 0);
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthAttachment, 0);
+        }
+
+        if (specification.useExistingDepthStencilAttachment) {
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, specification.existingDepthAttachment, 0);
+            depthAttachment = specification.existingDepthAttachment;
+        }
+
+        if (specification.useExistingDepthAttachment) {
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, specification.existingDepthAttachment, 0);
+            depthAttachment = specification.existingDepthAttachment;
         }
 
         CG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");

@@ -12,6 +12,9 @@ namespace CgEngine {
         glm::vec4 clearColor;
         bool hasDepthStencilAttachment = true;
         bool hasDepthAttachment = false;
+        bool useExistingDepthStencilAttachment = false;
+        bool useExistingDepthAttachment = false;
+        uint32_t existingDepthAttachment;
         std::vector<FramebufferFormat> colorAttachments;
         uint32_t samples = 1;
         bool screenTarget = false;

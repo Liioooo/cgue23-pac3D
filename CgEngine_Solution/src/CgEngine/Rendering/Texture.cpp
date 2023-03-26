@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "Asserts.h"
+#include <glm/gtc/type_ptr.hpp>
 #include "glad/glad.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stbi_image.h"
@@ -13,18 +14,32 @@ namespace CgEngine {
                 case TextureFormat::RGBA:    return GL_RGBA;
                 case TextureFormat::Float16: return GL_RGBA16F;
                 case TextureFormat::Float32: return GL_RGBA32F;
+                case TextureFormat::Depth:   return GL_DEPTH_COMPONENT32F;
             }
             return 0;
         }
 
         int getTextureFormatType(TextureFormat format) {
-            if (format == TextureFormat::Float16 || format == TextureFormat::Float32) {
+            if (format == TextureFormat::Float16 || format == TextureFormat::Float32 || format == TextureFormat::Depth) {
                 return GL_FLOAT;
             }
             return GL_UNSIGNED_BYTE;
         }
 
-        void applyMipMapFiltering(MipMapFiltering mipMapFiltering, GLenum textureType) {
+        int getTextureWrap(TextureWrap wrap) {
+            switch (wrap) {
+                case TextureWrap::Repeat:       return GL_REPEAT;
+                case TextureWrap::Clamp:        return GL_CLAMP_TO_EDGE;
+                case TextureWrap::ClampBorder:  return GL_CLAMP_TO_BORDER;
+            }
+            return 0;
+        }
+
+        void setClampBorderColor(const glm::vec4& color, unsigned int textureType) {
+            glTexParameterfv(textureType, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(color));
+        }
+
+        void applyMipMapFiltering(MipMapFiltering mipMapFiltering, unsigned int textureType) {
             switch (mipMapFiltering) {
                 case MipMapFiltering::Nearest: {
                     glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -58,13 +73,13 @@ namespace CgEngine {
         glBindTexture(GL_TEXTURE_2D, id);
 
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
-        GLint textureWrap = wrap == TextureWrap::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+        GLint textureWrap = TextureUtils::getTextureWrap(wrap);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
 
         GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
         GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, type, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format == TextureFormat::Depth ? GL_DEPTH_COMPONENT : GL_RGBA, type, nullptr);
     }
 
     Texture2D::Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, const void* data, MipMapFiltering mipMapFiltering) : format(format), width(width), height(height) {
@@ -72,13 +87,13 @@ namespace CgEngine {
         glBindTexture(GL_TEXTURE_2D, id);
 
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
-        GLint textureWrap = wrap == TextureWrap::Clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+        GLint textureWrap = TextureUtils::getTextureWrap(wrap);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
 
         GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
         GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format == TextureFormat::Depth ? GL_DEPTH_COMPONENT : GL_RGBA, type, data);
 
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -168,8 +183,66 @@ namespace CgEngine {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
+    void Texture2D::setClampBorderColor(const glm::vec4& color) {
+        glBindTexture(GL_TEXTURE_2D, id);
+        TextureUtils::setClampBorderColor(color, GL_TEXTURE_2D);
+    }
+
     bool Texture2D::isLoaded() const {
         return loaded;
+    }
+
+    Texture2DArray::Texture2DArray(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, uint32_t count, MipMapFiltering mipMapFiltering) : format(format), width(width), height(height), count(count) {
+        glGenTextures(1, &id);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+
+        TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D_ARRAY);
+        GLint textureWrap = TextureUtils::getTextureWrap(wrap);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, textureWrap);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, textureWrap);
+
+        GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getTextureFormatType(format);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, width, height, count, 0, format == TextureFormat::Depth ? GL_DEPTH_COMPONENT : GL_RGBA, type, nullptr);
+    }
+
+    Texture2DArray::~Texture2DArray() {
+        glDeleteTextures(1, &id);
+    }
+
+    uint32_t Texture2DArray::getWidth() const {
+        return width;
+    }
+
+    uint32_t Texture2DArray::getHeight() const {
+        return height;
+    }
+
+    uint32_t Texture2DArray::getCount() const {
+        return count;
+    }
+
+    TextureFormat Texture2DArray::getFormat() const {
+        return format;
+    }
+
+    uint32_t Texture2DArray::getRendererId() const {
+        return id;
+    }
+
+    void Texture2DArray::bind(uint32_t slot) {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+    }
+
+    void Texture2DArray::generateMipMaps() {
+        glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+        glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+    }
+
+    void Texture2DArray::setClampBorderColor(const glm::vec4& color) {
+        glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+        TextureUtils::setClampBorderColor(color, GL_TEXTURE_2D_ARRAY);
     }
 
     TextureCube* TextureCube::createResource(const std::string& name) {

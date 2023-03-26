@@ -24,7 +24,7 @@ layout (location = 4) in vec3 a_Bitangent;
 
 out VS_OUT {
     vec3 WorldPosition;
-    vec4 DirShadowMapPosition;
+    vec4 DirShadowMapPosition[4];
     vec3 Normal;
     mat3 TBN;
     vec2 TexCoord;
@@ -39,7 +39,10 @@ void main() {
     vs_out.WorldPosition = worldPosition.xyz;
     vs_out.Normal = mat3(transpose(inverse(model))) * a_Normal;
     vs_out.TBN = mat3(model) * mat3(a_Tangent, a_Bitangent, a_Normal);
-    vs_out.DirShadowMapPosition = u_DirShadowData.lightSpaceMat[0] * vec4(worldPosition.xyz, 1.0f);
+    vs_out.DirShadowMapPosition[0] = u_DirShadowData.lightSpaceMat[0] * vec4(worldPosition.xyz, 1.0f);
+    vs_out.DirShadowMapPosition[1] = u_DirShadowData.lightSpaceMat[1] * vec4(worldPosition.xyz, 1.0f);
+    vs_out.DirShadowMapPosition[2] = u_DirShadowData.lightSpaceMat[2] * vec4(worldPosition.xyz, 1.0f);
+    vs_out.DirShadowMapPosition[3] = u_DirShadowData.lightSpaceMat[3] * vec4(worldPosition.xyz, 1.0f);
 
     gl_Position = u_CameraData.viewProjection * worldPosition;
 }
