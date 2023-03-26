@@ -24,6 +24,7 @@ namespace CgEngine {
         bool clearColorBuffer = true;
         bool clearStencilBuffer = false;
         bool backfaceCulling = true;
+        bool frontfaceCulling = false;
         bool depthTest = true;
         bool depthWrite = true;
         bool wireframe = false;

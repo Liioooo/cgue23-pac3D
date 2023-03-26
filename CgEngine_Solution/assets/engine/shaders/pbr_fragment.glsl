@@ -38,6 +38,7 @@ layout (binding = 1, std140) uniform LightData {
 
 in VS_OUT {
     vec3 WorldPosition;
+    vec4 DirShadowMapPosition;
     vec3 Normal;
     mat3 TBN;
     vec2 TexCoord;
@@ -59,6 +60,8 @@ uniform float u_EnvironmentIntensity;
 layout(binding = 4) uniform samplerCube u_IrradianceMap;
 layout(binding = 5) uniform samplerCube u_PrefilterMap;
 layout(binding = 6) uniform sampler2D u_BrdfLUT;
+
+layout(binding = 7) uniform sampler2D u_DirShadowMap;
 
 const float PI = 3.141592;
 
@@ -107,6 +110,22 @@ vec3 fresnelSchlick(vec3 F0, float cosTheta) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
+float calcDirShadow(vec3 N, vec3 L) {
+    vec3 projCoords = fs_in.DirShadowMapPosition.xyz / fs_in.DirShadowMapPosition.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(u_DirShadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+
+    if (currentDepth > 1.0f) {
+        return 0.0f;
+    }
+
+    float bias = max(0.0002f * (1.0f - dot(N, L)), 0.0002f); ;
+    float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
+
+    return shadow;
+}
+
 vec3 calcDirLight(vec3 F0, vec3 matAlbedo, float matMetalness, float matRoughness, vec3 N, vec3 V, float NdotV) {
     if (u_LightData.dirLightIntensity == 0.0f) {
         return vec3(0.0f);
@@ -126,7 +145,7 @@ vec3 calcDirLight(vec3 F0, vec3 matAlbedo, float matMetalness, float matRoughnes
     vec3 diffuseBRDF = kd * matAlbedo;
     vec3 specularBRDF = (F * D * G) / max(0.0001, 4.0 * NdotL * NdotV);
     specularBRDF = clamp(specularBRDF, vec3(0.0f), vec3(10.0f));
-    return (diffuseBRDF + specularBRDF) * Lradiance * NdotL;
+    return (diffuseBRDF + specularBRDF) * Lradiance * NdotL * (1.0f - calcDirShadow(N, L));
 }
 
 vec3 calcPointLights(vec3 F0, vec3 matAlbedo, float matMetalness, float matRoughness, vec3 worldPos, vec3 N, vec3 V, float NdotV) {

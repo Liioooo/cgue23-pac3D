@@ -33,7 +33,7 @@ namespace CgEngine {
         glm::vec3 dirLightDirection;
         float dirLightIntensity = 0.0f;
         glm::vec3 dirLightColor;
-        bool dirLightCastShadows;
+        bool dirLightCastShadows = false;
         std::vector<ScenePointLight> pointLights;
         std::vector<SceneSpotLight> spotLights;
     };

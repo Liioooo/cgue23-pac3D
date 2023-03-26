@@ -22,6 +22,8 @@ namespace CgEngine {
         } else {
             material = GlobalObjectManager::getInstance().getResourceManager().getResource<Material>(params.material);
         }
+
+        castShadows = params.castShadows;
     }
 
     MeshVertices &MeshRendererComponent::getMeshVertices() {
@@ -30,6 +32,14 @@ namespace CgEngine {
 
     Material* MeshRendererComponent::getMaterial() {
         return material;
+    }
+
+    bool MeshRendererComponent::getCastShadows() const {
+        return castShadows;
+    }
+
+    void MeshRendererComponent::setCastShadows(bool value) {
+        castShadows = value;
     }
 
     const std::vector<uint32_t> &MeshRendererComponent::getSubmeshIndices() {

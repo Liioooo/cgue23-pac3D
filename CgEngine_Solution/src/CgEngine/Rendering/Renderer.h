@@ -32,7 +32,8 @@ namespace CgEngine {
         static RenderPass* currentRenderPass;
         static RendererData rendererData;
         static bool isWireframe;
-        static bool isBackfaceCulling;
+        static bool isBackFaceCulling;
+        static bool isFrontFaceCulling;
         static DepthCompareOperator depthCompareOperator;
         static bool depthTest;
         static bool depthWrite;

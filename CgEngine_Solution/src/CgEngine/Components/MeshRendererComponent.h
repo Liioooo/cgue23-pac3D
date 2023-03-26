@@ -10,6 +10,7 @@ namespace CgEngine {
         std::string assetFile;
         std::string mesh;
         std::string material;
+        bool castShadows;
         std::vector<uint32_t> submeshIndices;
     };
 
@@ -21,11 +22,14 @@ namespace CgEngine {
 
         MeshVertices& getMeshVertices();
         Material* getMaterial();
+        bool getCastShadows() const;
+        void setCastShadows(bool value);
         const std::vector<uint32_t>& getSubmeshIndices();
 
     private:
         MeshVertices* mesh;
         Material* material;
+        bool castShadows;
         std::vector<uint32_t> submeshIndices;
     };
 

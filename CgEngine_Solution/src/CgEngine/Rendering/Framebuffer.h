@@ -11,6 +11,7 @@ namespace CgEngine {
         uint32_t height;
         glm::vec4 clearColor;
         bool hasDepthStencilAttachment = true;
+        bool hasDepthAttachment = false;
         std::vector<FramebufferFormat> colorAttachments;
         uint32_t samples = 1;
         bool screenTarget = false;

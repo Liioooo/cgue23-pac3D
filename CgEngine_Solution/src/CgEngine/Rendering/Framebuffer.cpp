@@ -27,6 +27,7 @@ namespace CgEngine {
         } else {
             glBindFramebuffer(GL_FRAMEBUFFER, id);
         }
+        glViewport(0, 0, specification.width, specification.height);
     }
 
     void Framebuffer::unbind() {
@@ -42,7 +43,6 @@ namespace CgEngine {
         specification.height = height;
 
         if (specification.screenTarget) {
-            glViewport(0, 0, width, height);
             return;
         }
 
@@ -95,6 +95,12 @@ namespace CgEngine {
             index++;
         }
 
+        if (specification.colorAttachments.empty()) {
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
+
+        CG_ASSERT(!(specification.hasDepthStencilAttachment && specification.hasDepthAttachment), "Framebuffer can't have 2 Depth Attachments")
 
         if (specification.hasDepthStencilAttachment) {
             if (multisample) {
@@ -106,9 +112,32 @@ namespace CgEngine {
                 glGenTextures(1, &depthAttachment);
                 glBindTexture(GL_TEXTURE_2D, depthAttachment);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, specification.width, specification.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthAttachment, 0);
+        }
+
+        if (specification.hasDepthAttachment) {
+            if (multisample) {
+                glGenTextures(1, &depthAttachment);
+                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, depthAttachment);
+                glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, specification.samples, GL_DEPTH_COMPONENT, specification.width, specification.height, GL_FALSE);
+                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+            } else {
+                glGenTextures(1, &depthAttachment);
+                glBindTexture(GL_TEXTURE_2D, depthAttachment);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, specification.width, specification.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthAttachment, 0);
         }
 
         CG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");

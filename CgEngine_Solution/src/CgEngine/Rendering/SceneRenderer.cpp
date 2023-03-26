@@ -7,9 +7,32 @@
 namespace CgEngine {
     SceneRenderer::SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
         {
+            FramebufferSpecification shadowMapFramebufferSpec;
+            shadowMapFramebufferSpec.height = 2048;
+            shadowMapFramebufferSpec.width = 2048;
+            shadowMapFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+            shadowMapFramebufferSpec.hasDepthStencilAttachment = false;
+            shadowMapFramebufferSpec.hasDepthAttachment = true;
+
+            auto* framebuffer = new Framebuffer(shadowMapFramebufferSpec);
+
+            RenderPassSpecification shadowMapRenderPassSpec;
+            shadowMapRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("dirShadowMap");
+            shadowMapRenderPassSpec.framebuffer = framebuffer;
+            shadowMapRenderPassSpec.clearColorBuffer = false;
+            shadowMapRenderPassSpec.clearDepthBuffer = true;
+            shadowMapRenderPassSpec.clearStencilBuffer = false;
+            shadowMapRenderPassSpec.frontfaceCulling = false;
+            shadowMapRenderPassSpec.backfaceCulling = true;
+
+            shadowMapRenderPass = new RenderPass(shadowMapRenderPassSpec);
+
+            shadowMapMaterial = new Material("ShadowMapMaterial");
+        }
+        {
             FramebufferSpecification geoFramebufferSpec;
             geoFramebufferSpec.height = viewportHeight;
-            geoFramebufferSpec.width = viewportHeight;
+            geoFramebufferSpec.width = viewportWidth;
             geoFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
             geoFramebufferSpec.colorAttachments = {FramebufferFormat::RGBA16F};
             geoFramebufferSpec.samples = 1;
@@ -69,9 +92,8 @@ namespace CgEngine {
         {
             FramebufferSpecification screenFramebufferSpec;
             screenFramebufferSpec.height = viewportHeight;
-            screenFramebufferSpec.width = viewportHeight;
+            screenFramebufferSpec.width = viewportWidth;
             screenFramebufferSpec.clearColor = {0.0f, 1.0f, 1.0f, 1.0f};
-            screenFramebufferSpec.colorAttachments = {FramebufferFormat::RGBA8};
             screenFramebufferSpec.hasDepthStencilAttachment = false;
             screenFramebufferSpec.samples = 1;
             screenFramebufferSpec.screenTarget = true;
@@ -90,9 +112,11 @@ namespace CgEngine {
 
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
         ubLightData = new UniformBuffer<UBLightData>("LightData", 1, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
+        ubDirShadowData = new UniformBuffer<UBDirShadowData>("DirShadowData", 2, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("dirShadowMap"));
     }
 
     SceneRenderer::~SceneRenderer() {
+        delete shadowMapRenderPass;
         delete geometryRenderPass;
         delete skyboxRenderPass;
         delete physicsCollidersRenderPass;
@@ -103,9 +127,11 @@ namespace CgEngine {
         delete physicsCollidersMaterial;
         delete normalsDebugMaterial;
         delete screenMaterial;
+        delete shadowMapMaterial;
 
         delete ubCameraData;
         delete ubLightData;
+        delete ubDirShadowData;
     }
 
     void SceneRenderer::setActiveScene(Scene* scene) {
@@ -181,6 +207,9 @@ namespace CgEngine {
         currentSceneEnvironment.environmentIntensity = sceneEnvironment.environmentIntensity;
         currentSceneEnvironment.irradianceMapId = sceneEnvironment.irradianceMap->getRendererId();
         currentSceneEnvironment.prefilterMapId = sceneEnvironment.prefilterMap->getRendererId();
+        currentSceneEnvironment.dirLightCastShadows = lightEnvironment.dirLightCastShadows && lightEnvironment.dirLightIntensity != 0.0f;
+
+        setupShadowMapData(lightEnvironment.dirLightDirection);
     }
 
     void SceneRenderer::endScene() {
@@ -188,6 +217,7 @@ namespace CgEngine {
 
         ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
 
+        shadowMapPass();
         geometryPass();
         skyboxPass();
         if (applicationOptions.debugShowPhysicsColliders) {
@@ -199,6 +229,7 @@ namespace CgEngine {
         screenPass();
 
         drawCommandQueue.clear();
+        shadowMapDrawCommandQueue.clear();
         meshTransforms.clear();
 
         physicsCollidersDrawCommandQueue.clear();
@@ -207,7 +238,7 @@ namespace CgEngine {
         activeRendering = false;
     }
 
-    void SceneRenderer::submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, const glm::mat4& transform) {
+    void SceneRenderer::submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, bool castShadows, const glm::mat4& transform) {
         auto& submeshes = mesh.getSubmeshes();
 
         for (const auto &index: submeshIndices) {
@@ -226,6 +257,16 @@ namespace CgEngine {
             drawCommand.baseVertex = submesh.baseVertex;
             drawCommand.indexCount = submesh.indexCount;
             drawCommand.instanceCount++;
+
+            if (castShadows) {
+                DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
+                shadowMapDrawCommand.vao = mesh.getVAO();
+                shadowMapDrawCommand.material = material;
+                shadowMapDrawCommand.baseIndex = submesh.baseIndex;
+                shadowMapDrawCommand.baseVertex = submesh.baseVertex;
+                shadowMapDrawCommand.indexCount = submesh.indexCount;
+                shadowMapDrawCommand.instanceCount++;
+            }
         }
     }
 
@@ -248,6 +289,22 @@ namespace CgEngine {
         }
     }
 
+    void SceneRenderer::shadowMapPass() {
+        if (!currentSceneEnvironment.dirLightCastShadows) {
+            clearPass(*shadowMapRenderPass);
+            return;
+        }
+
+        Renderer::beginRenderPass(*shadowMapRenderPass);
+
+        for (const auto [mk, command]: shadowMapDrawCommandQueue) {
+            const auto& transforms = meshTransforms[mk];
+            Renderer::executeDrawCommand(*command.vao, *shadowMapMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
+        }
+
+        Renderer::endRenderPass();
+    }
+
     void SceneRenderer::geometryPass() {
         Renderer::beginRenderPass(*geometryRenderPass);
 
@@ -255,6 +312,7 @@ namespace CgEngine {
         geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 5);
         geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 6);
         geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
+        geometryRenderPass->getSpecification().shader->setTexture2D(shadowMapRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId(), 7);
 
         for (const auto [mk, command]: drawCommandQueue) {
             const auto& transforms = meshTransforms[mk];
@@ -301,5 +359,17 @@ namespace CgEngine {
     void SceneRenderer::clearPass(RenderPass &renderPass) {
         Renderer::beginRenderPass(renderPass);
         Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::setupShadowMapData(glm::vec3 dirLightDirection) {
+        UBDirShadowData dirShadowData{};
+
+        float near_plane = 1.0f, far_plane = 100.0f;
+        glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
+        glm::mat4 lightView = glm::lookAt(dirLightDirection * 50.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        dirShadowData.lightSpaceMat[0] = lightProjection * lightView;
+
+        ubDirShadowData->setData(dirShadowData);
     }
 }

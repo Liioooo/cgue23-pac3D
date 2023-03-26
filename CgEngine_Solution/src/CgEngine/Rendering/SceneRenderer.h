@@ -20,7 +20,7 @@ namespace CgEngine {
         void setViewportSize(uint32_t width, uint32_t height);
         void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment, const SceneEnvironment& sceneEnvironment);
         void endScene();
-        void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, const glm::mat4& transform);
+        void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, bool castShadows, const glm::mat4& transform);
         void submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform);
 
     private:
@@ -30,6 +30,7 @@ namespace CgEngine {
         bool needsResize = true;
         bool activeRendering = false;
 
+        RenderPass* shadowMapRenderPass;
         RenderPass* geometryRenderPass;
         RenderPass* screenRenderPass;
         RenderPass* skyboxRenderPass;
@@ -39,13 +40,20 @@ namespace CgEngine {
         Material* skyboxMaterial;
         Material* physicsCollidersMaterial;
         Material* normalsDebugMaterial;
+        Material* shadowMapMaterial;
 
+        Material* testMat;
+        RenderPass* testPass;
+
+        void shadowMapPass();
         void geometryPass();
         void skyboxPass();
         void physicsCollidersPass();
         void normalsDebugPass();
         void screenPass();
         void clearPass(RenderPass& renderPass);
+
+        void setupShadowMapData(glm::vec3 dirLightDirection);
 
         struct UBCameraData {
             glm::mat4 viewProjection;
@@ -89,6 +97,12 @@ namespace CgEngine {
         };
         UniformBuffer<UBLightData>* ubLightData;
 
+        struct UBDirShadowData {
+            glm::mat4 lightSpaceMat[4];
+            glm::vec4 cascadeSplits;
+        };
+        UniformBuffer<UBDirShadowData>* ubDirShadowData;
+
         struct MeshKey {
             const uint32_t voaId;
             const uint32_t submeshIndex;
@@ -113,6 +127,7 @@ namespace CgEngine {
         };
 
         std::map<MeshKey, DrawCommand> drawCommandQueue;
+        std::map<MeshKey, DrawCommand> shadowMapDrawCommandQueue;
         std::map<MeshKey, std::vector<glm::mat4>> meshTransforms;
 
         std::map<MeshKey, DrawCommand> physicsCollidersDrawCommandQueue;
@@ -122,6 +137,7 @@ namespace CgEngine {
             uint32_t prefilterMapId;
             uint32_t irradianceMapId;
             float environmentIntensity;
+            bool dirLightCastShadows;
         } currentSceneEnvironment;
 
     };

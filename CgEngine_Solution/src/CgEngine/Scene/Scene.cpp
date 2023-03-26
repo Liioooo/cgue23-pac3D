@@ -205,7 +205,7 @@ namespace CgEngine {
         renderer.beginScene(cameraComponent->getCamera(), cameraTransform.getModelMatrix(), lightEnvironment, sceneEnvironment);
 
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
-            renderer.submitMesh(it->getMeshVertices(), it->getSubmeshIndices(), it->getMaterial(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
+            renderer.submitMesh(it->getMeshVertices(), it->getSubmeshIndices(), it->getMaterial(), it->getCastShadows(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
         }
 
         auto& applicationOptions = Application::get().getApplicationOptions();

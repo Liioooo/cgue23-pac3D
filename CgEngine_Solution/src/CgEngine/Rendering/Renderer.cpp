@@ -8,7 +8,8 @@ namespace CgEngine {
     RenderPass* Renderer::currentRenderPass = nullptr;
     RendererData Renderer::rendererData;
     bool Renderer::isWireframe;
-    bool Renderer::isBackfaceCulling;
+    bool Renderer::isBackFaceCulling;
+    bool Renderer::isFrontFaceCulling;
     DepthCompareOperator Renderer::depthCompareOperator;
     bool Renderer::depthTest;
     bool Renderer::depthWrite;
@@ -79,8 +80,10 @@ namespace CgEngine {
 
         isWireframe = false;
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        isBackfaceCulling = true;
+        isBackFaceCulling = true;
+        isFrontFaceCulling = false;
         glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         depthTest = true;
         glEnable(GL_DEPTH_TEST);
         depthWrite = true;
@@ -135,12 +138,19 @@ namespace CgEngine {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
         }
-        if (isBackfaceCulling != spec.backfaceCulling) {
-            isBackfaceCulling = spec.backfaceCulling;
-            if (isBackfaceCulling) {
+        if (isBackFaceCulling != spec.backfaceCulling || isFrontFaceCulling != spec.frontfaceCulling) {
+            isBackFaceCulling = spec.backfaceCulling;
+            isFrontFaceCulling = spec.frontfaceCulling;
+            if (isBackFaceCulling || isFrontFaceCulling) {
                 glEnable(GL_CULL_FACE);
             } else {
                 glDisable(GL_CULL_FACE);
+            }
+            if (isBackFaceCulling) {
+                glCullFace(GL_BACK);
+            }
+            if (isFrontFaceCulling) {
+                glCullFace(GL_FRONT);
             }
         }
         if (depthTest != spec.depthTest) {
