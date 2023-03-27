@@ -7,12 +7,12 @@
 namespace CgEngine {
     SceneRenderer::SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
         {
-            dirShadowMaps = new Texture2DArray(TextureFormat::Depth, 2048, 2048, TextureWrap::ClampBorder, 4, MipMapFiltering::Nearest);
+            dirShadowMaps = new Texture2DArray(TextureFormat::Depth, 4096, 4096, TextureWrap::ClampBorder, 4, MipMapFiltering::Nearest);
             dirShadowMaps->setClampBorderColor({1.0f, 1.0f, 1.0f, 1.0f});
 
             FramebufferSpecification shadowMapFramebufferSpec;
-            shadowMapFramebufferSpec.height = 2048;
-            shadowMapFramebufferSpec.width = 2048;
+            shadowMapFramebufferSpec.height = 4096;
+            shadowMapFramebufferSpec.width = 4096;
             shadowMapFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
             shadowMapFramebufferSpec.hasDepthStencilAttachment = false;
             shadowMapFramebufferSpec.hasDepthAttachment = false;
@@ -216,7 +216,7 @@ namespace CgEngine {
         currentSceneEnvironment.prefilterMapId = sceneEnvironment.prefilterMap->getRendererId();
         currentSceneEnvironment.dirLightCastShadows = lightEnvironment.dirLightCastShadows && lightEnvironment.dirLightIntensity != 0.0f;
 
-        setupShadowMapData(lightEnvironment.dirLightDirection);
+        setupShadowMapData(lightEnvironment.dirLightDirection, cameraData.view, camera);
     }
 
     void SceneRenderer::endScene() {
@@ -368,14 +368,77 @@ namespace CgEngine {
         Renderer::endRenderPass();
     }
 
-    void SceneRenderer::setupShadowMapData(glm::vec3 dirLightDirection) {
+    void SceneRenderer::setupShadowMapData(glm::vec3 dirLightDirection, const glm::mat4& cameraView, const Camera& camera) {
+        glm::vec4 cascadeSplits = {0.02f, 0.05f, 0.15f, 0.4f};
+
+        // https://stackoverflow.com/questions/33499053/cascaded-shadow-map-shimmering
+        // https://learnopengl.com/Guest-Articles/2021/CSM
+
         UBDirShadowData dirShadowData{};
 
-        float near_plane = 1.0f, far_plane = 100.0f;
-        glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(dirLightDirection * 50.0f, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        float nearToFarPlane = camera.getPerspectiveFar() - camera.getPerspectiveNear();
+        float lastFar = camera.getPerspectiveNear();
 
-        dirShadowData.lightSpaceMat[0] = lightProjection * lightView;
+        for (int i = 0; i < 4; i++) {
+            glm::vec3 frustumCorners[8] = {
+                    glm::vec3(-1.0f,  1.0f, -1.0f),
+                    glm::vec3( 1.0f,  1.0f, -1.0f),
+                    glm::vec3( 1.0f, -1.0f, -1.0f),
+                    glm::vec3(-1.0f, -1.0f, -1.0f),
+                    glm::vec3(-1.0f,  1.0f,  1.0f),
+                    glm::vec3( 1.0f,  1.0f,  1.0f),
+                    glm::vec3( 1.0f, -1.0f,  1.0f),
+                    glm::vec3(-1.0f, -1.0f,  1.0f)
+            };
+
+            float currentFar = camera.getPerspectiveNear() + cascadeSplits[i] * nearToFarPlane;
+            const glm::mat4 cameraProj = glm::perspective(camera.getPerspectiveFov(), camera.getAspectRatio(), lastFar, currentFar);
+            const glm::mat4 invCamViewProj = glm::inverse(cameraProj * cameraView);
+
+            dirShadowData.cascadeSplits[i] = currentFar;
+            lastFar = currentFar;
+
+            for (size_t j = 0; j < 8; j++) {
+                glm::vec4 invFrustumCorner = invCamViewProj * glm::vec4(frustumCorners[j], 1.0f);
+                frustumCorners[j] = invFrustumCorner / invFrustumCorner.w;
+            }
+
+            auto frustumCenter = glm::vec3(0.0f);
+            for (size_t j = 0; j < 8; j++) {
+                frustumCenter += frustumCorners[j];
+            }
+            frustumCenter /= 8.0f;
+
+            const auto lightView = glm::lookAt(frustumCenter + dirLightDirection, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+
+            float radius = 0.0f;
+            for (uint32_t j = 0; j < 8; j++) {
+                float distance = glm::length(frustumCorners[i] - frustumCenter);
+                radius = glm::max(radius, distance);
+            }
+            radius = glm::ceil(radius);
+
+            glm::vec3 maxOrtho = frustumCenter + glm::vec3(radius);
+            glm::vec3 minOrtho = frustumCenter - glm::vec3(radius);
+
+            maxOrtho = glm::vec3(lightView * glm::vec4(maxOrtho, 1.0f));
+            minOrtho = glm::vec3(lightView * glm::vec4(minOrtho, 1.0f));
+
+            glm::mat4 lightProjection = glm::ortho(minOrtho.x, maxOrtho.x, minOrtho.y, maxOrtho.y, -50.0f, maxOrtho.z - minOrtho.z + 50.0f);
+
+            glm::mat4 shadowMatrix = lightProjection * lightView;
+            float shadowMapResolution = static_cast<float>(dirShadowMaps->getWidth());
+            glm::vec4 shadowOrigin = (shadowMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)) * shadowMapResolution / 2.0f;
+            glm::vec4 roundedOrigin = glm::round(shadowOrigin);
+            glm::vec4 roundOffset = roundedOrigin - shadowOrigin;
+            roundOffset = roundOffset * 2.0f / shadowMapResolution;
+            roundOffset.z = 0.0f;
+            roundOffset.w = 0.0f;
+
+            lightProjection[3] += roundOffset;
+
+            dirShadowData.lightSpaceMat[i] = lightProjection * lightView;
+        }
 
         ubDirShadowData->setData(dirShadowData);
     }

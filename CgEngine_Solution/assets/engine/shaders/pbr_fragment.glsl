@@ -36,6 +36,11 @@ layout (binding = 1, std140) uniform LightData {
     SpotLight spotLights[100];
 } u_LightData;
 
+layout (binding = 2, std140) uniform DirShadowData {
+    mat4 lightSpaceMat[4];
+    vec4 cascadeSplits;
+} u_DirShadowData;
+
 in VS_OUT {
     vec3 WorldPosition;
     vec4 DirShadowMapPosition[4];
@@ -91,8 +96,8 @@ float geometrySchlickGGX(float NdotV, float roughness) {
 }
 
 float geometrySmith(float NdotV, float NdotL, float roughness) {
-    float ggx2  = geometrySchlickGGX(NdotV, roughness);
-    float ggx1  = geometrySchlickGGX(NdotL, roughness);
+    float ggx2 = geometrySchlickGGX(NdotV, roughness);
+    float ggx1 = geometrySchlickGGX(NdotL, roughness);
 
     return ggx1 * ggx2;
 }
@@ -110,20 +115,64 @@ vec3 fresnelSchlick(vec3 F0, float cosTheta) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-float calcDirShadow(vec3 N, vec3 L) {
-    vec3 projCoords = fs_in.DirShadowMapPosition[0].xyz / fs_in.DirShadowMapPosition[0].w;
+int getShadowCascade(float depth) {
+    for (int i = 0; i < 4; i++) {
+        if (depth < u_DirShadowData.cascadeSplits[i]) {
+            return i;
+        }
+    }
+    return 3;
+}
+
+float sampleShadowMap(int layer, float NdotL) {
+    vec3 projCoords = fs_in.DirShadowMapPosition[layer].xyz / fs_in.DirShadowMapPosition[layer].w;
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(u_DirShadowMap, vec3(projCoords.xy, 0)).r;
     float currentDepth = projCoords.z;
 
     if (currentDepth > 1.0f) {
         return 0.0f;
     }
 
-    float bias = max(0.0002f * (1.0f - dot(N, L)), 0.0002f); ;
-    float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
+    float bias = max(0.001f * (1.0f - NdotL), 0.001f);
+
+    float shadow = 0.0f;
+    vec2 texelSize = 1.0f / vec2(textureSize(u_DirShadowMap, 0));
+    for(int x = -1; x <= 1; x++) {
+        for(int y = -1; y <= 1; y++) {
+            float pcfDepth = texture(u_DirShadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, layer)).r;
+            shadow += step(pcfDepth, (currentDepth - bias));
+        }
+    }
+    shadow /= 9.0;
 
     return shadow;
+}
+
+float calcDirShadow(vec3 N, vec3 L) {
+    vec4 viewSpacePos = u_CameraData.view * vec4(fs_in.WorldPosition, 1.0f);
+    float depth = abs(viewSpacePos.z);
+
+    float c0 = smoothstep(u_DirShadowData.cascadeSplits[0] - 1.0f, u_DirShadowData.cascadeSplits[0] + 1.0f, depth);
+    float c1 = smoothstep(u_DirShadowData.cascadeSplits[1] - 1.0f, u_DirShadowData.cascadeSplits[1] + 1.0f, depth);
+    float c2 = smoothstep(u_DirShadowData.cascadeSplits[2] - 1.0f, u_DirShadowData.cascadeSplits[2] + 1.0f, depth);
+
+    float NdotL = dot(N, L);
+
+    if (c0 > 0.0 && c0 < 1.0) {
+        float f0 = sampleShadowMap(0, NdotL);
+        float f1 = sampleShadowMap(1, NdotL);
+        return mix(f0, f1, c0);
+    } else if (c1 > 0.0 && c1 < 1.0) {
+        float f1 = sampleShadowMap(1, NdotL);
+        float f2 = sampleShadowMap(2, NdotL);
+        return mix(f1, f2, c1);
+    } else if (c2 > 0.0 && c2 < 1.0) {
+        float f2 = sampleShadowMap(2, NdotL);
+        float f3 = sampleShadowMap(3, NdotL);
+        return mix(f2, f3, c2);
+    } else {
+        return sampleShadowMap(getShadowCascade(depth), NdotL);
+    }
 }
 
 vec3 calcDirLight(vec3 F0, vec3 matAlbedo, float matMetalness, float matRoughness, vec3 N, vec3 V, float NdotV) {

@@ -23,6 +23,8 @@ namespace CgEngine {
         float getOrthographicFar() const;
         void setOrthographicFar(float orthographicFar);
 
+        float getAspectRatio() const;
+
         const glm::mat4& getProjectionMatrix() const;
 
         void setViewportSize(int width, int height);

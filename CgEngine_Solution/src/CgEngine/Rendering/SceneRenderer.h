@@ -52,7 +52,7 @@ namespace CgEngine {
         void screenPass();
         void clearPass(RenderPass& renderPass);
 
-        void setupShadowMapData(glm::vec3 dirLightDirection);
+        void setupShadowMapData(glm::vec3 dirLightDirection, const glm::mat4& cameraView, const Camera& camera);
 
         struct UBCameraData {
             glm::mat4 viewProjection;

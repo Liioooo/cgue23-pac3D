@@ -5,7 +5,7 @@
         </Components>
         <Entity>
             <Components>
-                <TransformComponent position="0 4.5 0" rotation="90 0 45" scale="0.04 0.04 0.04" />
+                <TransformComponent position="0 0 0" rotation="0 0 0" scale="0.04 0.04 0.04" />
                 <MeshRendererComponent asset-file="wood_table.fbx" />
             </Components>
         </Entity>

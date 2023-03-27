@@ -65,6 +65,10 @@ namespace CgEngine {
         calculateProjection();
     }
 
+    float Camera::getAspectRatio() const {
+        return aspectRatio;
+    }
+
     const glm::mat4& Camera::getProjectionMatrix() const {
         return projectionMatrix;
     }
