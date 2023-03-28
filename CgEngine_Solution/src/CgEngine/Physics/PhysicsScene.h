@@ -7,6 +7,8 @@
 
 namespace CgEngine {
 
+    class Scene;
+
     class PhysicsScene {
     public:
         PhysicsScene();
@@ -14,13 +16,13 @@ namespace CgEngine {
 
         void addActor(PhysicsActor* actor);
         void removeActor(PhysicsActor* actor);
-        void simulate(TimeStep ts);
+        void simulate(TimeStep ts, Scene& scene);
 
     private:
         physx::PxScene* physXScene;
         std::unordered_map<Entity, PhysicsActor> actors;
 
-        bool advance(float ts);
+        bool advance(float ts, Scene& scene);
 
         float simulateTimeStep;
         float accumulator;

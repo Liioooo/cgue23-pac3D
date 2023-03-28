@@ -135,7 +135,7 @@ namespace CgEngine {
     }
 
     void Scene::onUpdate(TimeStep ts) {
-        physicsScene->simulate(ts);
+        physicsScene->simulate(ts, *this);
 
         for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
             it->update(ts);
@@ -235,6 +235,13 @@ namespace CgEngine {
         }
 
         renderer.endScene();
+    }
+
+    void Scene::_executeFixedUpdate() {
+        for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
+            it->fixedUpdate();
+        }
+        executePostUpdateFunctions();
     }
 
     int Scene::getViewportWidth() const {

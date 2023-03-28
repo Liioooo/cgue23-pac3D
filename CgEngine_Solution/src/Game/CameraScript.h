@@ -11,6 +11,7 @@ namespace Game {
             return std::make_shared<CameraScript>();
         }
 
+        void fixedUpdate() override;
         void update(CgEngine::TimeStep ts) override;
 
     private:

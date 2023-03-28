@@ -1,7 +1,7 @@
 #include "PhysicsScene.h"
 #include "GlobalObjectManager.h"
 #include "Asserts.h"
-
+#include "Scene/Scene.h"
 
 namespace CgEngine {
     PhysicsScene::PhysicsScene() {
@@ -40,8 +40,8 @@ namespace CgEngine {
         physXScene->removeActor(actor->getPhysxActor());
     }
 
-    void PhysicsScene::simulate(TimeStep ts) {
-        bool hasSimulated = advance(ts.getSeconds());
+    void PhysicsScene::simulate(TimeStep ts, Scene& scene) {
+        bool hasSimulated = advance(ts.getSeconds(), scene);
 
         if (hasSimulated) {
             uint32_t actorCount;
@@ -56,7 +56,7 @@ namespace CgEngine {
         }
     }
 
-    bool PhysicsScene::advance(float ts) {
+    bool PhysicsScene::advance(float ts, Scene& scene) {
 
         accumulator += ts;
 
@@ -70,6 +70,7 @@ namespace CgEngine {
             accumulator -= simulateTimeStep;
             physXScene->simulate(simulateTimeStep);
             physXScene->fetchResults(true);
+            scene._executeFixedUpdate();
         }
         return true;
     }

@@ -18,6 +18,7 @@ namespace CgEngine {
         void onAttach(Scene& scene, ScriptComponentParams& params);
         void onDetach(Scene& scene) override;
 
+        void fixedUpdate();
         void update(TimeStep ts);
         void lateUpdate(TimeStep ts);
 

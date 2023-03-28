@@ -4,6 +4,22 @@
 #include "glm/gtx/common.hpp"
 
 namespace Game {
+    void CameraScript::fixedUpdate() {
+
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Up)) {
+            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
+            rigid.addForce({0, 300, 0});
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Left)) {
+            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
+            rigid.addForce({-100, 0, 0});
+        }
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Right)) {
+            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
+            rigid.addForce({100, 0, 0});
+        }
+    }
+
     void CameraScript::update(CgEngine::TimeStep ts) {
         if (CgEngine::Input::isMouseButtonPressed(CgEngine::MouseButton::MouseButtonLeft) && CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Normal) {
             CgEngine::Input::setCursorMode(CgEngine::CursorMode::Locked);
@@ -49,19 +65,6 @@ namespace Game {
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
             destroyEntity(findEntityById("floor"));
-        }
-
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Up)) {
-            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({0, 10, 0});
-        }
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Left)) {
-            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({-4, 0, 0});
-        }
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Right)) {
-            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({4, 0, 0});
         }
 
 //        CG_LOGGING_INFO(ts.getMillis())

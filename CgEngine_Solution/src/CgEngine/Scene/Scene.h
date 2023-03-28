@@ -68,6 +68,8 @@ namespace CgEngine {
         void onUpdate(TimeStep ts);
         void onRender(SceneRenderer& renderer);
 
+        void _executeFixedUpdate();
+
         template<typename C>
         C& attachComponent(Entity entity) {
             C comp = C(entity);
