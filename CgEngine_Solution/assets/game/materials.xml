@@ -6,8 +6,8 @@
     </Material>
     <Material name="Red">
         <Albedo>#ffffff</Albedo>
-        <Roughness>0.1</Roughness>
-        <Metalness>0.8</Metalness>
+        <Roughness>1.0</Roughness>
+        <Metalness>0</Metalness>
         <Emission>0.0</Emission>
     </Material>
 </Materials>

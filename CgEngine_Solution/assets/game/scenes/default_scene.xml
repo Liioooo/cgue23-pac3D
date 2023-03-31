@@ -17,7 +17,7 @@
         <Entity>
             <Components>
                 <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-                <CameraComponent primary="true" projection="perspective" near="0.1" far="100" fov="60" />
+                <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="60" />
                 <ScriptComponent script-name="cameraScript" />
             </Components>
         </Entity>

@@ -133,7 +133,7 @@ float sampleShadowMap(int layer, float NdotL) {
         return 0.0f;
     }
 
-    float bias = max(0.001f * (1.0f - NdotL), 0.001f);
+    float bias = layer == 0 ? 0.0001f : layer == 1 ? max(0.0008f * (1.0f - NdotL), 0.001f) : max(0.001f * (1.0f - NdotL), 0.002f);
 
     float shadow = 0.0f;
     vec2 texelSize = 1.0f / vec2(textureSize(u_DirShadowMap, 0));
@@ -152,9 +152,9 @@ float calcDirShadow(vec3 N, vec3 L) {
     vec4 viewSpacePos = u_CameraData.view * vec4(fs_in.WorldPosition, 1.0f);
     float depth = abs(viewSpacePos.z);
 
-    float c0 = smoothstep(u_DirShadowData.cascadeSplits[0] - 1.0f, u_DirShadowData.cascadeSplits[0] + 1.0f, depth);
-    float c1 = smoothstep(u_DirShadowData.cascadeSplits[1] - 1.0f, u_DirShadowData.cascadeSplits[1] + 1.0f, depth);
-    float c2 = smoothstep(u_DirShadowData.cascadeSplits[2] - 1.0f, u_DirShadowData.cascadeSplits[2] + 1.0f, depth);
+    float c0 = smoothstep(u_DirShadowData.cascadeSplits[0] - 1.2f, u_DirShadowData.cascadeSplits[0] + 1.2f, depth);
+    float c1 = smoothstep(u_DirShadowData.cascadeSplits[1] - 1.2f, u_DirShadowData.cascadeSplits[1] + 1.2f, depth);
+    float c2 = smoothstep(u_DirShadowData.cascadeSplits[2] - 1.2f, u_DirShadowData.cascadeSplits[2] + 1.2f, depth);
 
     float NdotL = dot(N, L);
 
