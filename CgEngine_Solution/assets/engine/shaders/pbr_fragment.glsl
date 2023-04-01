@@ -133,7 +133,7 @@ float sampleShadowMap(int layer, float NdotL) {
         return 0.0f;
     }
 
-    float bias = layer == 0 ? 0.0001f : layer == 1 ? max(0.0008f * (1.0f - NdotL), 0.001f) : max(0.001f * (1.0f - NdotL), 0.002f);
+    float bias = layer == 0 ? max(0.0001f * (1.0f - NdotL), 0.0002f) : layer == 1 ? max(0.0005f * (1.0f - NdotL), 0.0005f) : max(0.0005f * (1.0f - NdotL), 0.001f);
 
     float shadow = 0.0f;
     vec2 texelSize = 1.0f / vec2(textureSize(u_DirShadowMap, 0));
@@ -143,7 +143,7 @@ float sampleShadowMap(int layer, float NdotL) {
             shadow += step(pcfDepth, (currentDepth - bias));
         }
     }
-    shadow /= 9.0;
+    shadow /= 9.0f;
 
     return shadow;
 }
@@ -296,4 +296,22 @@ void main() {
     vec3 ibl = calcIBL(F0, mat_AlbedoColor, mat_Metalness, mat_Roughness, mat_Normal, V, NdotV) * u_EnvironmentIntensity;
 
     o_FragColor = vec4(light + ibl, 1.0f);
+
+
+//    vec4 viewSpacePos = u_CameraData.view * vec4(fs_in.WorldPosition, 1.0f);
+//    switch (getShadowCascade(abs(viewSpacePos.z)))
+//    {
+//        case 0:
+//        o_FragColor.rgb *= vec3(1.0f, 0.25f, 0.25f);
+//        break;
+//        case 1:
+//        o_FragColor.rgb *= vec3(0.25f, 1.0f, 0.25f);
+//        break;
+//        case 2:
+//        o_FragColor.rgb *= vec3(0.25f, 0.25f, 1.0f);
+//        break;
+//        case 3:
+//        o_FragColor.rgb *= vec3(1.0f, 1.0f, 0.25f);
+//        break;
+//    }
 }

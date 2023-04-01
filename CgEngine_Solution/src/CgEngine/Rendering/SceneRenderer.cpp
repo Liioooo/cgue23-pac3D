@@ -216,7 +216,7 @@ namespace CgEngine {
         currentSceneEnvironment.prefilterMapId = sceneEnvironment.prefilterMap->getRendererId();
         currentSceneEnvironment.dirLightCastShadows = lightEnvironment.dirLightCastShadows && lightEnvironment.dirLightIntensity != 0.0f;
 
-        setupShadowMapData(lightEnvironment.dirLightDirection, cameraData.view, camera);
+        setupShadowMapData(lightEnvironment.dirLightDirection, cameraData.viewProjection, camera);
     }
 
     void SceneRenderer::endScene() {
@@ -368,8 +368,9 @@ namespace CgEngine {
         Renderer::endRenderPass();
     }
 
-    void SceneRenderer::setupShadowMapData(glm::vec3 dirLightDirection, const glm::mat4& cameraView, const Camera& camera) {
+    void SceneRenderer::setupShadowMapData(glm::vec3 dirLightDirection, const glm::mat4& cameraViewProjection, const Camera& camera) {
         glm::vec4 cascadeSplits = {0.02f, 0.05f, 0.15f, 0.4f};
+        glm::mat4 invCamViewProj = glm::inverse(cameraViewProjection);
 
         // https://stackoverflow.com/questions/33499053/cascaded-shadow-map-shimmering
         // https://learnopengl.com/Guest-Articles/2021/CSM
@@ -377,7 +378,7 @@ namespace CgEngine {
         UBDirShadowData dirShadowData{};
 
         float nearToFarPlane = camera.getPerspectiveFar() - camera.getPerspectiveNear();
-        float lastFar = camera.getPerspectiveNear();
+        float lastSplitDist = 0.0;
 
         for (int i = 0; i < 4; i++) {
             glm::vec3 frustumCorners[8] = {
@@ -391,38 +392,38 @@ namespace CgEngine {
                     glm::vec3(-1.0f, -1.0f,  1.0f)
             };
 
-            float currentFar = camera.getPerspectiveNear() + cascadeSplits[i] * nearToFarPlane;
-            const glm::mat4 cameraProj = glm::perspective(camera.getPerspectiveFov(), camera.getAspectRatio(), lastFar, currentFar);
-            const glm::mat4 invCamViewProj = glm::inverse(cameraProj * cameraView);
-
-            dirShadowData.cascadeSplits[i] = currentFar;
-            lastFar = currentFar;
-
-            for (size_t j = 0; j < 8; j++) {
-                glm::vec4 invFrustumCorner = invCamViewProj * glm::vec4(frustumCorners[j], 1.0f);
-                frustumCorners[j] = invFrustumCorner / invFrustumCorner.w;
+            for (auto& frustumCorner : frustumCorners) {
+                glm::vec4 invFrustumCorner = invCamViewProj * glm::vec4(frustumCorner, 1.0f);
+                frustumCorner = invFrustumCorner / invFrustumCorner.w;
             }
 
+            float splitDist = cascadeSplits[i];
+
+            for (uint32_t j = 0; j < 4; j++) {
+                glm::vec3 dist = frustumCorners[j + 4] - frustumCorners[j];
+                frustumCorners[j + 4] = frustumCorners[j] + (dist * splitDist);
+                frustumCorners[j] = frustumCorners[j] + (dist * lastSplitDist);
+            }
+            lastSplitDist = cascadeSplits[i];
+            dirShadowData.cascadeSplits[i] = camera.getPerspectiveNear() + splitDist * nearToFarPlane;
+
             auto frustumCenter = glm::vec3(0.0f);
-            for (size_t j = 0; j < 8; j++) {
-                frustumCenter += frustumCorners[j];
+            for (auto& frustumCorner : frustumCorners) {
+                frustumCenter += frustumCorner;
             }
             frustumCenter /= 8.0f;
 
             const auto lightView = glm::lookAt(frustumCenter + dirLightDirection, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
             float radius = 0.0f;
-            for (uint32_t j = 0; j < 8; j++) {
-                float distance = glm::length(frustumCorners[i] - frustumCenter);
+            for (auto& frustumCorner : frustumCorners) {
+                float distance = glm::length(frustumCorner - frustumCenter);
                 radius = glm::max(radius, distance);
             }
             radius = glm::ceil(radius);
 
-            glm::vec3 maxOrtho = frustumCenter + glm::vec3(radius);
-            glm::vec3 minOrtho = frustumCenter - glm::vec3(radius);
-
-            maxOrtho = glm::vec3(lightView * glm::vec4(maxOrtho, 1.0f));
-            minOrtho = glm::vec3(lightView * glm::vec4(minOrtho, 1.0f));
+            auto maxOrtho = glm::vec3(radius);
+            glm::vec3 minOrtho = -maxOrtho;
 
             glm::mat4 lightProjection = glm::ortho(minOrtho.x, maxOrtho.x, minOrtho.y, maxOrtho.y, -50.0f, maxOrtho.z - minOrtho.z + 50.0f);
 
