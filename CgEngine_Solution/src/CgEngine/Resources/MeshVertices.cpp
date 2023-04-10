@@ -507,7 +507,8 @@ namespace CgEngine {
                 aiColor3D aiEmissionColor;
                 bool hasEmissionColor = aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiEmissionColor) == AI_SUCCESS;
                 aiString aiEmissiveTexPath;
-                bool hasEmissiveTexture = aiMaterial->GetTexture(aiTextureType_EMISSIVE, 0, &aiEmissiveTexPath) == AI_SUCCESS;
+                aiTextureMapMode aiEmissiveWrapMode[3];
+                bool hasEmissiveTexture = aiMaterial->GetTexture(aiTextureType_EMISSIVE, 0, &aiEmissiveTexPath, nullptr, nullptr, nullptr, nullptr, aiEmissiveWrapMode) == AI_SUCCESS;
                 bool useEmissiveColor = !hasEmissiveTexture;
                 if (hasEmissiveTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiEmissiveTexPath.C_Str());
@@ -519,7 +520,7 @@ namespace CgEngine {
                             material->set("u_Mat_Emission", {1.0f, 1.0f, 1.0f});
                         }
                     } else {
-                        auto *texture = new Texture2D(texturePath, true);
+                        auto *texture = new Texture2D(texturePath, true, getTextureWrapFromAssimp(aiEmissiveWrapMode[0]));
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_EmissionTexture", *texture, 4);
                             if (hasEmissionIntensity) {
@@ -552,7 +553,8 @@ namespace CgEngine {
                     aiAlbedo = {1.0f, 1.0f, 1.0f};
                 }
                 aiString aiAlbedoTexPath;
-                bool hasAlbedoTexture = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiAlbedoTexPath) == AI_SUCCESS;
+                aiTextureMapMode aiAlbedoWrapMode[3];
+                bool hasAlbedoTexture = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiAlbedoTexPath, nullptr, nullptr, nullptr, nullptr, aiAlbedoWrapMode) == AI_SUCCESS;
                 bool useAlbedoColor = !hasAlbedoTexture;
                 if (hasAlbedoTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiAlbedoTexPath.C_Str());
@@ -560,7 +562,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(texturePath), 0);
                         material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
                     } else {
-                        auto *texture = new Texture2D(texturePath, true);
+                        auto *texture = new Texture2D(texturePath, true, getTextureWrapFromAssimp(aiAlbedoWrapMode[0]));
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_AlbedoTexture", *texture, 0);
                             material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
@@ -583,7 +585,8 @@ namespace CgEngine {
                     roughness = 1.0f - glm::sqrt(shininess / 100.0f);
                 }
                 aiString aiRoughnessTexPath;
-                bool hasRoughnessTexture = aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiRoughnessTexPath) == AI_SUCCESS;
+                aiTextureMapMode aiRoughnessWrapMode[3];
+                bool hasRoughnessTexture = aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiRoughnessTexPath, nullptr, nullptr, nullptr, nullptr, aiRoughnessWrapMode) == AI_SUCCESS;
                 bool useRoughnessValue = !hasRoughnessTexture;
                 if (hasRoughnessTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiRoughnessTexPath.C_Str());
@@ -591,7 +594,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(texturePath), 3);
                         material->set("u_Mat_Roughness", 1.0f);
                     } else {
-                        auto *texture = new Texture2D(texturePath, false);
+                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiRoughnessWrapMode[0]));
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_RoughnessTexture", *texture, 3);
                             material->set("u_Mat_Roughness", 1.0f);
@@ -608,7 +611,8 @@ namespace CgEngine {
                 }
 
                 aiString aiNormalTexPath;
-                bool hasNormalMap = aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiNormalTexPath) == AI_SUCCESS;
+                aiTextureMapMode aiNormalWrapMode[3];
+                bool hasNormalMap = aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiNormalTexPath, nullptr, nullptr, nullptr, nullptr, aiNormalWrapMode) == AI_SUCCESS;
                 bool dontUseNormals = !hasNormalMap;
                 if (hasNormalMap) {
                     std::string texturePath = getTexturePath(modelPath, aiNormalTexPath.C_Str());
@@ -616,7 +620,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(texturePath), 1);
                         material->set("u_Mat_UseNormals", true);
                     } else {
-                        auto *texture = new Texture2D(texturePath, false);
+                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiNormalWrapMode[0]));
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_NormalTexture", *texture, 1);
                             material->set("u_Mat_UseNormals", true);
@@ -638,7 +642,8 @@ namespace CgEngine {
                     metalness = 0.0f;
                 }
                 aiString aiMetalnessTexPath;
-                bool hasMetalnessTexture = aiMaterial->GetTexture(aiTextureType_METALNESS, 0, &aiMetalnessTexPath) == AI_SUCCESS;
+                aiTextureMapMode aiMetalnessWrapMode[3];
+                bool hasMetalnessTexture = aiMaterial->GetTexture(aiTextureType_METALNESS, 0, &aiMetalnessTexPath, nullptr, nullptr, nullptr, nullptr, aiMetalnessWrapMode) == AI_SUCCESS;
                 bool useMetalnessValue = !hasMetalnessTexture;
                 if (hasMetalnessTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiMetalnessTexPath.C_Str());
@@ -646,7 +651,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(texturePath), 2);
                         material->set("u_Mat_Metalness", 1.0f);
                     } else {
-                        auto *texture = new Texture2D(texturePath, false);
+                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiMetalnessWrapMode[0]));
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_MetalnessTexture", *texture, 2);
                             material->set("u_Mat_Metalness", 1.0f);
@@ -683,6 +688,17 @@ namespace CgEngine {
         result[0][2] = transform.c1; result[1][2] = transform.c2; result[2][2] = transform.c3; result[3][2] = transform.c4;
         result[0][3] = transform.d1; result[1][3] = transform.d2; result[2][3] = transform.d3; result[3][3] = transform.d4;
         return result;
+    }
+
+    TextureWrap MeshVertices::getTextureWrapFromAssimp(aiTextureMapMode mapMode) {
+        switch (mapMode) {
+            case aiTextureMapMode_Clamp:
+                return TextureWrap::Clamp;
+            case aiTextureMapMode_Wrap:
+                return TextureWrap::Repeat;
+        }
+
+        return TextureWrap::Repeat;
     }
 
     void MeshVertices::traverseNodes(aiNode *node, const glm::mat4 &parentTransform) {

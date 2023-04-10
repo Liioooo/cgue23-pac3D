@@ -55,6 +55,7 @@ namespace CgEngine {
 
         static std::string getTexturePath(const std::string& modelPath, const std::string& texturePath);
         static glm::mat4 getTransformFromAssimpTransform(const aiMatrix4x4& transform);
+        static TextureWrap getTextureWrapFromAssimp(aiTextureMapMode mapMode);
 
         void traverseNodes(aiNode* node, const glm::mat4& parentTransform);
 

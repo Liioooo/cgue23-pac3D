@@ -100,7 +100,7 @@ namespace CgEngine {
         loaded = true;
     }
 
-    Texture2D::Texture2D(const std::string &path, bool srgb, MipMapFiltering mipMapFiltering) {
+    Texture2D::Texture2D(const std::string &path, bool srgb, TextureWrap wrap, MipMapFiltering mipMapFiltering) {
         int loadWidth, loadHeight, channels;
 
         unsigned char* data;
@@ -127,8 +127,9 @@ namespace CgEngine {
             glBindTexture(GL_TEXTURE_2D, id);
 
             TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            GLint textureWrap = TextureUtils::getTextureWrap(wrap);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
 
             GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
             GLenum type = TextureUtils::getTextureFormatType(format);
@@ -140,8 +141,9 @@ namespace CgEngine {
             glBindTexture(GL_TEXTURE_2D, id);
 
             TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            GLint textureWrap = TextureUtils::getTextureWrap(wrap);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
 
             GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
             GLenum type = TextureUtils::getTextureFormatType(format);

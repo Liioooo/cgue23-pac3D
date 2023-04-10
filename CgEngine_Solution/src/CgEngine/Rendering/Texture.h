@@ -29,7 +29,7 @@ namespace CgEngine {
 
         Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
         Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, const void* data, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
-        Texture2D(const std::string& path, bool srgb, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
+        Texture2D(const std::string& path, bool srgb, TextureWrap wrap = TextureWrap::Repeat, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
         ~Texture2D();
 
         uint32_t getWidth() const;

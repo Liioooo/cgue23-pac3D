@@ -99,7 +99,7 @@ namespace CgEngine {
         uint32_t blackCubeMapTextureData = 0xff000000;
         blackCubeTexture = new TextureCube(TextureFormat::RGBA, 1, 1, &blackCubeMapTextureData, MipMapFiltering::Nearest);
 
-        brdfLUT = new Texture2D(FileSystem::getAsEnginePath("ibl_brdf_lut.png"), true, MipMapFiltering::Bilinear);
+        brdfLUT = new Texture2D(FileSystem::getAsEnginePath("ibl_brdf_lut.png"), true, TextureWrap::Clamp, MipMapFiltering::Bilinear);
 
         transformsBuffer = new ShaderStorageBuffer(0);
     }
