@@ -512,7 +512,7 @@ namespace CgEngine {
                 if (hasEmissiveTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiEmissiveTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture2D("u_Mat_EmissionTexture", *resourceManager.getResource<Texture2D>(path), 4);
+                        material->setTexture2D("u_Mat_EmissionTexture", *resourceManager.getResource<Texture2D>(texturePath), 4);
                         if (hasEmissionIntensity) {
                             material->set("u_Mat_Emission", {aiEmissionIntensity, aiEmissionIntensity, aiEmissionIntensity});
                         } else {
@@ -557,7 +557,7 @@ namespace CgEngine {
                 if (hasAlbedoTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiAlbedoTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(path), 0);
+                        material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(texturePath), 0);
                         material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
                     } else {
                         auto *texture = new Texture2D(texturePath, true);
@@ -588,7 +588,7 @@ namespace CgEngine {
                 if (hasRoughnessTexture) {
                     std::string texturePath = getTexturePath(modelPath, aiRoughnessTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(path), 3);
+                        material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(texturePath), 3);
                         material->set("u_Mat_Roughness", 1.0f);
                     } else {
                         auto *texture = new Texture2D(texturePath, false);
@@ -613,7 +613,7 @@ namespace CgEngine {
                 if (hasNormalMap) {
                     std::string texturePath = getTexturePath(modelPath, aiNormalTexPath.C_Str());
                     if (resourceManager.hasResource<Texture2D>(texturePath)) {
-                        material->setTexture2D("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(path), 1);
+                        material->setTexture2D("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(texturePath), 1);
                         material->set("u_Mat_UseNormals", true);
                     } else {
                         auto *texture = new Texture2D(texturePath, false);
@@ -637,8 +637,30 @@ namespace CgEngine {
                 if (aiMaterial->Get(AI_MATKEY_REFLECTIVITY, metalness) != AI_SUCCESS) {
                     metalness = 0.0f;
                 }
-                material->set("u_Mat_Metalness", metalness);
-                material->setTexture2D("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
+                aiString aiMetalnessTexPath;
+                bool hasMetalnessTexture = aiMaterial->GetTexture(aiTextureType_METALNESS, 0, &aiMetalnessTexPath) == AI_SUCCESS;
+                bool useMetalnessValue = !hasMetalnessTexture;
+                if (hasMetalnessTexture) {
+                    std::string texturePath = getTexturePath(modelPath, aiMetalnessTexPath.C_Str());
+                    if (resourceManager.hasResource<Texture2D>(texturePath)) {
+                        material->setTexture2D("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(texturePath), 2);
+                        material->set("u_Mat_Metalness", 1.0f);
+                    } else {
+                        auto *texture = new Texture2D(texturePath, false);
+                        if (texture->isLoaded()) {
+                            material->setTexture2D("u_Mat_MetalnessTexture", *texture, 2);
+                            material->set("u_Mat_Metalness", 1.0f);
+                            resourceManager.insertResource<Texture2D>(texturePath, texture);
+                        } else {
+                            useMetalnessValue = true;
+                            delete texture;
+                        }
+                    }
+                }
+                if (useMetalnessValue) {
+                    material->setTexture2D("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
+                    material->set("u_Mat_Metalness", metalness);
+                }
             }
         } else {
             mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());
