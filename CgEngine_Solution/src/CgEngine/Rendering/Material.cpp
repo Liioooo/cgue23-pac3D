@@ -14,14 +14,16 @@ namespace CgEngine {
         std::string metalness = materialNode.child("Metalness").child_value();
         std::string roughness = materialNode.child("Roughness").child_value();
         std::string emission = materialNode.child("Emission").child_value();
+        std::string emissionColor = materialNode.child("EmissionColor").child_value();
         std::string albedoTexture = materialNode.child("AlbedoTexture").child_value();
         bool albedoTextureSRGB = materialNode.child("AlbedoTexture").attribute("srgb").as_bool(false);
         std::string metalnessTexture = materialNode.child("metalnessTexture").child_value();
         std::string roughnessTexture = materialNode.child("RoughnessTexture").child_value();
+        std::string emissionTexture = materialNode.child("EmissionTexture").child_value();
         std::string normalTexture = materialNode.child("NormalTexture").child_value();
         bool useNormals = strcmp(materials.child("UserNormals").child_value(), "true") == 0;
 
-        auto * material = new Material(name);
+        auto* material = new Material(name);
 
         if (albedo.empty()) {
             material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
@@ -42,10 +44,21 @@ namespace CgEngine {
         } else {
             material->set("u_Mat_Roughness", std::stof(roughness));
         }
-        if (emission.empty()) {
-            material->set("u_Mat_Emission", 0.0f);
+        if (!emissionTexture.empty()) {
+            material->setTexture2D("u_Mat_EmissionTexture", *resourceManager.getResource<Texture2D>(FileSystem::getAsGamePath(emissionTexture)), 4);
+            float emissionIntensity = emission.empty() ? 1.0f : std::stof(emission);
+            material->set("u_Mat_Emission", {emissionIntensity, emissionIntensity, emissionIntensity});
+        } else if (!emissionColor.empty()) {
+            material->setTexture2D("u_Mat_EmissionTexture", Renderer::getWhiteTexture(), 4);
+            float emissionIntensity = emission.empty() ? 1.0f : std::stof(emission);
+            uint64_t color = std::stoul(emissionColor.substr(1), nullptr, 16);
+            float r = ((color >> 16) & 0xFF) / 255.0f;
+            float g = ((color >> 8) & 0xFF) / 255.0f;
+            float b = (color & 0xFF) / 255.0f;
+            material->set("u_Mat_Emission", glm::vec3(r, g, b) * emissionIntensity);
         } else {
-            material->set("u_Mat_Emission", std::stof(emission));
+            material->setTexture2D("u_Mat_EmissionTexture", Renderer::getWhiteTexture(), 4);
+            material->set("u_Mat_Emission", {0.0f, 0.0f, 0.0f});
         }
         if (albedoTexture.empty()) {
             material->setTexture2D("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);

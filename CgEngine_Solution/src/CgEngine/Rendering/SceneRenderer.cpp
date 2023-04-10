@@ -315,11 +315,11 @@ namespace CgEngine {
     void SceneRenderer::geometryPass() {
         Renderer::beginRenderPass(*geometryRenderPass);
 
-        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.irradianceMapId, 4);
-        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 5);
-        geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 6);
+        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.irradianceMapId, 5);
+        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 6);
+        geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 7);
         geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
-        geometryRenderPass->getSpecification().shader->setTexture2DArray(dirShadowMaps->getRendererId(), 7);
+        geometryRenderPass->getSpecification().shader->setTexture2DArray(dirShadowMaps->getRendererId(), 8);
 
         for (const auto [mk, command]: drawCommandQueue) {
             const auto& transforms = meshTransforms[mk];

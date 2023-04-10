@@ -54,19 +54,20 @@ out vec4 o_FragColor;
 uniform vec3 u_Mat_AlbedoColor;
 uniform float u_Mat_Metalness;
 uniform float u_Mat_Roughness;
-uniform float u_Mat_Emission;
+uniform vec3 u_Mat_Emission;
 uniform bool u_Mat_UseNormals;
 layout(binding = 0) uniform sampler2D u_Mat_AlbedoTexture;
 layout(binding = 1) uniform sampler2D u_Mat_NormalTexture;
 layout(binding = 2) uniform sampler2D u_Mat_MetalnessTexture;
 layout(binding = 3) uniform sampler2D u_Mat_RoughnessTexture;
+layout(binding = 4) uniform sampler2D u_Mat_EmissionTexture;
 
 uniform float u_EnvironmentIntensity;
-layout(binding = 4) uniform samplerCube u_IrradianceMap;
-layout(binding = 5) uniform samplerCube u_PrefilterMap;
-layout(binding = 6) uniform sampler2D u_BrdfLUT;
+layout(binding = 5) uniform samplerCube u_IrradianceMap;
+layout(binding = 6) uniform samplerCube u_PrefilterMap;
+layout(binding = 7) uniform sampler2D u_BrdfLUT;
 
-layout(binding = 7) uniform sampler2DArray u_DirShadowMap;
+layout(binding = 8) uniform sampler2DArray u_DirShadowMap;
 
 const float PI = 3.141592;
 
@@ -275,6 +276,7 @@ void main() {
     vec3 mat_AlbedoColor = texture(u_Mat_AlbedoTexture, fs_in.TexCoord).rgb * u_Mat_AlbedoColor;
     float mat_Metalness = texture(u_Mat_MetalnessTexture, fs_in.TexCoord).r * u_Mat_Metalness;
     float mat_Roughness = texture(u_Mat_RoughnessTexture, fs_in.TexCoord).r * u_Mat_Roughness;
+    vec3 mat_Emission = texture(u_Mat_EmissionTexture, fs_in.TexCoord).rgb * u_Mat_Emission;
 
     vec3 mat_Normal = normalize(fs_in.Normal);
     if (u_Mat_UseNormals) {
@@ -291,7 +293,7 @@ void main() {
     vec3 light = calcDirLight(F0, mat_AlbedoColor, mat_Metalness, mat_Roughness, mat_Normal, V, NdotV);
     light += calcPointLights(F0, mat_AlbedoColor, mat_Metalness, mat_Roughness, fs_in.WorldPosition, mat_Normal, V, NdotV);
     light += calcSpotLights(F0, mat_AlbedoColor, mat_Metalness, mat_Roughness, fs_in.WorldPosition, mat_Normal, V, NdotV);
-    light += mat_AlbedoColor * u_Mat_Emission;
+    light += mat_Emission;
 
     vec3 ibl = calcIBL(F0, mat_AlbedoColor, mat_Metalness, mat_Roughness, mat_Normal, V, NdotV) * u_EnvironmentIntensity;
 

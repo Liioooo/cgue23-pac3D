@@ -8,6 +8,5 @@
         <Albedo>#ffffff</Albedo>
         <Roughness>1.0</Roughness>
         <Metalness>0</Metalness>
-        <Emission>0.0</Emission>
     </Material>
 </Materials>

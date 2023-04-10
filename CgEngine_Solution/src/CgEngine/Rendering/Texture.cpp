@@ -127,8 +127,8 @@ namespace CgEngine {
             glBindTexture(GL_TEXTURE_2D, id);
 
             TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
             GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
             GLenum type = TextureUtils::getTextureFormatType(format);
@@ -140,12 +140,12 @@ namespace CgEngine {
             glBindTexture(GL_TEXTURE_2D, id);
 
             TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
             GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
             GLenum type = TextureUtils::getTextureFormatType(format);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, channels == 4 ? GL_RGBA : GL_RGB, type, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGB, type, data);
 
             glGenerateMipmap(GL_TEXTURE_2D);
         }

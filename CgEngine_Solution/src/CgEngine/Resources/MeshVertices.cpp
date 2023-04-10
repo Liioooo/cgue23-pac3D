@@ -502,11 +502,49 @@ namespace CgEngine {
 
                 auto &material = mesh->materials.emplace_back(new Material(aiMaterial->GetName().C_Str()));
 
-                aiColor3D aiEmission;
-                if (aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiEmission) == AI_SUCCESS) {
-                    material->set("u_Mat_Emission", aiEmission.r);
-                } else {
-                    material->set("u_Mat_Emission", 0.0f);
+                float aiEmissionIntensity;
+                bool hasEmissionIntensity = aiMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, aiEmissionIntensity) == AI_SUCCESS;
+                aiColor3D aiEmissionColor;
+                bool hasEmissionColor = aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiEmissionColor) == AI_SUCCESS;
+                aiString aiEmissiveTexPath;
+                bool hasEmissiveTexture = aiMaterial->GetTexture(aiTextureType_EMISSIVE, 0, &aiEmissiveTexPath) == AI_SUCCESS;
+                bool useEmissiveColor = !hasEmissiveTexture;
+                if (hasEmissiveTexture) {
+                    std::string texturePath = getTexturePath(modelPath, aiEmissiveTexPath.C_Str());
+                    if (resourceManager.hasResource<Texture2D>(texturePath)) {
+                        material->setTexture2D("u_Mat_EmissionTexture", *resourceManager.getResource<Texture2D>(path), 4);
+                        if (hasEmissionIntensity) {
+                            material->set("u_Mat_Emission", {aiEmissionIntensity, aiEmissionIntensity, aiEmissionIntensity});
+                        } else {
+                            material->set("u_Mat_Emission", {1.0f, 1.0f, 1.0f});
+                        }
+                    } else {
+                        auto *texture = new Texture2D(texturePath, true);
+                        if (texture->isLoaded()) {
+                            material->setTexture2D("u_Mat_EmissionTexture", *texture, 4);
+                            if (hasEmissionIntensity) {
+                                material->set("u_Mat_Emission", {aiEmissionIntensity, aiEmissionIntensity, aiEmissionIntensity});
+                            } else {
+                                material->set("u_Mat_Emission", {1.0f, 1.0f, 1.0f});
+                            }
+                            resourceManager.insertResource<Texture2D>(texturePath, texture);
+                        } else {
+                            useEmissiveColor = true;
+                            delete texture;
+                        }
+                    }
+                }
+                if (useEmissiveColor) {
+                    material->setTexture2D("u_Mat_EmissionTexture", Renderer::getWhiteTexture(), 4);
+                    if (hasEmissionColor) {
+                        if (hasEmissionIntensity) {
+                            material->set("u_Mat_Emission", glm::vec3(aiEmissionColor.r, aiEmissionColor.g, aiEmissionColor.b) * aiEmissionIntensity);
+                        } else {
+                            material->set("u_Mat_Emission", {aiEmissionColor.r, aiEmissionColor.g, aiEmissionColor.b});
+                        }
+                    } else {
+                        material->set("u_Mat_Emission", {0.0f, 0.0f, 0.0f});
+                    }
                 }
 
                 aiColor3D aiAlbedo;
