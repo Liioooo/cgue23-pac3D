@@ -11,7 +11,7 @@ namespace CgEngine {
         std::string mesh;
         std::string material;
         bool castShadows;
-        std::vector<uint32_t> submeshIndices;
+        std::vector<uint32_t> meshNodes;
     };
 
     class MeshRendererComponent : public Component {
@@ -24,13 +24,13 @@ namespace CgEngine {
         Material* getMaterial();
         bool getCastShadows() const;
         void setCastShadows(bool value);
-        const std::vector<uint32_t>& getSubmeshIndices();
+        const std::vector<uint32_t>& getMeshNodes();
 
     private:
         MeshVertices* mesh;
         Material* material;
         bool castShadows;
-        std::vector<uint32_t> submeshIndices;
+        std::vector<uint32_t> meshNodes;
     };
 
 }

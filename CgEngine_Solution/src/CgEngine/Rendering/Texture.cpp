@@ -167,6 +167,20 @@ namespace CgEngine {
         return height;
     }
 
+    uint32_t Texture2D::getWidthForMip(uint32_t mip) const {
+        int w;
+        glBindTexture(GL_TEXTURE_2D, id);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, mip, GL_TEXTURE_WIDTH, &w);
+        return w;
+    }
+
+    uint32_t Texture2D::getHeightForMip(uint32_t mip) const {
+        int h;
+        glBindTexture(GL_TEXTURE_2D, id);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, mip, GL_TEXTURE_HEIGHT, &h);
+        return h;
+    }
+
     TextureFormat Texture2D::getFormat() const {
         return format;
     }

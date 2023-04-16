@@ -76,6 +76,7 @@ namespace CgEngine {
         void setMat3(const std::string& name, const glm::mat3& mat);
         void setMat4(const std::string& name, const glm::mat4& mat);
         void setTexture2D(Texture2D& texture, uint32_t textureUnit);
+        void setTexture2D(uint32_t textureRendererId, uint32_t textureUnit);
         void setImage2D(Texture2D& texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level = 0);
         void setTextureCube(TextureCube& texture, uint32_t textureUnit);
         void setImageCube(TextureCube& texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level = 0);

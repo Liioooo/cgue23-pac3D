@@ -34,6 +34,8 @@ namespace CgEngine {
 
         uint32_t getWidth() const;
         uint32_t getHeight() const;
+        uint32_t getWidthForMip(uint32_t mip) const;
+        uint32_t getHeightForMip(uint32_t mip) const;
         TextureFormat getFormat() const;
         uint32_t getRendererId() const;
         void bind(uint32_t slot);

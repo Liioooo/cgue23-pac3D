@@ -29,6 +29,11 @@ namespace CgEngine {
         uint32_t indexCount;
         uint32_t vertexCount;
         uint32_t materialIndex;
+    };
+
+    struct MeshNode {
+        aiNode* aiNode;
+        std::vector<uint32_t> submeshIndices;
         glm::mat4 localTransform{1.0f};
         glm::mat4 transform{1.0f};
     };
@@ -44,6 +49,7 @@ namespace CgEngine {
         const std::vector<Vertex>& getVertices() const;
         const std::vector<uint32_t>& getIndexBuffer() const;
         const std::vector<Submesh>& getSubmeshes() const;
+        std::vector<MeshNode>& getMeshNodes();
         const Material* getMaterial(size_t index) const;
 
 
@@ -64,7 +70,7 @@ namespace CgEngine {
         std::vector<uint32_t> indexBuffer;
         std::vector<Submesh> submeshes;
         std::vector<std::unique_ptr<Material>> materials;
-        std::unordered_map<aiNode*, std::vector<uint32_t>> nodeToSubmesh{};
+        std::vector<MeshNode> meshNodes{};
     };
 
 }

@@ -74,8 +74,10 @@ namespace CgEngine {
     }
 
     void Camera::setViewportSize(int width, int height) {
-        aspectRatio = (float)width / (float)height;
-        calculateProjection();
+        if (width != 0 && height != 0) {
+            aspectRatio = (float)width / (float)height;
+            calculateProjection();
+        }
     }
 
     void Camera::calculateProjection() {

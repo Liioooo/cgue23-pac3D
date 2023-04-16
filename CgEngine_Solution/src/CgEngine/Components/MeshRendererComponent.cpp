@@ -1,4 +1,3 @@
-#include <numeric>
 #include "MeshRendererComponent.h"
 #include "GlobalObjectManager.h"
 
@@ -6,14 +5,22 @@ namespace CgEngine {
     void MeshRendererComponent::onAttach(Scene& scene, MeshRendererComponentParams &params) {
         if (!params.mesh.empty()) {
             mesh = GlobalObjectManager::getInstance().getResourceManager().getResource<MeshVertices>(params.mesh);
-            submeshIndices.push_back(0);
+            meshNodes.push_back(0);
         } else {
             mesh = GlobalObjectManager::getInstance().getResourceManager().getResource<MeshVertices>(params.assetFile);
-            if (params.submeshIndices.empty()) {
-                submeshIndices = std::vector<uint32_t>(mesh->getSubmeshes().size());
-                std::iota(submeshIndices.begin(), submeshIndices.end(), 0);
+            if (params.meshNodes.empty()) {
+                for (uint32_t i = 0; i < mesh->getMeshNodes().size(); i++) {
+                    if (!mesh->getMeshNodes().at(i).submeshIndices.empty()) {
+                        meshNodes.push_back(i);
+                    }
+                }
             } else {
-                submeshIndices = params.submeshIndices;
+                for (const auto& i: params.meshNodes) {
+                    auto& mN = mesh->getMeshNodes().at(i);
+                    if (!mN.submeshIndices.empty()) {
+                        meshNodes.push_back(i);
+                    }
+                }
             }
         }
 
@@ -42,7 +49,7 @@ namespace CgEngine {
         castShadows = value;
     }
 
-    const std::vector<uint32_t> &MeshRendererComponent::getSubmeshIndices() {
-        return submeshIndices;
+    const std::vector<uint32_t>& MeshRendererComponent::getMeshNodes() {
+        return meshNodes;
     }
 }

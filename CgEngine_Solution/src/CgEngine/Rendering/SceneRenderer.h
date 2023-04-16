@@ -20,7 +20,7 @@ namespace CgEngine {
         void setViewportSize(uint32_t width, uint32_t height);
         void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment, const SceneEnvironment& sceneEnvironment);
         void endScene();
-        void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, bool castShadows, const glm::mat4& transform);
+        void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform);
         void submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform);
 
     private:
@@ -43,12 +43,17 @@ namespace CgEngine {
         Material* shadowMapMaterial;
 
         Texture2DArray* dirShadowMaps;
+        Texture2D* bloomFilteredTexture;
+        Texture2D* bloomDownsampleStagingTexture;
+        Texture2D* bloomTexture;
+        std::vector<Framebuffer*> bloomFramebuffers;
 
         void shadowMapPass();
         void geometryPass();
         void skyboxPass();
         void physicsCollidersPass();
         void normalsDebugPass();
+        void bloomPass();
         void screenPass();
         void clearPass(RenderPass& renderPass);
 

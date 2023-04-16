@@ -64,6 +64,16 @@ namespace CgEngine {
             skyboxMaterial = new Material("skyboxMaterial");
         }
         {
+//            bloomFilteredTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+//            bloomFilteredTexture->generateMipMaps();
+//
+//            bloomDownsampleStagingTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+//            bloomDownsampleStagingTexture->generateMipMaps();
+//
+//            bloomTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+//            bloomTexture->generateMipMaps();
+        }
+        {
             RenderPassSpecification physicsCollidersRenderPassSpec;
             physicsCollidersRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("physicsColliders");
             physicsCollidersRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
@@ -113,6 +123,7 @@ namespace CgEngine {
 
             screenMaterial = new Material("screenMaterial");
             screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+//            screenMaterial->setTexture2D("u_BloomTexture", *bloomFilteredTexture, 1);
         }
 
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
@@ -135,6 +146,7 @@ namespace CgEngine {
         delete shadowMapMaterial;
 
         delete dirShadowMaps;
+        delete bloomTexture;
 
         delete ubCameraData;
         delete ubLightData;
@@ -160,11 +172,26 @@ namespace CgEngine {
 
         activeRendering = true;
 
-        if (needsResize) {
+        if (needsResize && viewportWidth != 0 && viewportHeight != 0) {
             needsResize = false;
 
             geometryRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
             screenRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
+
+//            delete bloomFilteredTexture;
+//            bloomFilteredTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+//            bloomFilteredTexture->generateMipMaps();
+//
+//            delete bloomDownsampleStagingTexture;
+//            bloomDownsampleStagingTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+//            bloomDownsampleStagingTexture->generateMipMaps();
+//
+//            delete bloomTexture;
+//            bloomTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+//            bloomTexture->generateMipMaps();
+//
+//            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+//            screenMaterial->setTexture2D("u_BloomTexture", *bloomFilteredTexture, 1);
         }
 
         UBCameraData cameraData{};
@@ -233,6 +260,7 @@ namespace CgEngine {
         if (applicationOptions.debugShowNormals) {
             normalsDebugPass();
         }
+//        bloomPass();
         screenPass();
 
         drawCommandQueue.clear();
@@ -245,54 +273,58 @@ namespace CgEngine {
         activeRendering = false;
     }
 
-    void SceneRenderer::submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& submeshIndices, Material* overrideMaterial, bool castShadows, const glm::mat4& transform) {
+    void SceneRenderer::submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform) {
         auto& submeshes = mesh.getSubmeshes();
 
-        for (const auto &index: submeshIndices) {
-            const Submesh& submesh = submeshes.at(index);
+        for (const auto& meshNodeIndex: meshNodes) {
+            const auto& meshNode = mesh.getMeshNodes().at(meshNodeIndex);
 
-            const Material* material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
+            for (const auto& submeshIndex: meshNode.submeshIndices) {
+                const Submesh& submesh = submeshes.at(submeshIndex);
+                const Material* material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
+                MeshKey mk = {mesh.getVAO()->getRendererId(), submeshIndex, material->getUuid().getUuid()};
 
-            MeshKey mk = {mesh.getVAO()->getRendererId(), index, material->getUuid().getUuid()};
+                meshTransforms[mk].emplace_back(transform * meshNode.transform);
 
-            meshTransforms[mk].emplace_back(transform * submesh.transform);
+                DrawCommand& drawCommand = drawCommandQueue[mk];
+                drawCommand.vao = mesh.getVAO();
+                drawCommand.material = material;
+                drawCommand.baseIndex = submesh.baseIndex;
+                drawCommand.baseVertex = submesh.baseVertex;
+                drawCommand.indexCount = submesh.indexCount;
+                drawCommand.instanceCount++;
 
-            DrawCommand& drawCommand = drawCommandQueue[mk];
-            drawCommand.vao = mesh.getVAO();
-            drawCommand.material = material;
-            drawCommand.baseIndex = submesh.baseIndex;
-            drawCommand.baseVertex = submesh.baseVertex;
-            drawCommand.indexCount = submesh.indexCount;
-            drawCommand.instanceCount++;
-
-            if (castShadows) {
-                DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
-                shadowMapDrawCommand.vao = mesh.getVAO();
-                shadowMapDrawCommand.material = material;
-                shadowMapDrawCommand.baseIndex = submesh.baseIndex;
-                shadowMapDrawCommand.baseVertex = submesh.baseVertex;
-                shadowMapDrawCommand.indexCount = submesh.indexCount;
-                shadowMapDrawCommand.instanceCount++;
+                if (castShadows) {
+                    DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
+                    shadowMapDrawCommand.vao = mesh.getVAO();
+                    shadowMapDrawCommand.material = material;
+                    shadowMapDrawCommand.baseIndex = submesh.baseIndex;
+                    shadowMapDrawCommand.baseVertex = submesh.baseVertex;
+                    shadowMapDrawCommand.indexCount = submesh.indexCount;
+                    shadowMapDrawCommand.instanceCount++;
+                }
             }
         }
     }
 
     void SceneRenderer::submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform) {
         const auto& submeshes = mesh.getSubmeshes();
-        for (uint32_t i = 0; i < submeshes.size(); i++) {
-            const auto& submesh = submeshes.at(i);
 
-            MeshKey mk = {mesh.getVAO()->getRendererId(), i, physicsCollidersMaterial->getUuid().getUuid()};
+        for (const auto& meshNode: mesh.getMeshNodes()) {
+            for (const auto& submeshIndex: meshNode.submeshIndices) {
+                const Submesh& submesh = submeshes.at(submeshIndex);
+                MeshKey mk = {mesh.getVAO()->getRendererId(), submeshIndex, physicsCollidersMaterial->getUuid().getUuid()};
 
-            physicsCollidersMeshTransforms[mk].emplace_back(transform * submesh.transform);
+                physicsCollidersMeshTransforms[mk].emplace_back(transform * meshNode.transform);
 
-            DrawCommand& drawCommand = physicsCollidersDrawCommandQueue[mk];
-            drawCommand.vao = mesh.getVAO();
-            drawCommand.material = physicsCollidersMaterial;
-            drawCommand.baseIndex = submesh.baseIndex;
-            drawCommand.baseVertex = submesh.baseVertex;
-            drawCommand.indexCount = submesh.indexCount;
-            drawCommand.instanceCount++;
+                DrawCommand& drawCommand = physicsCollidersDrawCommandQueue[mk];
+                drawCommand.vao = mesh.getVAO();
+                drawCommand.material = physicsCollidersMaterial;
+                drawCommand.baseIndex = submesh.baseIndex;
+                drawCommand.baseVertex = submesh.baseVertex;
+                drawCommand.indexCount = submesh.indexCount;
+                drawCommand.instanceCount++;
+            }
         }
     }
 
@@ -355,6 +387,111 @@ namespace CgEngine {
         }
 
         Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::bloomPass() {
+        auto& bloomShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<ComputeShader>("bloom");
+        bloomShader.bind();
+
+        uint32_t mipWidth = bloomFilteredTexture->getWidth();
+        uint32_t mipHeight = bloomFilteredTexture->getHeight();
+
+        auto groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
+        auto groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
+
+        bloomShader.setInt("u_Mode", 0);
+
+        bloomShader.setInt("u_LOD", 0);
+        bloomShader.setFloat("u_Threshold", 1.0f);
+        bloomShader.setFloat("u_Knee", 0.1f);
+        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 1);
+        bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, 0);
+        bloomShader.dispatch(groupsX, groupsY, 1);
+        bloomShader.waitForMemoryBarrier();
+
+        bloomShader.setInt("u_Mode", 1);
+        uint32_t mipCount = TextureUtils::calculateMipCount(bloomFilteredTexture->getWidth(), bloomFilteredTexture->getHeight()) - 2;
+        for (int i = 1; i < mipCount; i++) {
+            mipWidth = bloomFilteredTexture->getWidthForMip(i);
+            mipHeight = bloomFilteredTexture->getHeightForMip(i);
+            groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
+            groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
+
+            bloomShader.setInt("u_LOD", i - 1);
+            bloomShader.setTexture2D(*bloomFilteredTexture, 0);
+            bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, i);
+
+            bloomShader.dispatch(groupsX, groupsY, 1);
+            bloomShader.waitForMemoryBarrier();
+
+
+//            bloomShader.setInt("u_LOD", i);
+//            bloomShader.setTexture2D(*bloomDownsampleStagingTexture, 0);
+//            bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, i);
+//
+//            bloomShader.dispatch(groupsX, groupsY, 1);
+//            bloomShader.waitForMemoryBarrier();
+        }
+
+//        auto& bloomUpsampleShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("upsample");
+//        bloomUpsampleShader.bind();
+//
+//        uint32_t mFBO;
+//        glGenFramebuffers(1, &mFBO);
+//        glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+//
+//        glEnable(GL_BLEND);
+//        glBlendFunc(GL_ONE, GL_ONE);
+//        glBlendEquation(GL_FUNC_ADD);
+//
+//        for (int i = mipCount - 1; i > 0; i--) {
+//            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomFilteredTexture->getRendererId(), i - 1);
+//            glViewport(0, 0, bloomFilteredTexture->getWidthForMip(i - 1), bloomFilteredTexture->getHeightForMip(i - 1));
+//
+//            bloomUpsampleShader.setInt("u_LOD", i);
+//            bloomFilteredTexture->bind(0);
+//
+//            Renderer::rendererData.quadVAO->bind();
+//            glDrawElements(GL_TRIANGLES, Renderer::rendererData.quadVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+//        }
+//
+//        glDisable(GL_BLEND);
+//        glDeleteFramebuffers(1, &mFBO);
+//
+//
+//        bloomShader.setInt("u_Mode", 2);
+//        mipWidth = bloomFilteredTexture->getWidthForMip(mipCount - 2);
+//        mipHeight = bloomFilteredTexture->getHeightForMip(mipCount - 2);
+//        groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
+//        groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
+//
+//        bloomShader.setInt("u_LOD", mipCount - 2);
+//        bloomShader.setTexture2D(*bloomFilteredTexture, 0);
+//        bloomShader.setImage2D(*bloomTexture, 2, ShaderStorageAccess::WriteOnly, mipCount - 2);
+//
+//        bloomShader.dispatch(groupsX, groupsY, 1);
+//        bloomShader.waitForMemoryBarrier();
+//
+//        bloomShader.setInt("u_Mode", 3);
+//        for (int i = mipCount - 3; i >= 0; i--) {
+//            mipWidth = bloomFilteredTexture->getWidthForMip(i);
+//            mipHeight = bloomFilteredTexture->getHeightForMip(i);
+//            groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
+//            groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
+//
+//            bloomShader.setInt("u_LOD", i);
+//            bloomShader.setTexture2D(*bloomFilteredTexture, 0);
+//            bloomShader.setTexture2D(*bloomTexture, 1);
+//            bloomShader.setImage2D(*bloomTexture, 2, ShaderStorageAccess::WriteOnly, i);
+//
+//            bloomShader.dispatch(groupsX, groupsY, 1);
+//            bloomShader.waitForMemoryBarrier();
+//        }
+
+        for (int i = 0; i < bloomFramebuffers.size(); i++) {
+            bloomFramebuffers[i]->bind();
+        }
     }
 
     void SceneRenderer::screenPass() {

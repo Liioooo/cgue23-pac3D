@@ -76,7 +76,7 @@ namespace CgEngine {
             node.attribute("mesh").as_string(),
             node.attribute("material").as_string(),
             node.attribute("cast-shadows").as_bool(true),
-            getListFromString(node.attribute("submesh-indices").as_string())
+            getListFromString(node.attribute("mesh-nodes").as_string())
         };
         scene->attachComponent<MeshRendererComponent>(entity, params);
     }

@@ -47,23 +47,27 @@ namespace CgEngine {
         delete vao;
     }
 
-    VertexArrayObject *MeshVertices::getVAO() {
+    VertexArrayObject* MeshVertices::getVAO() {
         return vao;
     }
 
-    const std::vector<Vertex> &MeshVertices::getVertices() const {
+    const std::vector<Vertex>& MeshVertices::getVertices() const {
         return vertices;
     }
 
-    const std::vector<uint32_t> &MeshVertices::getIndexBuffer() const {
+    const std::vector<uint32_t>& MeshVertices::getIndexBuffer() const {
         return indexBuffer;
     }
 
-    const std::vector<Submesh> &MeshVertices::getSubmeshes() const {
+    const std::vector<Submesh>& MeshVertices::getSubmeshes() const {
         return submeshes;
     }
 
-    const Material *MeshVertices::getMaterial(size_t index) const {
+    std::vector<MeshNode>& MeshVertices::getMeshNodes() {
+        return meshNodes;
+    }
+
+    const Material* MeshVertices::getMaterial(size_t index) const {
         return materials.at(index).get();
     }
 
@@ -167,7 +171,7 @@ namespace CgEngine {
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
 
-        Submesh &submesh = mesh->submeshes.emplace_back();
+        Submesh& submesh = mesh->submeshes.emplace_back();
         submesh.baseVertex = 0;
         submesh.baseIndex = 0;
         submesh.vertexCount = mesh->vertices.size();
@@ -175,6 +179,12 @@ namespace CgEngine {
         submesh.materialIndex = 0;
 
         mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());
+
+        MeshNode& meshNode = mesh->meshNodes.emplace_back();
+        meshNode.aiNode = nullptr;
+        meshNode.submeshIndices.push_back(0);
+        meshNode.transform = glm::mat4(1.0f);
+        meshNode.localTransform = glm::mat4(1.0f);
 
         return mesh;
     }
@@ -266,6 +276,12 @@ namespace CgEngine {
         submesh.materialIndex = 0;
 
         mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());
+
+        MeshNode& meshNode = mesh->meshNodes.emplace_back();
+        meshNode.aiNode = nullptr;
+        meshNode.submeshIndices.push_back(0);
+        meshNode.transform = glm::mat4(1.0f);
+        meshNode.localTransform = glm::mat4(1.0f);
 
         return mesh;
     }
@@ -425,6 +441,12 @@ namespace CgEngine {
         submesh.materialIndex = 0;
 
         mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());
+
+        MeshNode& meshNode = mesh->meshNodes.emplace_back();
+        meshNode.aiNode = nullptr;
+        meshNode.submeshIndices.push_back(0);
+        meshNode.transform = glm::mat4(1.0f);
+        meshNode.localTransform = glm::mat4(1.0f);
 
         return mesh;
     }
@@ -705,12 +727,14 @@ namespace CgEngine {
         glm::mat4 localTransform = getTransformFromAssimpTransform(node->mTransformation);
         glm::mat4 transform = parentTransform * localTransform;
 
+        MeshNode& meshNode = meshNodes.emplace_back();
+        meshNode.aiNode = node;
+        meshNode.localTransform = localTransform;
+        meshNode.transform = transform;
+
         for (uint32_t i = 0; i < node->mNumMeshes; i++) {
             uint32_t submeshIndex = node->mMeshes[i];
-            Submesh& submesh = submeshes.at(submeshIndex);
-            submesh.localTransform = localTransform;
-            submesh.transform = transform;
-            nodeToSubmesh[node].push_back(submeshIndex);
+            meshNode.submeshIndices.push_back(submeshIndex);
         }
 
         for (uint32_t i = 0; i < node->mNumChildren; i++) {

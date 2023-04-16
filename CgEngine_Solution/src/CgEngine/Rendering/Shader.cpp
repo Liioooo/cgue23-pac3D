@@ -268,6 +268,11 @@ namespace CgEngine {
         glBindTexture(GL_TEXTURE_2D, texture2D.getRendererId());
     }
 
+    void ComputeShader::setTexture2D(uint32_t textureRendererId, uint32_t textureUnit) {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glBindTexture(GL_TEXTURE_2D, textureRendererId);
+    }
+
     void ComputeShader::setImage2D(Texture2D &texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level) {
         glBindImageTexture(textureUnit, texture.getRendererId(), level, GL_FALSE, 0, static_cast<GLuint>(storageAccess), TextureUtils::getOpenGLTextureFormat(texture.getFormat()));
     }
