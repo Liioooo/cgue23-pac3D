@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "GlobalObjectManager.h"
 #include "FileSystem.h"
+#include "Application.h"
 
 namespace CgEngine {
     Material *Material::createResource(const std::string &name) {
@@ -22,6 +23,8 @@ namespace CgEngine {
         std::string emissionTexture = materialNode.child("EmissionTexture").child_value();
         std::string normalTexture = materialNode.child("NormalTexture").child_value();
         bool useNormals = strcmp(materials.child("UserNormals").child_value(), "true") == 0;
+
+        ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
 
         auto* material = new Material(name);
 
@@ -68,7 +71,7 @@ namespace CgEngine {
             if (resourceManager.hasResource<Texture2D>(albedoTexturePath)) {
                 material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(albedoTexturePath), 0);
             } else {
-                auto* texture = new Texture2D(albedoTexturePath, albedoTextureSRGB);
+                auto* texture = new Texture2D(albedoTexturePath, albedoTextureSRGB, TextureWrap::Repeat, MipMapFiltering::Trilinear, applicationOptions.anisotropicFiltering);
                 resourceManager.insertResource(albedoTexturePath, texture);
                 material->setTexture2D("u_Mat_AlbedoTexture", *texture, 0);
             }

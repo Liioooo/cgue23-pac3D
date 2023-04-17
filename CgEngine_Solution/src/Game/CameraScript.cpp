@@ -12,11 +12,11 @@ namespace Game {
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Left)) {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({-100, 0, 0});
+            rigid.addForce({0, 0, -100});
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Right)) {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({100, 0, 0});
+            rigid.addForce({0, 0, 100});
         }
     }
 

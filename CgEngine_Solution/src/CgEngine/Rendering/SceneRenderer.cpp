@@ -7,12 +7,14 @@
 namespace CgEngine {
     SceneRenderer::SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
         {
-            dirShadowMaps = new Texture2DArray(TextureFormat::Depth, 4096, 4096, TextureWrap::ClampBorder, 4, MipMapFiltering::Bilinear);
+            ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
+
+            dirShadowMaps = new Texture2DArray(TextureFormat::Depth, applicationOptions.shadowMapResolution, applicationOptions.shadowMapResolution, TextureWrap::ClampBorder, 4, MipMapFiltering::Bilinear);
             dirShadowMaps->setClampBorderColor({1.0f, 1.0f, 1.0f, 1.0f});
 
             FramebufferSpecification shadowMapFramebufferSpec;
-            shadowMapFramebufferSpec.height = 4096;
-            shadowMapFramebufferSpec.width = 4096;
+            shadowMapFramebufferSpec.height = applicationOptions.shadowMapResolution;
+            shadowMapFramebufferSpec.width = applicationOptions.shadowMapResolution;
             shadowMapFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
             shadowMapFramebufferSpec.hasDepthStencilAttachment = false;
             shadowMapFramebufferSpec.hasDepthAttachment = false;

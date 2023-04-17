@@ -27,7 +27,9 @@ namespace CgEngine {
 
     void Application::init() {
         applicationOptions.debugShowPhysicsColliders = iniReader->GetBoolean("application", "debug_show_physics_colliders", false);
-        applicationOptions.debugShowPhysicsColliders = iniReader->GetBoolean("application", "debug_show_normals", false);
+        applicationOptions.debugShowNormals = iniReader->GetBoolean("application", "debug_show_normals", false);
+        applicationOptions.anisotropicFiltering = static_cast<float>(iniReader->GetReal("application", "anisotropic_filtering", 1.0));
+        applicationOptions.shadowMapResolution = iniReader->GetInteger("application", "shadow_map_resolution", 2048);
 
         WindowSpecification windowSpecification;
         windowSpecification.width = iniReader->GetInteger("window", "width", 1280);

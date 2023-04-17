@@ -5,6 +5,7 @@
 #include <filesystem>
 #include "FileSystem.h"
 #include <GlobalObjectManager.h>
+#include "Application.h"
 
 namespace CgEngine {
     MeshVertices *MeshVertices::createResource(const std::string &name) {
@@ -519,6 +520,8 @@ namespace CgEngine {
         auto resourceManager = GlobalObjectManager::getInstance().getResourceManager();
 
         if (scene->HasMaterials()) {
+            auto& applicationOptions = Application::get().getApplicationOptions();
+
             for (uint32_t m = 0; m < scene->mNumMaterials; m++) {
                 aiMaterial *aiMaterial = scene->mMaterials[m];
 
@@ -542,7 +545,7 @@ namespace CgEngine {
                             material->set("u_Mat_Emission", {1.0f, 1.0f, 1.0f});
                         }
                     } else {
-                        auto *texture = new Texture2D(texturePath, true, getTextureWrapFromAssimp(aiEmissiveWrapMode[0]));
+                        auto *texture = new Texture2D(texturePath, true, getTextureWrapFromAssimp(aiEmissiveWrapMode[0]), MipMapFiltering::Trilinear, applicationOptions.anisotropicFiltering);
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_EmissionTexture", *texture, 4);
                             if (hasEmissionIntensity) {
@@ -584,7 +587,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_AlbedoTexture", *resourceManager.getResource<Texture2D>(texturePath), 0);
                         material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
                     } else {
-                        auto *texture = new Texture2D(texturePath, true, getTextureWrapFromAssimp(aiAlbedoWrapMode[0]));
+                        auto *texture = new Texture2D(texturePath, true, getTextureWrapFromAssimp(aiAlbedoWrapMode[0]), MipMapFiltering::Trilinear, applicationOptions.anisotropicFiltering);
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_AlbedoTexture", *texture, 0);
                             material->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
@@ -616,7 +619,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_RoughnessTexture", *resourceManager.getResource<Texture2D>(texturePath), 3);
                         material->set("u_Mat_Roughness", 1.0f);
                     } else {
-                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiRoughnessWrapMode[0]));
+                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiRoughnessWrapMode[0]), MipMapFiltering::Trilinear, applicationOptions.anisotropicFiltering);
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_RoughnessTexture", *texture, 3);
                             material->set("u_Mat_Roughness", 1.0f);
@@ -642,7 +645,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_NormalTexture", *resourceManager.getResource<Texture2D>(texturePath), 1);
                         material->set("u_Mat_UseNormals", true);
                     } else {
-                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiNormalWrapMode[0]));
+                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiNormalWrapMode[0]), MipMapFiltering::Trilinear, applicationOptions.anisotropicFiltering);
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_NormalTexture", *texture, 1);
                             material->set("u_Mat_UseNormals", true);
@@ -673,7 +676,7 @@ namespace CgEngine {
                         material->setTexture2D("u_Mat_MetalnessTexture", *resourceManager.getResource<Texture2D>(texturePath), 2);
                         material->set("u_Mat_Metalness", 1.0f);
                     } else {
-                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiMetalnessWrapMode[0]));
+                        auto *texture = new Texture2D(texturePath, false, getTextureWrapFromAssimp(aiMetalnessWrapMode[0]), MipMapFiltering::Trilinear, applicationOptions.anisotropicFiltering);
                         if (texture->isLoaded()) {
                             material->setTexture2D("u_Mat_MetalnessTexture", *texture, 2);
                             material->set("u_Mat_Metalness", 1.0f);

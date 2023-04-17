@@ -227,7 +227,8 @@ namespace CgEngine {
         defaultPBRMaterial->set("u_Mat_AlbedoColor", {1.0f, 1.0f, 1.0f});
         defaultPBRMaterial->set("u_Mat_Metalness", 0.0f);
         defaultPBRMaterial->set("u_Mat_Roughness", 1.0f);
-        defaultPBRMaterial->set("u_Mat_Emission", 0.0f);
+        defaultPBRMaterial->set("u_Mat_Emission", {0.0f, 0.0f, 0.0f});
+        defaultPBRMaterial->setTexture2D("u_Mat_EmissionTexture", Renderer::getWhiteTexture(), 4);
         defaultPBRMaterial->setTexture2D("u_Mat_AlbedoTexture", Renderer::getWhiteTexture(), 0);
         defaultPBRMaterial->setTexture2D("u_Mat_MetalnessTexture", Renderer::getWhiteTexture(), 2);
         defaultPBRMaterial->setTexture2D("u_Mat_RoughnessTexture", Renderer::getWhiteTexture(), 3);
