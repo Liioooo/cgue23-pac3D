@@ -6,6 +6,7 @@
 #include "UniformBuffer.h"
 #include "VertexArrayObject.h"
 #include "Scene/Scene.h"
+#include "Renderer.h"
 
 namespace CgEngine {
 
@@ -22,6 +23,7 @@ namespace CgEngine {
         void endScene();
         void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform);
         void submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform);
+        void submitDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 
     private:
         Scene* activeScene;
@@ -36,6 +38,7 @@ namespace CgEngine {
         RenderPass* skyboxRenderPass;
         RenderPass* physicsCollidersRenderPass;
         RenderPass* normalsDebugRenderPass;
+        RenderPass* debugLinesRenderPass;
         Material* screenMaterial;
         Material* skyboxMaterial;
         Material* physicsCollidersMaterial;
@@ -53,6 +56,7 @@ namespace CgEngine {
         void skyboxPass();
         void physicsCollidersPass();
         void normalsDebugPass();
+        void debugLinesPass();
         void bloomPass();
         void screenPass();
         void clearPass(RenderPass& renderPass);
@@ -136,6 +140,8 @@ namespace CgEngine {
 
         std::map<MeshKey, DrawCommand> physicsCollidersDrawCommandQueue;
         std::map<MeshKey, std::vector<glm::mat4>> physicsCollidersMeshTransforms;
+
+        std::vector<LineDrawInfo> debugLinesDrawInfoQueue;
 
         struct CurrentSceneEnvironment {
             uint32_t prefilterMapId;

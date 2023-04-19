@@ -68,5 +68,7 @@ namespace Game {
         }
 
 //        CG_LOGGING_INFO(ts.getMillis())
+
+        drawDebugLine({10, 5, 2}, {0, 5, 0}, {1, 0, 1});
     }
 }

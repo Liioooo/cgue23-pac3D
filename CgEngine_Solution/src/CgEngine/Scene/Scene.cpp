@@ -134,6 +134,10 @@ namespace CgEngine {
         postUpdateFunctions.emplace_back(function);
     }
 
+    void Scene::submitOnRenderFunction(std::function<void(SceneRenderer&)>&& function) {
+        onRenderFunctions.emplace_back(function);
+    }
+
     void Scene::onUpdate(TimeStep ts) {
         physicsScene->simulate(ts, *this);
 
@@ -207,6 +211,8 @@ namespace CgEngine {
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
             renderer.submitMesh(it->getMeshVertices(), it->getMeshNodes(), it->getMaterial(), it->getCastShadows(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
         }
+
+        executeOnRenderFunctions(renderer);
 
         auto& applicationOptions = Application::get().getApplicationOptions();
         if (applicationOptions.debugShowPhysicsColliders) {
@@ -286,5 +292,12 @@ namespace CgEngine {
             fn();
         }
         postUpdateFunctions.clear();
+    }
+
+    void Scene::executeOnRenderFunctions(SceneRenderer& renderer) {
+        for (const auto &fn: onRenderFunctions) {
+            fn(renderer);
+        }
+        onRenderFunctions.clear();
     }
 }

@@ -1,5 +1,6 @@
 #include "NativeScript.h"
 #include "Scene/Scene.h"
+#include "Rendering/SceneRenderer.h"
 
 namespace CgEngine {
     void NativeScript::_setScene(Scene* scene) {
@@ -22,7 +23,7 @@ namespace CgEngine {
         });
     }
 
-    Entity NativeScript::findEntityById(const std::string &id) {
+    Entity NativeScript::findEntityById(const std::string& id) {
         return owningScene->findEntityById(id);
     }
 
@@ -32,5 +33,11 @@ namespace CgEngine {
 
     const std::unordered_set<Entity>& NativeScript::getChildEntities() {
         return owningScene->getChildren(owningEntity);
+    }
+
+    void NativeScript::drawDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color) {
+        owningScene->submitOnRenderFunction([from, to, color](SceneRenderer& renderer) {
+            renderer.submitDebugLine(from, to, color);
+        });
     }
 }

@@ -16,6 +16,7 @@ namespace CgEngine {
     struct ApplicationOptions {
         bool debugShowPhysicsColliders;
         bool debugShowNormals;
+        bool debugRenderLines;
 
         float anisotropicFiltering;
         uint32_t shadowMapResolution;

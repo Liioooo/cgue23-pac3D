@@ -7,9 +7,10 @@
 
 namespace CgEngine {
 
-    struct RendererData {
-        std::unique_ptr<VertexArrayObject> quadVAO;
-        std::unique_ptr<VertexArrayObject> unitCubeVAO;
+    struct LineDrawInfo {
+        glm::vec3 from;
+        glm::vec3 to;
+        glm::vec3 color;
     };
 
     class Renderer {
@@ -20,6 +21,7 @@ namespace CgEngine {
         static void endRenderPass();
         static void renderFullScreenQuad(const Material& material);
         static void renderUnitCube(const Material& material);
+        static void renderLines(const std::vector<LineDrawInfo>& lines);
         static void executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount);
 
         static Texture2D& getWhiteTexture();
@@ -30,7 +32,6 @@ namespace CgEngine {
 
     private:
         static RenderPass* currentRenderPass;
-        static RendererData rendererData;
         static bool isWireframe;
         static bool isBackFaceCulling;
         static bool isFrontFaceCulling;
@@ -41,6 +42,10 @@ namespace CgEngine {
         static Texture2D* whiteTexture;
         static Texture2D* brdfLUT;
         static TextureCube* blackCubeTexture;
+
+        static VertexArrayObject* quadVAO;
+        static VertexArrayObject* unitCubeVAO;
+        static VertexArrayObject* linesVAO;
 
         static ShaderStorageBuffer* transformsBuffer;
     };

@@ -1,7 +1,6 @@
 #include "SceneRenderer.h"
 #include "Asserts.h"
 #include "GlobalObjectManager.h"
-#include "Renderer.h"
 #include "Application.h"
 
 namespace CgEngine {
@@ -107,6 +106,18 @@ namespace CgEngine {
             normalsDebugMaterial->set("u_Color", {1.0f, 0.0f, 0.0f});
         }
         {
+            RenderPassSpecification debugLinesRenderPassSpec;
+            debugLinesRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("lines");
+            debugLinesRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
+            debugLinesRenderPassSpec.depthTest = true;
+            debugLinesRenderPassSpec.depthWrite = false;
+            debugLinesRenderPassSpec.clearColorBuffer = false;
+            debugLinesRenderPassSpec.clearDepthBuffer = false;
+            debugLinesRenderPassSpec.clearStencilBuffer = false;
+
+            debugLinesRenderPass = new RenderPass(debugLinesRenderPassSpec);
+        }
+        {
             FramebufferSpecification screenFramebufferSpec;
             screenFramebufferSpec.height = viewportHeight;
             screenFramebufferSpec.width = viewportWidth;
@@ -125,7 +136,6 @@ namespace CgEngine {
 
             screenMaterial = new Material("screenMaterial");
             screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
-//            screenMaterial->setTexture2D("u_BloomTexture", *bloomFilteredTexture, 1);
         }
 
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
@@ -139,6 +149,7 @@ namespace CgEngine {
         delete skyboxRenderPass;
         delete physicsCollidersRenderPass;
         delete normalsDebugRenderPass;
+        delete debugLinesRenderPass;
         delete screenRenderPass;
 
         delete skyboxMaterial;
@@ -262,6 +273,9 @@ namespace CgEngine {
         if (applicationOptions.debugShowNormals) {
             normalsDebugPass();
         }
+        if (applicationOptions.debugRenderLines) {
+            debugLinesPass();
+        }
 //        bloomPass();
         screenPass();
 
@@ -271,6 +285,8 @@ namespace CgEngine {
 
         physicsCollidersDrawCommandQueue.clear();
         physicsCollidersMeshTransforms.clear();
+
+        debugLinesDrawInfoQueue.clear();
 
         activeRendering = false;
     }
@@ -328,6 +344,13 @@ namespace CgEngine {
                 drawCommand.instanceCount++;
             }
         }
+    }
+
+    void SceneRenderer::submitDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color) {
+        auto& lineInfo = debugLinesDrawInfoQueue.emplace_back();
+        lineInfo.from = from;
+        lineInfo.to = to;
+        lineInfo.color = color;
     }
 
     void SceneRenderer::shadowMapPass() {
@@ -388,6 +411,12 @@ namespace CgEngine {
             Renderer::executeDrawCommand(*command.vao, *normalsDebugMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
         }
 
+        Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::debugLinesPass() {
+        Renderer::beginRenderPass(*debugLinesRenderPass);
+        Renderer::renderLines(debugLinesDrawInfoQueue);
         Renderer::endRenderPass();
     }
 

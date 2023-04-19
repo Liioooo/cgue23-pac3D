@@ -6,7 +6,6 @@
 
 namespace CgEngine {
     RenderPass* Renderer::currentRenderPass = nullptr;
-    RendererData Renderer::rendererData;
     bool Renderer::isWireframe;
     bool Renderer::isBackFaceCulling;
     bool Renderer::isFrontFaceCulling;
@@ -16,11 +15,13 @@ namespace CgEngine {
     Texture2D* Renderer::whiteTexture;
     Texture2D* Renderer::brdfLUT;
     TextureCube* Renderer::blackCubeTexture;
+    VertexArrayObject* Renderer::quadVAO;
+    VertexArrayObject* Renderer::unitCubeVAO;
+    VertexArrayObject* Renderer::linesVAO;
     ShaderStorageBuffer* Renderer::transformsBuffer;
 
-    void Renderer::init() {
-        rendererData = RendererData();
 
+    void Renderer::init() {
         struct QuadVertex {
             glm::vec3 pos;
             glm::vec2 uv;
@@ -38,12 +39,12 @@ namespace CgEngine {
         quadVertexData[3].pos = {-1.0f, 1.0f, 0.0f};
         quadVertexData[3].uv = {0.0f, 1.0f};
 
-        rendererData.quadVAO = std::make_unique<VertexArrayObject>();
+        quadVAO = new VertexArrayObject();
         auto quadVertexBuffer = std::make_shared<VertexBuffer>(quadVertexData, 4 * sizeof(QuadVertex));
         quadVertexBuffer->setLayout({{ShaderDataType::Float3, true}, {ShaderDataType::Float2, true}});
-        rendererData.quadVAO->addVertexBuffer(quadVertexBuffer);
+        quadVAO->addVertexBuffer(quadVertexBuffer);
         uint32_t quadIndices[6] = {0, 1, 2, 2, 3, 0 };
-        rendererData.quadVAO->setIndexBuffer(quadIndices, 6);
+        quadVAO->setIndexBuffer(quadIndices, 6);
 
         float unitCubeVertices[] = {
                 -1.0f, 1.0f, 1.0f, // left_top_front_0
@@ -71,12 +72,16 @@ namespace CgEngine {
                 5, 7, 3
         };
 
-        rendererData.unitCubeVAO = std::make_unique<VertexArrayObject>();
+        unitCubeVAO = new VertexArrayObject();
         auto unitCubeVertexBuffer = std::make_shared<VertexBuffer>(unitCubeVertices, sizeof(unitCubeVertices));
         unitCubeVertexBuffer->setLayout({{ShaderDataType::Float3, false}});
-        rendererData.unitCubeVAO->addVertexBuffer(unitCubeVertexBuffer);
-        rendererData.unitCubeVAO->setIndexBuffer(unitCubeIndices, 36);
+        unitCubeVAO->addVertexBuffer(unitCubeVertexBuffer);
+        unitCubeVAO->setIndexBuffer(unitCubeIndices, 36);
 
+        linesVAO = new VertexArrayObject();
+        auto linesVertexBuffer = std::make_shared<VertexBuffer>(0, VertexBufferUsage::Dynamic);
+        linesVertexBuffer->setLayout({{ShaderDataType::Float3, false}, {ShaderDataType::Float3, false}});
+        linesVAO->addVertexBuffer(linesVertexBuffer);
 
         isWireframe = false;
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -108,6 +113,9 @@ namespace CgEngine {
         delete whiteTexture;
         delete blackCubeTexture;
         delete brdfLUT;
+        delete quadVAO;
+        delete unitCubeVAO;
+        delete linesVAO;
         delete transformsBuffer;
     }
 
@@ -188,8 +196,8 @@ namespace CgEngine {
 
         material.uploadToShader(*currentRenderPass->getSpecification().shader);
 
-        rendererData.quadVAO->bind();
-        glDrawElements(GL_TRIANGLES, rendererData.quadVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+        quadVAO->bind();
+        glDrawElements(GL_TRIANGLES, quadVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::renderUnitCube(const Material &material) {
@@ -197,8 +205,39 @@ namespace CgEngine {
 
         material.uploadToShader(*currentRenderPass->getSpecification().shader);
 
-        rendererData.unitCubeVAO->bind();
-        glDrawElements(GL_TRIANGLES, rendererData.unitCubeVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+        unitCubeVAO->bind();
+        glDrawElements(GL_TRIANGLES, unitCubeVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::renderLines(const std::vector<LineDrawInfo>& lines) {
+        if (lines.size() == 0) {
+            return;
+        }
+
+        linesVAO->bind();
+        auto& vertexBuffer = linesVAO->getVertexBuffers()[0];
+        auto vertices = std::vector<float>();
+
+        for (const auto& line: lines) {
+            vertices.push_back(line.from.x);
+            vertices.push_back(line.from.y);
+            vertices.push_back(line.from.z);
+
+            vertices.push_back(line.color.x);
+            vertices.push_back(line.color.y);
+            vertices.push_back(line.color.z);
+
+            vertices.push_back(line.to.x);
+            vertices.push_back(line.to.y);
+            vertices.push_back(line.to.z);
+
+            vertices.push_back(line.color.x);
+            vertices.push_back(line.color.y);
+            vertices.push_back(line.color.z);
+        }
+
+        vertexBuffer->setData(vertices.data(), vertices.size() * sizeof(float), VertexBufferUsage::Dynamic);
+        glDrawArrays(GL_LINES, 0, lines.size() * 2);
     }
 
     void Renderer::executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount) {

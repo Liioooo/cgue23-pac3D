@@ -65,6 +65,7 @@ namespace CgEngine {
         int getViewportWidth() const;
         int getViewportHeight() const;
         void submitPostUpdateFunction(std::function<void()>&& function);
+        void submitOnRenderFunction(std::function<void(SceneRenderer& renderer)>&& function);
         void onUpdate(TimeStep ts);
         void onRender(SceneRenderer& renderer);
 
@@ -152,6 +153,7 @@ namespace CgEngine {
         std::unordered_map<Entity, std::unordered_set<Entity>> children{};
         std::unordered_map<Entity, Entity> parents{};
         std::vector<std::function<void()>> postUpdateFunctions{};
+        std::vector<std::function<void(SceneRenderer& renderer)>> onRenderFunctions{};
         ComponentManager* componentManager = new ComponentManager();
         int viewportWidth;
         int viewportHeight;
@@ -161,6 +163,7 @@ namespace CgEngine {
         void recursiveDestroyEntity(Entity entity);
         void recursiveUpdateChildTransforms(Entity entity, const glm::mat4& parentModelMatrix, bool parentDirty);
         void executePostUpdateFunctions();
+        void executeOnRenderFunctions(SceneRenderer& renderer);
     };
 
 }

@@ -34,6 +34,8 @@ namespace CgEngine {
         Entity getParentEntity();
         const std::unordered_set<Entity>& getChildEntities();
 
+        void drawDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
+
         template<typename C>
         C& getComponent() {
             return owningScene->getComponent<C>(owningEntity);
