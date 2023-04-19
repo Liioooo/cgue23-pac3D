@@ -1,138 +1,291 @@
 <Scene>
-    <Entity id="model">
-        <Components>
-            <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="1 1 1" />
-        </Components>
-        <Entity>
-            <Components>
-                <TransformComponent position="0 0 0" rotation="0 0 0" scale="0.04 0.04 0.04" />
-                <MeshRendererComponent asset-file="wood_table.fbx" />
-            </Components>
-        </Entity>
-    </Entity>
     <Entity>
         <Components>
-            <TransformComponent position="-4 7.5 0" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent asset-file="house.gltf" />
+            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+            <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="80" />
+            <ScriptComponent script-name="cameraScript" />
         </Components>
     </Entity>
     <Entity>
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+            <SkyboxComponent hdri-path="blue_lagoon_night_2k.hdr" lod="0.2" intensity="0.1" />
         </Components>
-        <Entity>
-            <Components>
-                <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-                <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="60" />
-                <ScriptComponent script-name="cameraScript" />
-            </Components>
-        </Entity>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 0 0" rotation="25 0 -35" scale="1 1 1" />
+            <DirectionalLightComponent color="#ffffff" intensity="0.6" />
+        </Components>
     </Entity>
     <Entity>
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            <SkyboxComponent hdri-path="rooitou_park_4k.hdr" lod="1" />
+            <MeshRendererComponent asset-file="city_map.fbx" />
         </Components>
     </Entity>
-    <Entity>
+    <Entity id="worldColliders">
         <Components>
-            <TransformComponent position="0 0 0" rotation="45 0 45" scale="1 1 1" />
-            <DirectionalLightComponent color="#ffffff" intensity="1" />
+            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
         </Components>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 -0.25 17" rotation="0 0 0" scale="66 0.5 102" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 3.5 -43.08" rotation="20.6 0 0" scale="66 0.5 21.36" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 7.25 -60.49" rotation="0 0 0" scale="66 0.5 15" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-24.25 2 16" rotation="0 0 0" scale="12.5 4 30" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="24.25 2 16" rotation="0 0 0" scale="12.5 4 30" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="24.25 2 41.75" rotation="0 0 0" scale="12.5 4 17.5" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-24.25 2 41.75" rotation="0 0 0" scale="12.5 4 17.5" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-24.25 1.5 58.75" rotation="0 0 0" scale="12.5 3 12.5" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="24.25 1.5 58.75" rotation="0 0 0" scale="12.5 3 12.5" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 2 58.75" rotation="0 0 0" scale="32 4 12.5" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 2 41.75" rotation="0 0 0" scale="32 4 17.5" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="24.25 2 -16" rotation="0 0 0" scale="12.5 4 30" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-24.25 2 -16" rotation="0 0 0" scale="12.5 4 30" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-24.25 5 -43" rotation="0 0 0" scale="12.5 10 20" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="24.25 4.5 -43" rotation="0 0 0" scale="12.5 9 20" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 4.5 -43" rotation="0 0 0" scale="32 9 20" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 9 -60" rotation="0 0 0" scale="32 3 10" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-24.25 9 -60" rotation="0 0 0" scale="12.5 3 10" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="24.25 9 -60" rotation="0 0 0" scale="12.5 3 10" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="8.5 2 22" rotation="0 0 0" scale="15 4 18" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-8.5 2 22" rotation="0 0 0" scale="15 4 18" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="13 2 7" rotation="0 0 0" scale="6 4 12" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-13 2 7" rotation="0 0 0" scale="6 4 12" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-13 2 -9.5" rotation="0 0 0" scale="6 4 17" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="13 2 -9.5" rotation="0 0 0" scale="6 4 17" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-8.5 2 -24.5" rotation="0 0 0" scale="15 4 13" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="8.5 2 -24.5" rotation="0 0 0" scale="15 4 13" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-33 2 17" rotation="0 0 0" scale="1 4 100" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="33 2 17" rotation="0 0 0" scale="1 4 100" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 2 67.5" rotation="0 0 0" scale="65 4 1" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="33 5.5 -43" rotation="20.6 0 0" scale="1 4 23" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-33 5.5 -43" rotation="20.6 0 0" scale="1 4 23" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="33 9.5 -60" rotation="0 0 0" scale="1 4 14" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="-33 9 -60" rotation="0 0 0" scale="1 3 14" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 9 -67.5" rotation="0 0 0" scale="65 3 1" />
+                <BoxColliderComponent />
+                <RigidBodyComponent dynamic="false" />
+            </Components>
+        </Entity>
     </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="0 4 0" rotation="0 0 0" scale="1 1 1" />
-            <PointLightComponent color="#ffffff" intensity="4" falloff="1" radius="6" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="0 16 -2" rotation="45 0 0" scale="1 1 1" />
-            <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="15" inner-angle="60" outer-angle="120" />
-        </Components>
-    </Entity>
-    <Entity id="licht">
-        <Components>
-            <TransformComponent position="4 0 0" rotation="180 0 0" scale="1 1 1" />
-            <SpotLightComponent color="#ffffff" intensity="1" falloff="1" radius="6" inner-angle="30" outer-angle="40" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="3 3 0" rotation="0 0 0" scale="0.1 0.1 0.1" />
-<!--            <MeshRendererComponent asset-file="gohst_b.fbx" />-->
-        </Components>
-    </Entity>
-    <Entity id="floor">
-        <Components>
-            <TransformComponent position="0 -2.5 0" rotation="0 0 0" scale="25 0.1 25" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
-            <RigidBodyComponent dynamic="false" />
-            <BoxColliderComponent offset="0 0 0" half-size="0.5 0.5 0.5" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="0 2.5 0" rotation="0 0 0" scale="15 0.1 15" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="Red" />
-            <RigidBodyComponent dynamic="false" />
-            <BoxColliderComponent trigger="true" />
-        </Components>
-    </Entity>
+<!--    <Entity id="player">-->
+<!--        <Components>-->
+<!--            <TransformComponent position="0 3 0" rotation="0 0 0" scale="1 1 1" />-->
+<!--            <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />-->
+<!--        </Components>-->
+<!--    </Entity>-->
     <Entity id="cube">
         <Components>
-            <TransformComponent position="1 2 0" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
-            <RigidBodyComponent dynamic="true" mass="10" collision-detection="continuous" />
-            <BoxColliderComponent material="bounce"  />
-            <ScriptComponent script-name="cubeTestScript" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="-2 1 0" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_SphereMesh_16_16" material="MyMaterial" />
-            <RigidBodyComponent dynamic="false" mass="10" collision-detection="continuous" />
-            <SphereColliderComponent material="bounce"  />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="2 5 0" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CapsuleMesh" material="Red" />
-            <CapsuleColliderComponent />
-            <RigidBodyComponent dynamic="true" mass="10" collision-detection="continuous" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="-2 -2 -2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="2 2 2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="-2 2 2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="2 -2 2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
-        </Components>
-    </Entity>
-    <Entity>
-        <Components>
-            <TransformComponent position="-2 -2 2" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" material="MyMaterial" />
+            <TransformComponent position="-17 25 -50" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent mesh="CG_CubeMesh" />
+            <BoxColliderComponent />
+            <RigidBodyComponent dynamic="true" mass="10" />
         </Components>
     </Entity>
 </Scene>
