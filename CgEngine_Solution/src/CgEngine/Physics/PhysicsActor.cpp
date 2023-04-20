@@ -129,6 +129,14 @@ namespace CgEngine {
         physxActor->is<physx::PxRigidDynamic>()->addTorque(PhysXUtils::glmToPhysXVec(force), static_cast<physx::PxForceMode::Enum>(forceMode));
     }
 
+    void PhysicsActor::setKinematicTarget(glm::vec3 target, glm::quat rotation) {
+        if (!kinematic) {
+            return;
+        }
+
+        physxActor->is<physx::PxRigidDynamic>()->setKinematicTarget(physx::PxTransform(PhysXUtils::glmToPhysXVec(target), PhysXUtils::glmToPhysXQuat(rotation)));
+    }
+
     void PhysicsActor::setMaxLinearVelocity(float velocity) {
         if (!dynamic) {
             return;

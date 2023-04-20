@@ -69,7 +69,7 @@ namespace CgEngine {
         void onUpdate(TimeStep ts);
         void onRender(SceneRenderer& renderer);
 
-        void _executeFixedUpdate();
+        void executeFixedUpdate();
 
         template<typename C>
         C& attachComponent(Entity entity) {
@@ -91,7 +91,7 @@ namespace CgEngine {
 
         template<typename C>
         void detachComponent(Entity entity) {
-            componentManager->getComponent<C>(entity).detach(*this);
+            componentManager->getComponent<C>(entity).onDetach(*this);
             componentManager->detachComponent<C>(entity);
         }
 

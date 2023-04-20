@@ -274,12 +274,25 @@
             </Components>
         </Entity>
     </Entity>
-<!--    <Entity id="player">-->
-<!--        <Components>-->
-<!--            <TransformComponent position="0 3 0" rotation="0 0 0" scale="1 1 1" />-->
-<!--            <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />-->
-<!--        </Components>-->
-<!--    </Entity>-->
+    <Entity id="ghosts">
+        <Components>
+            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+            <ScriptComponent script-name="ghostsController" />
+        </Components>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
+            </Components>
+        </Entity>
+    </Entity>
+    <Entity id="player">
+        <Components>
+            <TransformComponent position="0 5 0" rotation="0 0 0" scale="0.5 1 0.5" />
+            <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />
+            <CapsuleColliderComponent />
+            <CharacterControllerComponent slope-limit="30" step-offset="0.1" />
+        </Components>
+    </Entity>
     <Entity id="cube">
         <Components>
             <TransformComponent position="-17 25 -50" rotation="0 0 0" scale="1 1 1" />

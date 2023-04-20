@@ -5,6 +5,13 @@
 
 namespace CgEngine {
 
+    SceneManager::~SceneManager() {
+        if (nextScene != nullptr) {
+            delete nextScene;
+        }
+        delete activeScene;
+    }
+
     Scene* SceneManager::getActiveScene() {
         if (nextScene != nullptr) {
             delete activeScene;

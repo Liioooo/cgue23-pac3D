@@ -2,7 +2,7 @@
 #include "CgEngine/Application.h"
 
 #include "Game/CameraScript.h"
-#include "Game/CubeTestScript.h"
+#include "Game/GhostsController.h"
 
 int main(int argc, char **argv) {
     CgEngine::Logging::init();
@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     CgEngine::Application* application = new CgEngine::Application("assets/settings.ini");
 
     application->registerNativeScript<Game::CameraScript>("cameraScript");
-    application->registerNativeScript<Game::CubeTestScript>("cubeTestScript");
+    application->registerNativeScript<Game::GhostsController>("ghostsController");
 
     application->init();
     application->run();

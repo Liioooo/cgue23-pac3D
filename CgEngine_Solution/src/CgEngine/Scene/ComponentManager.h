@@ -13,6 +13,7 @@
 #include <Components/SphereColliderComponent.h>
 #include <Components/CApsuleColliderComponent.h>
 #include <Components/RigidBodyComponent.h>
+#include <Components/CharacterControllerComponent.h>
 #include "ComponentArray.h"
 
 namespace CgEngine {
@@ -32,6 +33,7 @@ namespace CgEngine {
             registerComponentType<SphereColliderComponent>();
             registerComponentType<CapsuleColliderComponent>();
             registerComponentType<RigidBodyComponent>();
+            registerComponentType<CharacterControllerComponent>();
         }
 
         template<typename C>

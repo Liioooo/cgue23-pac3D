@@ -71,6 +71,11 @@ namespace CgEngine {
             owningScene->detachComponent<C>(owningEntity);
         }
 
+        template<typename C>
+        void detachComponent(Entity entity) {
+            owningScene->detachComponent<C>(entity);
+        }
+
     private:
         Scene* owningScene;
         Entity owningEntity;

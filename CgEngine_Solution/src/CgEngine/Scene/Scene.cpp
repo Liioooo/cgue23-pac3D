@@ -233,9 +233,10 @@ namespace CgEngine {
             }
 
             for (auto it = componentManager->begin<CapsuleColliderComponent>(); it != componentManager->end<CapsuleColliderComponent>(); it++) {
-                auto& capsuleMesh = *resourceManager.getResource<MeshVertices>("CG_CapsuleMesh_" + std::to_string(it->getRadius()) + "_" + std::to_string(it->getHalfHeight() * 2.0f));
-                auto modelMatrix = componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix();
-                glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), it->getOffset()) * modelMatrix;
+                auto& transform = componentManager->getComponent<TransformComponent>(it->getEntity());
+                float radius = it->getRadius() * glm::max(transform.getGlobalScale().x, transform.getGlobalScale().z);
+                auto& capsuleMesh = *resourceManager.getResource<MeshVertices>("CG_CapsuleMesh_" + std::to_string(radius) + "_" + std::to_string(it->getHalfHeight() * 2.0f * transform.getGlobalScale().y));
+                glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), transform.getGlobalPosition() + it->getOffset());
                 renderer.submitPhysicsColliderMesh(capsuleMesh, colliderTransform);
             }
         }
@@ -243,7 +244,7 @@ namespace CgEngine {
         renderer.endScene();
     }
 
-    void Scene::_executeFixedUpdate() {
+    void Scene::executeFixedUpdate() {
         for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
             it->fixedUpdate();
         }

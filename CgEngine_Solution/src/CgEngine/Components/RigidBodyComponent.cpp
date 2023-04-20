@@ -77,6 +77,10 @@ namespace CgEngine {
         actor->addTorque(force, forceMode);
     }
 
+    void RigidBodyComponent::setKinematicTarget(glm::vec3 target, glm::quat rotation) {
+        actor->setKinematicTarget(target, rotation);
+    }
+
     void RigidBodyComponent::setMaxLinearVelocity(float velocity) {
         actor->setMaxLinearVelocity(velocity);
     }

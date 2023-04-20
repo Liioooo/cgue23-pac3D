@@ -7,10 +7,12 @@ namespace CgEngine {
 
     namespace PhysXUtils {
         const physx::PxVec3& glmToPhysXVec(const glm::vec3& value);
+        physx::PxExtendedVec3 glmToExtendedPhysXVec(const glm::vec3& value);
         const physx::PxVec4& glmToPhysXVec(const glm::vec4& value);
         physx::PxQuat glmToPhysXQuat(const glm::quat& value);
 
         glm::vec3 phsXToGlmVec(const physx::PxVec3& value);
+        glm::vec3 phsXExtendedToGlmVec(const physx::PxExtendedVec3& value);
         glm::vec4 phsXToGlmVec(const physx::PxVec4& value);
         glm::quat phsXToGlmQuat(const physx::PxQuat& value);
     }

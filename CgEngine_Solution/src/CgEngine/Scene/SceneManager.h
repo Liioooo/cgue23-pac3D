@@ -7,6 +7,7 @@ namespace CgEngine {
     class SceneManager {
     public:
         SceneManager() = default;
+        ~SceneManager();
 
         Scene* getActiveScene();
         void setActiveScene(const std::string& name);

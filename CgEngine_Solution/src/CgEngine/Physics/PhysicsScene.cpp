@@ -25,9 +25,14 @@ namespace CgEngine {
 
         physXScene = physicsSystem.getPhysxPhysics().createScene(sceneDesc);
         CG_ASSERT(physXScene != nullptr, "Error creating PhysXScene!")
+
+        physXControllerManager = PxCreateControllerManager(*physXScene);
     }
 
     PhysicsScene::~PhysicsScene() {
+        physXControllerManager->release();
+        physXControllerManager = nullptr;
+
         physXScene->release();
         physXScene = nullptr;
     }
@@ -38,6 +43,52 @@ namespace CgEngine {
 
     void PhysicsScene::removeActor(PhysicsActor* actor) {
         physXScene->removeActor(actor->getPhysxActor());
+    }
+
+    PhysicsController* PhysicsScene::createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float slopeLimit) {
+        physx::PxController* physXController = nullptr;
+
+        auto& transform = scene.getComponent<TransformComponent>(entity);
+
+        if (scene.hasComponent<BoxColliderComponent>(entity)) {
+            auto& collider = scene.getComponent<BoxColliderComponent>(entity);
+
+            glm::vec3 scale = collider.getHalfSize() * transform.getGlobalScale();
+
+            physx::PxBoxControllerDesc desc;
+            desc.halfHeight = scale.y;
+            desc.halfSideExtent = scale.x;
+            desc.halfForwardExtent = scale.z;
+            desc.position = PhysXUtils::glmToExtendedPhysXVec(transform.getGlobalPosition() + collider.getOffset());
+            desc.upDirection = {0.0f, 1.0f, 0.0f};
+            desc.stepOffset = stepOffset;
+            desc.slopeLimit = glm::max(0.0f, glm::cos(glm::radians(slopeLimit)));
+            desc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
+            desc.contactOffset = 0.05f;
+            desc.material = collider.getPhysicsMaterial().getPhysxMaterial();
+
+            physXController = physXControllerManager->createController(desc);
+        } else if (scene.hasComponent<CapsuleColliderComponent>(entity)) {
+            auto& collider = scene.getComponent<CapsuleColliderComponent>(entity);
+
+            physx::PxCapsuleControllerDesc desc;
+            desc.height = collider.getHalfHeight() * 2.0f * transform.getGlobalScale().y;
+            desc.radius = collider.getRadius() * glm::max(transform.getGlobalScale().x, transform.getGlobalScale().z);
+            desc.position = PhysXUtils::glmToExtendedPhysXVec(transform.getGlobalPosition() + collider.getOffset());
+            desc.upDirection = {0.0f, 1.0f, 0.0f};
+            desc.stepOffset = stepOffset;
+            desc.slopeLimit = glm::max(0.0f, glm::cos(glm::radians(slopeLimit)));
+            desc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
+            desc.climbingMode = physx::PxCapsuleClimbingMode::eCONSTRAINED;
+            desc.contactOffset = 0.05f;
+            desc.material = collider.getPhysicsMaterial().getPhysxMaterial();
+
+            physXController = physXControllerManager->createController(desc);
+        }
+
+        CG_ASSERT(physXController != nullptr, "Cannot create PhysicsController! Entity using Controller must have: BoxColliderComponent or CapsuleColliderComponent")
+
+        return new PhysicsController(physXController, hasGravity, entity);
     }
 
     void PhysicsScene::simulate(TimeStep ts, Scene& scene) {
@@ -53,6 +104,11 @@ namespace CgEngine {
                     actor->updateTransforms();
                 }
             }
+
+            for (uint32_t i = 0; i < physXControllerManager->getNbControllers(); i++) {
+                static_cast<PhysicsController*>(physXControllerManager->getController(i)->getUserData())->updateTransforms(scene);
+            }
+
         }
     }
 
@@ -70,8 +126,15 @@ namespace CgEngine {
             accumulator -= simulateTimeStep;
             physXScene->simulate(simulateTimeStep);
             physXScene->fetchResults(true);
-            scene._executeFixedUpdate();
+            scene.executeFixedUpdate();
+            updateControllers(simulateTimeStep);
         }
         return true;
+    }
+
+    void PhysicsScene::updateControllers(float ts) {
+        for (uint32_t i = 0; i < physXControllerManager->getNbControllers(); i++) {
+            static_cast<PhysicsController*>(physXControllerManager->getController(i)->getUserData())->update(ts);
+        }
     }
 }

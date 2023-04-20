@@ -4,6 +4,7 @@
 #include "TimeStep.h"
 #include "PhysicsActor.h"
 #include "PxPhysicsAPI.h"
+#include "PhysicsController.h"
 
 namespace CgEngine {
 
@@ -16,13 +17,15 @@ namespace CgEngine {
 
         void addActor(PhysicsActor* actor);
         void removeActor(PhysicsActor* actor);
+        PhysicsController* createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float slopeLimit);
         void simulate(TimeStep ts, Scene& scene);
 
     private:
         physx::PxScene* physXScene;
-        std::unordered_map<Entity, PhysicsActor> actors;
+        physx::PxControllerManager* physXControllerManager;
 
         bool advance(float ts, Scene& scene);
+        void updateControllers(float ts);
 
         float simulateTimeStep;
         float accumulator;

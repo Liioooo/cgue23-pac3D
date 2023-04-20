@@ -59,6 +59,8 @@ namespace CgEngine {
             createSphereColliderComponent(scene, entity, node);
         } else if (name == "CapsuleColliderComponent") {
             createCapsuleColliderComponent(scene, entity, node);
+        } else if (name == "CharacterControllerComponent") {
+            createCharacterControllerComponent(scene, entity, node);
         }
     }
 
@@ -182,6 +184,15 @@ namespace CgEngine {
             node.attribute("material").as_string("default-physics-material"),
         };
         scene->attachComponent<CapsuleColliderComponent>(entity, params);
+    }
+
+    void SceneLoader::createCharacterControllerComponent(CgEngine::Scene* scene, CgEngine::Entity entity, const pugi::xml_node& node) {
+        CharacterControllerComponentParams params{
+            node.attribute("has-gravity").as_bool(true),
+            node.attribute("step-offset").as_float(0.0f),
+            node.attribute("slope-limit").as_float(0.0f)
+        };
+        scene->attachComponent<CharacterControllerComponent>(entity, params);
     }
 
     glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {

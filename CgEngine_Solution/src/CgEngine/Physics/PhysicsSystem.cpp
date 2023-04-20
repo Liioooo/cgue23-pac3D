@@ -11,12 +11,20 @@ namespace CgEngine {
             return *(physx::PxVec4*)(&value);
         }
 
+        physx::PxExtendedVec3 glmToExtendedPhysXVec(const glm::vec3& value) {
+            return {value.x, value.y, value.z};
+        }
+
         physx::PxQuat glmToPhysXQuat(const glm::quat& value) {
             return {value.x, value.y, value.z, value.w};
         }
 
         glm::vec3 phsXToGlmVec(const physx::PxVec3& value) {
             return *(glm::vec3*)&value;
+        }
+
+        glm::vec3 phsXExtendedToGlmVec(const physx::PxExtendedVec3& value) {
+            return {value.x, value.y, value.z};
         }
 
         glm::vec4 phsXToGlmVec(const physx::PxVec4& value) {
@@ -76,9 +84,9 @@ namespace CgEngine {
         tolerancesScale.speed = 100.0f;
 
         physx::PxPvd* pvd = nullptr;
-//        pvd = physx::PxCreatePvd(*physxFoundation);
-//        physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 1000);
-//        pvd->connect(*transport,physx::PxPvdInstrumentationFlag::eALL);
+        pvd = physx::PxCreatePvd(*physxFoundation);
+        physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 1000);
+        pvd->connect(*transport,physx::PxPvdInstrumentationFlag::eALL);
 
         physxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *physxFoundation, tolerancesScale, false, pvd);
         CG_ASSERT(physxPhysics, "Error while creating PhysXPhysics")

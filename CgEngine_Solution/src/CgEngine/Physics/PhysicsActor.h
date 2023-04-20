@@ -34,6 +34,7 @@ namespace CgEngine {
 
         void addForce(glm::vec3 force, PhysicsForceMode forceMode);
         void addTorque(glm::vec3 force, PhysicsForceMode forceMode);
+        void setKinematicTarget(glm::vec3 target, glm::quat rotation);
 
         void setMaxLinearVelocity(float velocity);
         void setMaxAngularVelocity(float velocity);

@@ -18,7 +18,14 @@ namespace Game {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
             rigid.addForce({0, 0, 100});
         }
+
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::I)) {
+            auto& p = getComponent<CgEngine::CharacterControllerComponent>(findEntityById("player"));
+            p.move({0.0f, 0, -0.1f});
+        }
     }
+
+
 
     void CameraScript::update(CgEngine::TimeStep ts) {
         if (CgEngine::Input::isMouseButtonPressed(CgEngine::MouseButton::MouseButtonLeft) && CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Normal) {
@@ -63,12 +70,8 @@ namespace Game {
         comp.setLocalPosition(pos);
         comp.setYawPitchRoll(yaw, pitch, 0);
 
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
-            destroyEntity(findEntityById("floor"));
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter) && hasEntityComponent<CgEngine::CharacterControllerComponent>(findEntityById("player"))) {
+            detachComponent<CgEngine::CharacterControllerComponent>(findEntityById("player"));
         }
-
-//        CG_LOGGING_INFO(ts.getMillis())
-
-        drawDebugLine({10, 5, 2}, {0, 5, 0}, {1, 0, 1});
     }
 }
