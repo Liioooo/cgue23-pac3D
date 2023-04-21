@@ -1,10 +1,10 @@
-#include "CameraScript.h"
+#include "FlyingCameraScript.h"
 #include "Events/Input.h"
 #include "Events/KeyCodes.h"
 #include "glm/gtx/common.hpp"
 
 namespace Game {
-    void CameraScript::fixedUpdate() {
+    void FlyingCameraScript::fixedUpdate() {
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Up)) {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
@@ -18,16 +18,15 @@ namespace Game {
             auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
             rigid.addForce({0, 0, 100});
         }
-
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::I)) {
-            auto& p = getComponent<CgEngine::CharacterControllerComponent>(findEntityById("player"));
-            p.move({0.0f, 0, -0.1f});
-        }
     }
 
 
 
-    void CameraScript::update(CgEngine::TimeStep ts) {
+    void FlyingCameraScript::update(CgEngine::TimeStep ts) {
+        if (!getComponent<CgEngine::CameraComponent>().isPrimary()) {
+            return;
+        }
+
         if (CgEngine::Input::isMouseButtonPressed(CgEngine::MouseButton::MouseButtonLeft) && CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Normal) {
             CgEngine::Input::setCursorMode(CgEngine::CursorMode::Locked);
             prevMousePos = CgEngine::Input::getMousePosition();
@@ -38,14 +37,13 @@ namespace Game {
 
         auto mousePos = CgEngine::Input::getMousePosition();
 
-
-        auto& comp = getComponent<CgEngine::TransformComponent>();
-        glm::vec3 pos = comp.getLocalPosition();
-
         float mouseDeltaX = (prevMousePos.first - mousePos.first) * 0.001f;
         float mouseDeltaY = (prevMousePos.second - mousePos.second) * 0.001f;
 
         prevMousePos = mousePos;
+
+        auto& comp = getComponent<CgEngine::TransformComponent>();
+        glm::vec3 pos = comp.getLocalPosition();
 
         if (CgEngine::Input::getCursorMode() == CgEngine::CursorMode::Locked) {
             pitch = glm::clamp(pitch + mouseDeltaY, glm::radians(-80.0f), glm::radians(80.0f));
@@ -69,9 +67,5 @@ namespace Game {
 
         comp.setLocalPosition(pos);
         comp.setYawPitchRoll(yaw, pitch, 0);
-
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter) && hasEntityComponent<CgEngine::CharacterControllerComponent>(findEntityById("player"))) {
-            detachComponent<CgEngine::CharacterControllerComponent>(findEntityById("player"));
-        }
     }
 }

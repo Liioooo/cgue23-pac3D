@@ -153,6 +153,15 @@ namespace CgEngine {
         updateTransforms();
     }
 
+    void Scene::onEvent(Event& event) {
+        for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
+            it->onEvent(event);
+            if (event.wasHandled()) {
+                return;
+            }
+        }
+    }
+
     void Scene::onRender(SceneRenderer& renderer) {
         auto cameraComponent = std::find_if(componentManager->begin<CameraComponent>(), componentManager->end<CameraComponent>(), [](auto&& c) { return c.isPrimary();});
         auto cameraTransform = componentManager->getComponent<TransformComponent>(cameraComponent->getEntity());

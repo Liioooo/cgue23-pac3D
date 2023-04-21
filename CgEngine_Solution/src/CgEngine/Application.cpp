@@ -72,6 +72,10 @@ namespace CgEngine {
         eventDispatcher.dispatch<WindowCloseEvent>(EVENT_BIND_FN(onWindowClose));
         eventDispatcher.dispatch<WindowResizeEvent>(EVENT_BIND_FN(onWindowResize));
         eventDispatcher.dispatch<KeyPressedEvent>(EVENT_BIND_FN(onKeyPressed));
+
+        if (!event.wasHandled()) {
+            sceneManager->getActiveScene()->onEvent(event);
+        }
     }
 
     Window &Application::getWindow() {
@@ -88,6 +92,7 @@ namespace CgEngine {
 
     void Application::onWindowClose(WindowCloseEvent &event) {
         isRunning = false;
+        event.stopPropagation();
     }
 
     void Application::onWindowResize(WindowResizeEvent &event) {
@@ -99,10 +104,12 @@ namespace CgEngine {
         switch (event.getKeyCode()) {
             case KeyCode::F1: {
                 applicationOptions.debugShowPhysicsColliders = !applicationOptions.debugShowPhysicsColliders;
+                event.stopPropagation();
                 break;
             }
             case KeyCode::F2: {
                 applicationOptions.debugShowNormals = !applicationOptions.debugShowNormals;
+                event.stopPropagation();
                 break;
             }
         }

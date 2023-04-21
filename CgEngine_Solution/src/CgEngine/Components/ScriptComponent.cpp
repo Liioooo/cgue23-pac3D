@@ -1,5 +1,6 @@
 #include "ScriptComponent.h"
 #include "GlobalObjectManager.h"
+#include "Events/MouseScrolledEvent.h"
 
 namespace CgEngine {
     void ScriptComponent::onAttach(Scene &scene, ScriptComponentParams &params) {
@@ -39,5 +40,10 @@ namespace CgEngine {
 
     void ScriptComponent::onTriggerExit(Entity other) {
         script->onTriggerExit(other);
+    }
+
+    void ScriptComponent::onEvent(CgEngine::Event& event) {
+        EventDispatcher dispatcher(event);
+        dispatcher.dispatch<MouseScrolledEvent>(EVENT_BIND_FN(script->onMouseScrolled));
     }
 }

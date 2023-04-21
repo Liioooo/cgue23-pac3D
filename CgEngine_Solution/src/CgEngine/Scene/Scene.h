@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Events/Event.h"
 #include "Entity.h"
 #include "ComponentManager.h"
 #include "TimeStep.h"
@@ -67,6 +68,7 @@ namespace CgEngine {
         void submitPostUpdateFunction(std::function<void()>&& function);
         void submitOnRenderFunction(std::function<void(SceneRenderer& renderer)>&& function);
         void onUpdate(TimeStep ts);
+        void onEvent(Event& event);
         void onRender(SceneRenderer& renderer);
 
         void executeFixedUpdate();

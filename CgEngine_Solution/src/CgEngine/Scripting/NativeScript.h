@@ -2,6 +2,7 @@
 
 #include "Scene/Entity.h"
 #include "Scene/Scene.h"
+#include "Events/MouseScrolledEvent.h"
 
 namespace CgEngine {
 
@@ -25,6 +26,8 @@ namespace CgEngine {
 
         virtual void onTriggerEnter(Entity other) {};
         virtual void onTriggerExit(Entity other) {};
+
+        virtual void onMouseScrolled(MouseScrolledEvent& event) {}
 
 
     protected:

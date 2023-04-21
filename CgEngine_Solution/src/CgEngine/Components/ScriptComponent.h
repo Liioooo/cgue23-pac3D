@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Events/Event.h"
 #include "Component.h"
 #include "TimeStep.h"
 
@@ -27,6 +28,8 @@ namespace CgEngine {
 
         void onTriggerEnter(Entity other);
         void onTriggerExit(Entity other);
+
+        void onEvent(Event& event);
 
     private:
         std::shared_ptr<NativeScript> script;

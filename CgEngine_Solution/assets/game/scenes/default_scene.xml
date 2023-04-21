@@ -1,9 +1,9 @@
 <Scene>
-    <Entity>
+    <Entity id="flyingCamera">
         <Components>
-            <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="80" />
-            <ScriptComponent script-name="cameraScript" />
+            <TransformComponent position="0 10 0" rotation="0 0 0" scale="1 1 1" />
+            <CameraComponent primary="false" projection="perspective" near="0.1" far="500" fov="80" />
+            <ScriptComponent script-name="flyingCameraScript" />
         </Components>
     </Entity>
     <Entity>
@@ -287,11 +287,23 @@
     </Entity>
     <Entity id="player">
         <Components>
-            <TransformComponent position="0 5 0" rotation="0 0 0" scale="0.5 1 0.5" />
-            <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />
-            <CapsuleColliderComponent />
+            <TransformComponent position="0 5 0" rotation="0 0 0" scale="1 1 1" />
+            <CapsuleColliderComponent radius="0.5" />
             <CharacterControllerComponent slope-limit="30" step-offset="0.1" />
+            <ScriptComponent script-name="player" />
         </Components>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 0 5" rotation="0 0 0" scale="1 1 1" />
+                <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="80" />
+            </Components>
+        </Entity>
+        <Entity>
+            <Components>
+                <TransformComponent position="0 0 0" rotation="0 0 0" scale="0.5 0.7 0.5" />
+                <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />
+            </Components>
+        </Entity>
     </Entity>
     <Entity id="cube">
         <Components>
