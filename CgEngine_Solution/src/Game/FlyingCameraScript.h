@@ -11,7 +11,6 @@ namespace Game {
             return std::make_shared<FlyingCameraScript>();
         }
 
-        void fixedUpdate() override;
         void update(CgEngine::TimeStep ts) override;
 
     private:

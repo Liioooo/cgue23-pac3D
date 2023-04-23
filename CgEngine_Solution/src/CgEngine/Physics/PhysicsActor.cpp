@@ -6,7 +6,7 @@
 #include "Uuid.h"
 
 namespace CgEngine {
-    PhysicsActor::PhysicsActor(Scene* scene, Entity entity, glm::vec3 pos, glm::quat orientation, bool isDynamic, PhysicsCollisionDetection collisionDetection) : scene(scene), entity(entity), dynamic(isDynamic) {
+    PhysicsActor::PhysicsActor(Scene* scene, Entity entity, glm::vec3 pos, glm::quat orientation, bool isDynamic, PhysicsCollisionDetection collisionDetection) : AbstractPhysicsActor(scene, entity), dynamic(isDynamic) {
         auto& physicsSystem = GlobalObjectManager::getInstance().getPhysicsSystem();
 
         physx::PxTransform transform(PhysXUtils::glmToPhysXVec(pos), PhysXUtils::glmToPhysXQuat(orientation));
@@ -35,6 +35,10 @@ namespace CgEngine {
         physxActor = nullptr;
     }
 
+    PhysicsActorType PhysicsActor::getPhysicsActorType() const {
+        return PhysicsActorType::Actor;
+    }
+
     physx::PxRigidActor& PhysicsActor::getPhysxActor() const {
         return *physxActor;
     }
@@ -43,20 +47,12 @@ namespace CgEngine {
         return filterData;
     }
 
-    Scene& PhysicsActor::getScene() const {
-        return *scene;
-    }
-
-    Entity PhysicsActor::getEntity() const {
-        return entity;
-    }
-
-    bool PhysicsActor::isSleeping() {
+    bool PhysicsActor::isSleeping() const {
         return dynamic && physxActor->is<physx::PxRigidDynamic>()->isSleeping();
     }
 
     void PhysicsActor::updateTransforms() {
-        auto& transformComp = scene->getComponent<TransformComponent>(entity);
+        auto& transformComp = getScene().getComponent<TransformComponent>(getEntity());
         physx::PxTransform transform = physxActor->getGlobalPose();
         transformComp._physicsUpdate(PhysXUtils::phsXToGlmVec(transform.p), PhysXUtils::phsXToGlmQuat(transform.q));
     }

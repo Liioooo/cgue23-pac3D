@@ -9,7 +9,7 @@ namespace Game {
 
     struct MapNode {
         glm::vec3 pos;
-        std::vector<MapNode> neighbors;
+        std::vector<int> neighbors;
 
         explicit MapNode(glm::vec3 pos) : pos(pos) {};
     };
@@ -26,7 +26,11 @@ namespace Game {
     private:
         std::vector<MapNode> mapNodes;
 
-        void setMapNeighbors(size_t node, std::initializer_list<size_t> neighbors);
+        void setMapNeighbors(size_t node, std::initializer_list<int> neighbors);
+        void createCoins();
+        void createCoinAtPos(glm::vec3 pos);
+        glm::vec3 lerp(glm::vec3 x, glm::vec3 y, float t);
+
         void debugDrawMap();
     };
 

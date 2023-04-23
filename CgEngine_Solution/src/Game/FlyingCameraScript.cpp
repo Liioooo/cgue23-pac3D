@@ -4,24 +4,6 @@
 #include "glm/gtx/common.hpp"
 
 namespace Game {
-    void FlyingCameraScript::fixedUpdate() {
-
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Up)) {
-            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({0, 300, 0});
-        }
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Left)) {
-            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({0, 0, -100});
-        }
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Right)) {
-            auto& rigid = getComponent<CgEngine::RigidBodyComponent>(findEntityById("cube"));
-            rigid.addForce({0, 0, 100});
-        }
-    }
-
-
-
     void FlyingCameraScript::update(CgEngine::TimeStep ts) {
         if (!getComponent<CgEngine::CameraComponent>().isPrimary()) {
             return;

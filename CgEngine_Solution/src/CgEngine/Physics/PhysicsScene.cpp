@@ -96,7 +96,7 @@ namespace CgEngine {
 
         CG_ASSERT(physXController != nullptr, "Cannot create PhysicsController! Entity using Controller must have: BoxColliderComponent or CapsuleColliderComponent")
 
-        return new PhysicsController(physXController, hasGravity, entity);
+        return new PhysicsController(physXController, hasGravity, entity, scene);
     }
 
     void PhysicsScene::simulate(TimeStep ts, Scene& scene) {
@@ -108,13 +108,13 @@ namespace CgEngine {
 
             for(uint32_t i = 0; i < actorCount; i++) {
                 auto* actor = static_cast<PhysicsActor*>(activeActors[i]->userData);
-                if (actor && !actor->isSleeping()) {
+                if (actor  && actor->getPhysicsActorType() == PhysicsActorType::Actor && !actor->isSleeping()) {
                     actor->updateTransforms();
                 }
             }
 
             for (uint32_t i = 0; i < physXControllerManager->getNbControllers(); i++) {
-                static_cast<PhysicsController*>(physXControllerManager->getController(i)->getUserData())->updateTransforms(scene);
+                static_cast<PhysicsController*>(physXControllerManager->getController(i)->getUserData())->updateTransforms();
             }
 
         }

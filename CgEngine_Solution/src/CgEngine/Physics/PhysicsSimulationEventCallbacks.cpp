@@ -1,5 +1,5 @@
 #include "PhysicsSimulationEventCallbacks.h"
-#include "PhysicsActor.h"
+#include "AbstractPhysicsActor.h"
 #include "Scene/Scene.h"
 
 namespace CgEngine {
@@ -17,8 +17,8 @@ namespace CgEngine {
             return;
         }
 
-        auto* actor0 = static_cast<PhysicsActor*>(pairHeader.actors[0]->userData);
-        auto* actor1 = static_cast<PhysicsActor*>(pairHeader.actors[1]->userData);
+        auto* actor0 = static_cast<AbstractPhysicsActor*>(pairHeader.actors[0]->userData);
+        auto* actor1 = static_cast<AbstractPhysicsActor*>(pairHeader.actors[1]->userData);
 
         if (pairs->flags == physx::PxContactPairFlag::eACTOR_PAIR_HAS_FIRST_TOUCH) {
             if (actor0->getScene().hasComponent<ScriptComponent>(actor0->getEntity())) {
@@ -45,8 +45,8 @@ namespace CgEngine {
                 continue;
             }
 
-            auto* triggerActor = static_cast<PhysicsActor*>(pairs[i].triggerActor->userData);
-            auto* otherActor = static_cast<PhysicsActor*>(pairs[i].otherActor->userData);
+            auto* triggerActor = static_cast<AbstractPhysicsActor*>(pairs[i].triggerActor->userData);
+            auto* otherActor = static_cast<AbstractPhysicsActor*>(pairs[i].otherActor->userData);
 
             if (pairs[i].status == physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
                 if (triggerActor->getScene().hasComponent<ScriptComponent>(triggerActor->getEntity())) {

@@ -35,6 +35,10 @@ namespace CgEngine {
         return owningScene->getChildren(owningEntity);
     }
 
+    Entity NativeScript::createEntity() {
+        return owningScene->createEntity(owningEntity);
+    }
+
     PhysicsRaycastHit NativeScript::physicsRaycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities) {
         return owningScene->getPhysicsScene().raycast(origin, direction, maxDistance, excludeEntities);
     }

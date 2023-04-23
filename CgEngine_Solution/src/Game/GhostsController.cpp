@@ -62,7 +62,7 @@ namespace Game {
         mapNodes.emplace_back(glm::vec3(-31.5f, 8.5f, -66.0f)); // 36
         mapNodes.emplace_back(glm::vec3(-31.5f, 1.0f, 66.0f));  // 37
 
-        setMapNeighbors(0, {1, 2});
+        setMapNeighbors(0, {1, 2, 21});
         setMapNeighbors(1, {0, 3});
         setMapNeighbors(2, {0, 4});
         setMapNeighbors(3, {1, 4, 5, 6});
@@ -83,7 +83,7 @@ namespace Game {
         setMapNeighbors(18, {10, 12, 27});
         setMapNeighbors(19, {11, 25, 26, 28});
         setMapNeighbors(20, {12, 24, 27, 29});
-        setMapNeighbors(21, {12, 14});
+        setMapNeighbors(21, {0, 12, 14});
         setMapNeighbors(22, {13, 14, 30});
         setMapNeighbors(23, {13, 15, 31});
         setMapNeighbors(24, {14, 20, 30, 32});
@@ -100,28 +100,72 @@ namespace Game {
         setMapNeighbors(35, {27, 29});
         setMapNeighbors(36, {30, 32});
         setMapNeighbors(37, {31, 33});
+
+        createCoins();
     }
 
     void GhostsController::update(CgEngine::TimeStep ts) {
-        debugDrawMap();
     }
 
-    void GhostsController::setMapNeighbors(size_t node, std::initializer_list<size_t> neighbors) {
+    void GhostsController::setMapNeighbors(size_t node, std::initializer_list<int> neighbors) {
         for (const auto& n: neighbors) {
-            mapNodes[node].neighbors.push_back(mapNodes[n]);
+            mapNodes[node].neighbors.push_back(n);
         }
     }
 
-    void GhostsController::debugDrawMap() {
-        std::unordered_set<glm::vec3> visited;
+    void GhostsController::createCoins() {
+        std::unordered_set<std::string> visitedEdges;
+        for (int i = 0; i < mapNodes.size(); ++i) {
+            createCoinAtPos(mapNodes[i].pos);
+            for (int j = 0; j < mapNodes[i].neighbors.size(); ++j) {
+                int jIndex = mapNodes[i].neighbors[j];
+                std::string edgeKey = i < jIndex ? std::to_string(i)  + ":" + std::to_string(jIndex) : std::to_string(jIndex)  + ":" + std::to_string(i);
+                if (visitedEdges.count(edgeKey) != 0) {
+                    continue;
+                }
+                visitedEdges.insert(edgeKey);
 
-        for (const auto& n1: mapNodes) {
-            if (visited.count(n1.pos) != 0) {
-                continue;
+                float edgeLength = glm::distance(mapNodes[i].pos, mapNodes[jIndex].pos);
+                int coinAmount = static_cast<int>(glm::round(edgeLength / 1.5f));
+
+                for (int c = 1; c < coinAmount; c++) {
+                    createCoinAtPos(lerp(mapNodes[i].pos, mapNodes[jIndex].pos, static_cast<float>(c) / static_cast<float>(coinAmount)));
+                }
             }
-            visited.insert(n1.pos);
+        }
+    }
+
+    void GhostsController::createCoinAtPos(glm::vec3 pos) {
+        Entity e = createEntity();
+
+        pos.y -= 0.5f;
+
+        CgEngine::TransformComponentParams transformParams{
+            pos, glm::vec3(0.0f), glm::vec3(0.1f)
+        };
+        CgEngine::MeshRendererComponentParams rendererParams{
+            "", "CG_SphereMesh", "Red", true
+        };
+        CgEngine::SphereColliderComponentParams colliderParams{
+            1.4f, glm::vec3(0.0f), true, "default-physics-material"
+        };
+        CgEngine::RigidBodyComponentParams rigidBodyParams{};
+        rigidBodyParams.isDynamic = false;
+
+        attachComponent<CgEngine::TransformComponent>(e, transformParams);
+        attachComponent<CgEngine::MeshRendererComponent>(e, rendererParams);
+        attachComponent<CgEngine::SphereColliderComponent>(e, colliderParams);
+        attachComponent<CgEngine::RigidBodyComponent>(e, rigidBodyParams);
+    }
+
+    glm::vec3 GhostsController::lerp(glm::vec3 x, glm::vec3 y, float t) {
+        return x * (1.0f - t) + y * t;
+    }
+
+    void GhostsController::debugDrawMap() {
+        for (const auto& n1: mapNodes) {
             for (const auto& n2: n1.neighbors) {
-                drawDebugLine(n1.pos, n2.pos, {1.0f, 0.0f, 0.0f});
+                drawDebugLine(n1.pos, mapNodes[n2].pos, {1.0f, 0.0f, 0.0f});
             }
         }
 

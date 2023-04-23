@@ -2,24 +2,22 @@
 
 #include "PxPhysicsAPI.h"
 #include "Physics/PhysicsSystem.h"
-#include "Scene/Entity.h"
 #include "PhysicsShape.h"
+#include "AbstractPhysicsActor.h"
 
 namespace CgEngine {
 
-    class Scene;
-
-    class PhysicsActor {
+    class PhysicsActor : public AbstractPhysicsActor {
     public:
         PhysicsActor(Scene* scene, Entity entity, glm::vec3 pos, glm::quat orientation, bool isDynamic, PhysicsCollisionDetection collisionDetection);
         ~PhysicsActor();
 
+        PhysicsActorType getPhysicsActorType() const override;
+
         physx::PxRigidActor& getPhysxActor() const;
         const physx::PxFilterData& getFilterData() const;
-        Scene& getScene() const;
-        Entity getEntity() const;
 
-        bool isSleeping();
+        bool isSleeping() const;
 
         void updateTransforms();
 
@@ -49,8 +47,6 @@ namespace CgEngine {
         physx::PxFilterData filterData;
         bool dynamic;
         bool kinematic = false;
-        Scene* scene;
-        Entity entity;
 
         std::unordered_map<uint32_t, PhysicsShape*> colliders;
     };

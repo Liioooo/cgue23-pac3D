@@ -71,6 +71,10 @@ namespace Game {
         }
     }
 
+    void PlayerScript::onTriggerEnter(CgEngine::Entity other) {
+        destroyEntity(other);
+    }
+
     void PlayerScript::onMouseScrolled(CgEngine::MouseScrolledEvent& event) {
         if (event.getYOffsetPos() > 0) {
             cameraDistance -= 0.4f;

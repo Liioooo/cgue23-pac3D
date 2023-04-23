@@ -4,13 +4,18 @@
 #include "GlobalObjectManager.h"
 
 namespace CgEngine {
-    PhysicsController::PhysicsController(physx::PxController* physXController, bool hasGravity, Entity entity) : physXController(physXController), hasGravity(hasGravity), entity(entity) {
+    PhysicsController::PhysicsController(physx::PxController* physXController, bool hasGravity, Entity entity, Scene& scene) : AbstractPhysicsActor(&scene, entity), physXController(physXController), hasGravity(hasGravity), entity(entity) {
         gravity = GlobalObjectManager::getInstance().getPhysicsSystem().getPhysxSettings().gravity;
         physXController->setUserData(this);
+        physXController->getActor()->userData = this;
     }
 
     PhysicsController::~PhysicsController() {
         physXController->release();
+    }
+
+    PhysicsActorType PhysicsController::getPhysicsActorType() const {
+        return PhysicsActorType::Controller;
     }
 
     void PhysicsController::update(float ts) {
@@ -31,15 +36,15 @@ namespace CgEngine {
         currentMovement = {0.0f, 0.0f, 0.0f};
     }
 
-    void PhysicsController::updateTransforms(CgEngine::Scene& scene) {
-        auto& transformComp = scene.getComponent<TransformComponent>(entity);
+    void PhysicsController::updateTransforms() {
+        auto& transformComp = getScene().getComponent<TransformComponent>(entity);
         auto pos = PhysXUtils::phsXExtendedToGlmVec(physXController->getPosition());
 
-        if (scene.hasComponent<BoxColliderComponent>(entity)) {
-            pos -= scene.getComponent<BoxColliderComponent>(entity).getOffset();
+        if (getScene().hasComponent<BoxColliderComponent>(entity)) {
+            pos -= getScene().getComponent<BoxColliderComponent>(entity).getOffset();
         }
-        if (scene.hasComponent<CapsuleColliderComponent>(entity)) {
-            pos -= scene.getComponent<CapsuleColliderComponent>(entity).getOffset();
+        if (getScene().hasComponent<CapsuleColliderComponent>(entity)) {
+            pos -= getScene().getComponent<CapsuleColliderComponent>(entity).getOffset();
         }
 
         transformComp._physicsUpdate(pos, transformComp.getGlobalRotationQuat());
@@ -53,7 +58,7 @@ namespace CgEngine {
         currentJumpSpeed = strength;
     }
 
-    bool PhysicsController::standsOnGround() {
+    bool PhysicsController::standsOnGround() const {
         return collisionFlags & physx::PxControllerCollisionFlag::eCOLLISION_DOWN;
     }
 }

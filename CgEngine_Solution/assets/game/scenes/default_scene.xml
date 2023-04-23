@@ -274,16 +274,11 @@
             </Components>
         </Entity>
     </Entity>
-    <Entity id="ghosts">
+    <Entity id="ghostsCoins">
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
             <ScriptComponent script-name="ghostsController" />
         </Components>
-        <Entity>
-            <Components>
-                <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            </Components>
-        </Entity>
     </Entity>
     <Entity id="player">
         <Components>
@@ -304,13 +299,5 @@
                 <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />
             </Components>
         </Entity>
-    </Entity>
-    <Entity id="cube">
-        <Components>
-            <TransformComponent position="-17 25 -50" rotation="0 0 0" scale="1 1 1" />
-            <MeshRendererComponent mesh="CG_CubeMesh" />
-            <BoxColliderComponent />
-            <RigidBodyComponent dynamic="true" mass="10" />
-        </Components>
     </Entity>
 </Scene>

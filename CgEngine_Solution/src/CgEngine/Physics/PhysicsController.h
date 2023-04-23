@@ -2,23 +2,26 @@
 
 #include "Scene/Entity.h"
 #include "PxPhysicsAPI.h"
+#include "AbstractPhysicsActor.h"
 
 namespace CgEngine {
 
     class Scene;
 
-    class PhysicsController {
+    class PhysicsController : public AbstractPhysicsActor {
     public:
-        PhysicsController(physx::PxController* physXController, bool hasGravity, Entity entity);
+        PhysicsController(physx::PxController* physXController, bool hasGravity, Entity entity, Scene& scene);
         ~PhysicsController();
 
+        PhysicsActorType getPhysicsActorType() const override;
+
         void update(float ts);
-        void updateTransforms(Scene& scene);
+        void updateTransforms();
 
         void move(glm::vec3 dir);
         void jump(float strength);
 
-        bool standsOnGround();
+        bool standsOnGround() const;
 
     private:
         physx::PxController* physXController;

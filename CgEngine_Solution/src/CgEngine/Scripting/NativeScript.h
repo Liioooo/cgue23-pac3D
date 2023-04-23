@@ -39,6 +39,7 @@ namespace CgEngine {
         Entity findEntityById(const std::string& id);
         Entity getParentEntity();
         const std::unordered_set<Entity>& getChildEntities();
+        Entity createEntity();
 
         PhysicsRaycastHit physicsRaycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities);
 
@@ -72,6 +73,16 @@ namespace CgEngine {
         template<typename C, typename P>
         C& attachComponent(P componentPrams) {
             return owningScene->attachComponent<C>(owningEntity, componentPrams);
+        }
+
+        template<typename C, typename P>
+        C& attachComponent(Entity entity, P componentPrams) {
+            return owningScene->attachComponent<C>(entity, componentPrams);
+        }
+
+        template<typename C>
+        C& attachComponent(Entity entity) {
+            return owningScene->attachComponent<C>(entity);
         }
 
         template<typename C>

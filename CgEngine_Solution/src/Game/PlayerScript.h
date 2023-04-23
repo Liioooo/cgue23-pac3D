@@ -16,6 +16,8 @@ namespace Game {
         void update(CgEngine::TimeStep ts) override;
         void lateUpdate(CgEngine::TimeStep ts) override;
 
+        void onTriggerEnter(CgEngine::Entity other) override;
+
         void onMouseScrolled(CgEngine::MouseScrolledEvent& event) override;
         void onKeyPressed(CgEngine::KeyPressedEvent& event) override;
 
