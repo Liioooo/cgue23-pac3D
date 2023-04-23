@@ -4,7 +4,7 @@
 namespace Game {
     void GhostsController::onAttach() {
         /*
-         * 36--32--------------29--35
+         * 28--32--------------29--33
          * |    |               |   |
          * 30--24--------------20--27
          * |    |               |   |
@@ -19,8 +19,6 @@ namespace Game {
          * 23--15-----16-------11--17
          * |    |               |   |
          * 31--25--------------19--26
-         * |    |               |   |
-         * 37--33--------------28--34
          */
 
         mapNodes.emplace_back(glm::vec3(0.0f, 1.0f, -17.0f));   // 0
@@ -42,25 +40,21 @@ namespace Game {
         mapNodes.emplace_back(glm::vec3(0.0f, 1.0f, 32.0f));    // 16
         mapNodes.emplace_back(glm::vec3(31.5f, 1.0f, 32.0f));   // 17
         mapNodes.emplace_back(glm::vec3(31.5f, 1.0f, -32.0f));  // 18
-        mapNodes.emplace_back(glm::vec3(17.0f, 1.0f, 51.5f));   // 19
+        mapNodes.emplace_back(glm::vec3(17.0f, 1.0f, 46.5f));   // 19
         mapNodes.emplace_back(glm::vec3(17.0f, 8.5f, -54.0f));  // 20
         mapNodes.emplace_back(glm::vec3(0.0f, 1.0f, -32.0f));   // 21
         mapNodes.emplace_back(glm::vec3(-31.5f, 1.0f, -32.0f)); // 22
         mapNodes.emplace_back(glm::vec3(-31.5f, 1.0f, 32.0f));  // 23
         mapNodes.emplace_back(glm::vec3(-17.0f, 8.5f, -54.0f)); // 24
-        mapNodes.emplace_back(glm::vec3(-17.0f, 1.0f, 51.5f));  // 25
-        mapNodes.emplace_back(glm::vec3(31.5f, 1.0f, 51.5f));   // 26
+        mapNodes.emplace_back(glm::vec3(-17.0f, 1.0f, 46.5f));  // 25
+        mapNodes.emplace_back(glm::vec3(31.5f, 1.0f, 46.5f));   // 26
         mapNodes.emplace_back(glm::vec3(31.5f, 8.5f, -54.0f));  // 27
-        mapNodes.emplace_back(glm::vec3(17.0f, 1.0f, 66.0f));   // 28
+        mapNodes.emplace_back(glm::vec3(-31.5f, 8.5f, -66.0f)); // 28
         mapNodes.emplace_back(glm::vec3(17.0f, 8.5f, -66.0f));  // 29
         mapNodes.emplace_back(glm::vec3(-31.5f, 8.5f, -54.0f)); // 30
-        mapNodes.emplace_back(glm::vec3(-31.5f, 1.0f, 51.5f));  // 31
+        mapNodes.emplace_back(glm::vec3(-31.5f, 1.0f, 46.5f));  // 31
         mapNodes.emplace_back(glm::vec3(-17.0f, 8.5f, -66.0f)); // 32
-        mapNodes.emplace_back(glm::vec3(-17.0f, 1.0f, 66.0f));  // 33
-        mapNodes.emplace_back(glm::vec3(31.5f, 1.0f, 66.0f));   // 34
-        mapNodes.emplace_back(glm::vec3(31.5f, 8.5f, -66.0f));  // 35
-        mapNodes.emplace_back(glm::vec3(-31.5f, 8.5f, -66.0f)); // 36
-        mapNodes.emplace_back(glm::vec3(-31.5f, 1.0f, 66.0f));  // 37
+        mapNodes.emplace_back(glm::vec3(31.5f, 8.5f, -66.0f));  // 33
 
         setMapNeighbors(0, {1, 2, 21});
         setMapNeighbors(1, {0, 3});
@@ -81,25 +75,21 @@ namespace Game {
         setMapNeighbors(16, {11, 15});
         setMapNeighbors(17, {10, 11, 26});
         setMapNeighbors(18, {10, 12, 27});
-        setMapNeighbors(19, {11, 25, 26, 28});
+        setMapNeighbors(19, {11, 25, 26});
         setMapNeighbors(20, {12, 24, 27, 29});
         setMapNeighbors(21, {0, 12, 14});
         setMapNeighbors(22, {13, 14, 30});
         setMapNeighbors(23, {13, 15, 31});
         setMapNeighbors(24, {14, 20, 30, 32});
-        setMapNeighbors(25, {15, 19, 31, 33});
-        setMapNeighbors(26, {17, 19, 34});
-        setMapNeighbors(27, {18, 20, 35});
-        setMapNeighbors(28, {19, 33, 34});
-        setMapNeighbors(29, {20, 32, 35});
-        setMapNeighbors(30, {22, 24, 36});
-        setMapNeighbors(31, {23, 25, 37});
-        setMapNeighbors(32, {24, 29, 36});
-        setMapNeighbors(33, {25, 28, 37});
-        setMapNeighbors(34, {26, 28});
-        setMapNeighbors(35, {27, 29});
-        setMapNeighbors(36, {30, 32});
-        setMapNeighbors(37, {31, 33});
+        setMapNeighbors(25, {15, 19, 31});
+        setMapNeighbors(26, {17, 19});
+        setMapNeighbors(27, {18, 20, 33});
+        setMapNeighbors(28, {30, 32});
+        setMapNeighbors(29, {20, 32, 33});
+        setMapNeighbors(30, {22, 24, 28});
+        setMapNeighbors(31, {23, 25});
+        setMapNeighbors(32, {24, 28, 29});
+        setMapNeighbors(33, {27, 29});
 
         createCoins();
     }

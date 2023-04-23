@@ -1,9 +1,4 @@
 <Materials>
-    <Material name="MyMaterial">
-        <Albedo>#ffffff</Albedo>
-        <Roughness>0.8</Roughness>
-        <AlbedoTexture srgb="true">rocky_gravel_diff_2k.png</AlbedoTexture>
-    </Material>
     <Material name="Red">
         <Albedo>#ffffff</Albedo>
         <Roughness>1.0</Roughness>

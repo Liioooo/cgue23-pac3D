@@ -30,7 +30,7 @@
         </Components>
         <Entity>
             <Components>
-                <TransformComponent position="0 -0.25 17" rotation="0 0 0" scale="66 0.5 102" />
+                <TransformComponent position="0 -0.25 7.75" rotation="0 0 0" scale="66 0.5 82.5" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
@@ -65,42 +65,21 @@
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="24.25 2 41.75" rotation="0 0 0" scale="12.5 4 17.5" />
+                <TransformComponent position="-24.25 1.5 39.25" rotation="0 0 0" scale="12.5 3 12.5" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="-24.25 2 41.75" rotation="0 0 0" scale="12.5 4 17.5" />
+                <TransformComponent position="24.25 1.5 39.25" rotation="0 0 0" scale="12.5 3 12.5" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="-24.25 1.5 58.75" rotation="0 0 0" scale="12.5 3 12.5" />
-                <BoxColliderComponent />
-                <RigidBodyComponent dynamic="false" />
-            </Components>
-        </Entity>
-        <Entity>
-            <Components>
-                <TransformComponent position="24.25 1.5 58.75" rotation="0 0 0" scale="12.5 3 12.5" />
-                <BoxColliderComponent />
-                <RigidBodyComponent dynamic="false" />
-            </Components>
-        </Entity>
-        <Entity>
-            <Components>
-                <TransformComponent position="0 2 58.75" rotation="0 0 0" scale="32 4 12.5" />
-                <BoxColliderComponent />
-                <RigidBodyComponent dynamic="false" />
-            </Components>
-        </Entity>
-        <Entity>
-            <Components>
-                <TransformComponent position="0 2 41.75" rotation="0 0 0" scale="32 4 17.5" />
+                <TransformComponent position="0 2 39.25" rotation="0 0 0" scale="32 4 12.5" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
@@ -219,21 +198,21 @@
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="-33 2 17" rotation="0 0 0" scale="1 4 100" />
+                <TransformComponent position="-33 2 7.25" rotation="0 0 0" scale="1 4 80.5" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="33 2 17" rotation="0 0 0" scale="1 4 100" />
+                <TransformComponent position="33 2 7.25" rotation="0 0 0" scale="1 4 80.5" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="0 2 67.5" rotation="0 0 0" scale="65 4 1" />
+                <TransformComponent position="0 2 48" rotation="0 0 0" scale="65 4 1" />
                 <BoxColliderComponent />
                 <RigidBodyComponent dynamic="false" />
             </Components>
@@ -282,7 +261,7 @@
     </Entity>
     <Entity id="player">
         <Components>
-            <TransformComponent position="0 5 0" rotation="0 0 0" scale="1 1 1" />
+            <TransformComponent position="0 2 12" rotation="0 0 0" scale="1 1 1" />
             <CapsuleColliderComponent radius="0.5" half-height="0.25" />
             <CharacterControllerComponent slope-limit="30" step-offset="0.1" />
             <ScriptComponent script-name="player" />

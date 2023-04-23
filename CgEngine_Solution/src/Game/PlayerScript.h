@@ -23,7 +23,7 @@ namespace Game {
 
     private:
         std::pair<float, float> prevMousePos;
-        float pitch = 0.0f;
+        float pitch = -0.6f;
         float yaw = 0.0f;
         float cameraDistance = 4.0f;
         glm::vec3 cameraOffset = glm::vec3(0.0f, 1.5f, 0.0f);
