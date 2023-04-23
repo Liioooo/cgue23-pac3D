@@ -17,4 +17,8 @@ namespace CgEngine {
     void CharacterControllerComponent::jump(float strength) {
         physicsController->jump(strength);
     }
+
+    bool CharacterControllerComponent::standsOnGround() {
+        return physicsController->standsOnGround();
+    }
 }

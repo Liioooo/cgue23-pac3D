@@ -3,6 +3,8 @@
 #include "Scene/Entity.h"
 #include "Scene/Scene.h"
 #include "Events/MouseScrolledEvent.h"
+#include "Events/KeyPressedEvent.h"
+#include "Physics/PhysicsSystem.h"
 
 namespace CgEngine {
 
@@ -28,6 +30,7 @@ namespace CgEngine {
         virtual void onTriggerExit(Entity other) {};
 
         virtual void onMouseScrolled(MouseScrolledEvent& event) {}
+        virtual void onKeyPressed(KeyPressedEvent& event) {}
 
 
     protected:
@@ -36,6 +39,8 @@ namespace CgEngine {
         Entity findEntityById(const std::string& id);
         Entity getParentEntity();
         const std::unordered_set<Entity>& getChildEntities();
+
+        PhysicsRaycastHit physicsRaycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities);
 
         void drawDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 

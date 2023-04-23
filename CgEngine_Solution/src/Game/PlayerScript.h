@@ -17,12 +17,15 @@ namespace Game {
         void lateUpdate(CgEngine::TimeStep ts) override;
 
         void onMouseScrolled(CgEngine::MouseScrolledEvent& event) override;
+        void onKeyPressed(CgEngine::KeyPressedEvent& event) override;
 
     private:
         std::pair<float, float> prevMousePos;
-        float pitch = 0;
-        float yaw = 0;
+        float pitch = 0.0f;
+        float yaw = 0.0f;
         float cameraDistance = 4.0f;
+        glm::vec3 cameraOffset = glm::vec3(0.0f, 1.5f, 0.0f);
+        std::unordered_set<CgEngine::Entity> cameraRaycastExcluded;
     };
 
 }

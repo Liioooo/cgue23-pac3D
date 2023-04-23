@@ -16,9 +16,15 @@ namespace CgEngine {
     void PhysicsController::update(float ts) {
         physx::PxControllerFilters filters;
 
-        if (hasGravity && !standsOnGround()) {
+        if (hasGravity && !standsOnGround() && currentJumpSpeed <= 0) {
             currentMovement += gravity * ts;
         }
+
+        if (currentJumpSpeed > 0) {
+            currentJumpSpeed += gravity.y * ts;
+        }
+
+        currentMovement.y += currentJumpSpeed;
 
         collisionFlags = physXController->move(PhysXUtils::glmToPhysXVec(currentMovement), 0.0f, ts, filters);
 
@@ -44,7 +50,7 @@ namespace CgEngine {
     }
 
     void PhysicsController::jump(float strength) {
-
+        currentJumpSpeed = strength;
     }
 
     bool PhysicsController::standsOnGround() {

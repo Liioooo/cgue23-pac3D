@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Scene/Entity.h>
 #include "PxPhysicsAPI.h"
 #include "PhysicsSimulationEventCallbacks.h"
 
@@ -38,6 +39,13 @@ namespace CgEngine {
         Impulse = physx::PxForceMode::eIMPULSE,
         VelocityChange = physx::PxForceMode::eVELOCITY_CHANGE,
         Acceleration = physx::PxForceMode::eACCELERATION,
+    };
+
+    struct PhysicsRaycastHit {
+        bool hitFound;
+        Entity hitEntity;
+        glm::vec3 hitPosition;
+        float hitDistance;
     };
 
     class PhysicsSystem {

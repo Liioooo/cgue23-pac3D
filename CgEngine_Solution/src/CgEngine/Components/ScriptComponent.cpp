@@ -45,5 +45,6 @@ namespace CgEngine {
     void ScriptComponent::onEvent(CgEngine::Event& event) {
         EventDispatcher dispatcher(event);
         dispatcher.dispatch<MouseScrolledEvent>(EVENT_BIND_FN(script->onMouseScrolled));
+        dispatcher.dispatch<KeyPressedEvent>(EVENT_BIND_FN(script->onKeyPressed));
     }
 }

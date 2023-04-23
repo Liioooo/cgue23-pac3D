@@ -10,6 +10,13 @@ namespace CgEngine {
 
     class Scene;
 
+    class RaycastQueryFilterCallback : public physx::PxQueryFilterCallback {
+    public:
+        physx::PxQueryHitType::Enum preFilter(const physx::PxFilterData& filterData, const physx::PxShape* shape, const physx::PxRigidActor* actor, physx::PxHitFlags& queryFlags) override;
+
+        const std::unordered_set<Entity>* excludedEntities;
+    };
+
     class PhysicsScene {
     public:
         PhysicsScene();
@@ -20,9 +27,13 @@ namespace CgEngine {
         PhysicsController* createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float slopeLimit);
         void simulate(TimeStep ts, Scene& scene);
 
+        PhysicsRaycastHit raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities);
+
     private:
         physx::PxScene* physXScene;
         physx::PxControllerManager* physXControllerManager;
+
+        RaycastQueryFilterCallback raycastQueryFilterCallback;
 
         bool advance(float ts, Scene& scene);
         void updateControllers(float ts);

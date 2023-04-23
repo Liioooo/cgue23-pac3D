@@ -25,7 +25,8 @@ namespace CgEngine {
         bool hasGravity;
         Entity entity;
 
-        glm::vec3 currentMovement;
+        glm::vec3 currentMovement = glm::vec3(0.0f);
+        float currentJumpSpeed = 0;
         glm::vec3 gravity;
         physx::PxControllerCollisionFlags collisionFlags;
     };

@@ -4,6 +4,14 @@
 #include "Scene/Scene.h"
 
 namespace CgEngine {
+    physx::PxQueryHitType::Enum RaycastQueryFilterCallback::preFilter(const physx::PxFilterData& filterData, const physx::PxShape* shape, const physx::PxRigidActor* actor, physx::PxHitFlags& queryFlags) {
+        auto* physicsActor = static_cast<PhysicsActor*>(actor->userData);
+        if (excludedEntities->count(physicsActor->getEntity()) != 0) {
+            return physx::PxQueryHitType::eNONE;
+        }
+        return physx::PxQueryHitType::eBLOCK;
+    }
+
     PhysicsScene::PhysicsScene() {
         auto& physicsSystem = GlobalObjectManager::getInstance().getPhysicsSystem();
 
@@ -110,6 +118,35 @@ namespace CgEngine {
             }
 
         }
+    }
+
+    PhysicsRaycastHit PhysicsScene::raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities) {
+        physx::PxRaycastBuffer raycastBuffer;
+
+        raycastQueryFilterCallback.excludedEntities = &excludeEntities;
+
+        bool hitFound = physXScene->raycast(
+                PhysXUtils::glmToPhysXVec(origin),
+                PhysXUtils::glmToPhysXVec(glm::normalize(direction)),
+                maxDistance,
+                raycastBuffer,
+                physx::PxHitFlag::eDEFAULT,
+                physx::PxQueryFilterData(physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC | physx::PxQueryFlag::ePREFILTER),
+                &raycastQueryFilterCallback
+                );
+
+        raycastQueryFilterCallback.excludedEntities = nullptr;
+
+        PhysicsRaycastHit hit{};
+        hit.hitFound = hitFound;
+
+        if (hitFound) {
+            hit.hitEntity = static_cast<PhysicsActor*>(raycastBuffer.block.actor->userData)->getEntity();
+            hit.hitPosition = PhysXUtils::phsXToGlmVec(raycastBuffer.block.position);
+            hit.hitDistance = raycastBuffer.block.distance;
+        }
+
+        return hit;
     }
 
     bool PhysicsScene::advance(float ts, Scene& scene) {

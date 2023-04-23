@@ -20,6 +20,7 @@ namespace CgEngine {
 
         void move(glm::vec3 dir);
         void jump(float strength);
+        bool standsOnGround();
 
     private:
         PhysicsController* physicsController;

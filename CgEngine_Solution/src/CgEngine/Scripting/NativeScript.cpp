@@ -35,6 +35,10 @@ namespace CgEngine {
         return owningScene->getChildren(owningEntity);
     }
 
+    PhysicsRaycastHit NativeScript::physicsRaycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities) {
+        return owningScene->getPhysicsScene().raycast(origin, direction, maxDistance, excludeEntities);
+    }
+
     void NativeScript::drawDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color) {
         owningScene->submitOnRenderFunction([from, to, color](SceneRenderer& renderer) {
             renderer.submitDebugLine(from, to, color);
