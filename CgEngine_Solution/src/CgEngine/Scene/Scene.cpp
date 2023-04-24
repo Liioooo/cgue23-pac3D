@@ -102,6 +102,19 @@ namespace CgEngine {
         return children.count(entity) != 0;
     }
 
+    void Scene::setEntityTag(CgEngine::Entity entity, const std::string& tag) {
+        if (hasEntity(entity)) {
+            entityTags[entity] = tag;
+        }
+    }
+
+    std::string Scene::getEntityTag(CgEngine::Entity entity) {
+        if (entityTags.count(entity) != 0) {
+            return entityTags.at(entity);
+        }
+        return "";
+    }
+
     void Scene::updateTransforms() {
         for (const auto &item : children) {
             if (parents.count(item.first) == 0) {
@@ -253,9 +266,9 @@ namespace CgEngine {
         renderer.endScene();
     }
 
-    void Scene::executeFixedUpdate() {
+    void Scene::executeFixedUpdate(TimeStep ts) {
         for (auto it = componentManager->begin<ScriptComponent>(); it != componentManager->end<ScriptComponent>(); it++) {
-            it->fixedUpdate();
+            it->fixedUpdate(ts);
         }
         executePostUpdateFunctions();
     }
@@ -281,6 +294,8 @@ namespace CgEngine {
         if (idIter != std::end(idToEntity)) {
             idToEntity.erase(idIter->first);
         }
+
+        entityTags.erase(entity);
 
         componentManager->destroyEntity(entity, *this);
         parents.erase(entity);

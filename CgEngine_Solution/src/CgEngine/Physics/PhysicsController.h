@@ -10,7 +10,7 @@ namespace CgEngine {
 
     class PhysicsController : public AbstractPhysicsActor {
     public:
-        PhysicsController(physx::PxController* physXController, bool hasGravity, Entity entity, Scene& scene);
+        PhysicsController(physx::PxController* physXController, bool hasGravity, glm::vec3 gravity, Entity entity, Scene& scene);
         ~PhysicsController();
 
         PhysicsActorType getPhysicsActorType() const override;

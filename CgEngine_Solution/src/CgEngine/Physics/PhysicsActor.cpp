@@ -133,6 +133,10 @@ namespace CgEngine {
         physxActor->is<physx::PxRigidDynamic>()->setKinematicTarget(physx::PxTransform(PhysXUtils::glmToPhysXVec(target), PhysXUtils::glmToPhysXQuat(rotation)));
     }
 
+    glm::vec3 PhysicsActor::getGlobalPosePosition() {
+        return PhysXUtils::phsXToGlmVec(physxActor->getGlobalPose().p);
+    }
+
     void PhysicsActor::setMaxLinearVelocity(float velocity) {
         if (!dynamic) {
             return;

@@ -27,6 +27,7 @@ namespace CgEngine {
         sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
         sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
         sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+        sceneDesc.kineKineFilteringMode = physx::PxPairFilteringMode::eKEEP;
 
 
         CG_ASSERT(sceneDesc.isValid(), "PhysX SceneDesc is invalid!")
@@ -54,6 +55,8 @@ namespace CgEngine {
     }
 
     PhysicsController* PhysicsScene::createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float slopeLimit) {
+        auto& physicsSystem = GlobalObjectManager::getInstance().getPhysicsSystem();
+
         physx::PxController* physXController = nullptr;
 
         auto& transform = scene.getComponent<TransformComponent>(entity);
@@ -74,6 +77,7 @@ namespace CgEngine {
             desc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
             desc.contactOffset = 0.05f;
             desc.material = collider.getPhysicsMaterial().getPhysxMaterial();
+            desc.reportCallback = &physicsSystem.getControllerHitReportCallback();
 
             physXController = physXControllerManager->createController(desc);
         } else if (scene.hasComponent<CapsuleColliderComponent>(entity)) {
@@ -90,13 +94,14 @@ namespace CgEngine {
             desc.climbingMode = physx::PxCapsuleClimbingMode::eCONSTRAINED;
             desc.contactOffset = 0.05f;
             desc.material = collider.getPhysicsMaterial().getPhysxMaterial();
+            desc.reportCallback = &physicsSystem.getControllerHitReportCallback();
 
             physXController = physXControllerManager->createController(desc);
         }
 
         CG_ASSERT(physXController != nullptr, "Cannot create PhysicsController! Entity using Controller must have: BoxColliderComponent or CapsuleColliderComponent")
 
-        return new PhysicsController(physXController, hasGravity, entity, scene);
+        return new PhysicsController(physXController, hasGravity, physicsSystem.getPhysxSettings().gravity, entity, scene);
     }
 
     void PhysicsScene::simulate(TimeStep ts, Scene& scene) {
@@ -163,7 +168,7 @@ namespace CgEngine {
             accumulator -= simulateTimeStep;
             physXScene->simulate(simulateTimeStep);
             physXScene->fetchResults(true);
-            scene.executeFixedUpdate();
+            scene.executeFixedUpdate(simulateTimeStep);
             updateControllers(simulateTimeStep);
         }
         return true;

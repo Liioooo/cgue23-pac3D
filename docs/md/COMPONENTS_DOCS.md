@@ -4,19 +4,19 @@
 
 | **Property** | **Description**                    | **Example** | **Default** |
 |--------------|------------------------------------|-------------|-------------|
-| `position`   | Translation of the entity          | `0 0 0`     | /           |
-| `rotation`   | Local rotation of the entity (deg) | `0 0 0`     | /           |
-| `scale`      | Local scale of the entity          | `0 0 0`     | /           |
+| `position`   | Translation of the entity          | `0 0 0`     | -           |
+| `rotation`   | Local rotation of the entity (deg) | `0 0 0`     | -           |
+| `scale`      | Local scale of the entity          | `0 0 0`     | -           |
 
 ## MeshRendererComponent
 
 | **Property**   | **Description**                                                 | **Example**           | **Default** |
 |----------------|-----------------------------------------------------------------|-----------------------|-------------|
-| `asset-file`   | File to load 3D-Asset                                           | `model.fbx`           | /           |
-| `mesh`         | Built in mesh                                                   | `CG_SphereMesh_16_16` | /           |
-| `material`     | Material for this mesh. Overrides materials from asset files.   | `MyMaterial`          | /           |
+| `asset-file`   | File to load 3D-Asset                                           | `model.fbx`           | -           |
+| `mesh`         | Built in mesh                                                   | `CG_SphereMesh_16_16` | -           |
+| `material`     | Material for this mesh. Overrides materials from asset files.   | `MyMaterial`          | -           |
 | `cast-shadows` | Defines if this object casts shadows.                           | `true`                | `true`      |
-| `mesh-nodes`   | List of Nodes to render. Nothing means: everything is rendered. | `0,1,2`               | /           |
+| `mesh-nodes`   | List of Nodes to render. Nothing means: everything is rendered. | `0,1,2`               | -           |
 
 **Built in Meshes:**
 
@@ -43,9 +43,9 @@
 
 ## ScriptComponent
 
-| **Property** | **Description**                    | **Example**    | **Default** |
-|--------------|------------------------------------|----------------|-------------|
-| `scriptName` | Name of the script to use          | `PlayerScript` | /           |
+| **Property**  | **Description**                    | **Example**    | **Default** |
+|---------------|------------------------------------|----------------|-------------|
+| `script-name` | Name of the script to use          | `PlayerScript` | -           |
 
 Scripts must be registered in `Main.cpp` like this:
 ```c++

@@ -19,7 +19,7 @@ namespace CgEngine {
         virtual void onAttach() {};
         virtual void onDetach() {};
 
-        virtual void fixedUpdate() {};
+        virtual void fixedUpdate(TimeStep ts) {};
         virtual void update(TimeStep ts) {};
         virtual void lateUpdate(TimeStep ts) {};
 
@@ -40,6 +40,9 @@ namespace CgEngine {
         Entity getParentEntity();
         const std::unordered_set<Entity>& getChildEntities();
         Entity createEntity();
+        Entity createEntity(Entity parent);
+        void setEntityTag(Entity entity, const std::string& tag);
+        std::string getEntityTag(Entity entity);
 
         PhysicsRaycastHit physicsRaycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities);
 

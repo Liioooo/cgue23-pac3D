@@ -262,7 +262,7 @@
     <Entity id="player">
         <Components>
             <TransformComponent position="0 2 12" rotation="0 0 0" scale="1 1 1" />
-            <CapsuleColliderComponent radius="0.5" half-height="0.25" />
+            <CapsuleColliderComponent radius="0.5" half-height="0.1" />
             <CharacterControllerComponent slope-limit="30" step-offset="0.1" />
             <ScriptComponent script-name="player" />
         </Components>
@@ -274,7 +274,7 @@
         </Entity>
         <Entity>
             <Components>
-                <TransformComponent position="0 0 0" rotation="0 0 0" scale="0.5 0.5 0.5" />
+                <TransformComponent position="0 0 0" rotation="0 0 0" scale="0.5 0.4 0.5" />
                 <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />
             </Components>
         </Entity>

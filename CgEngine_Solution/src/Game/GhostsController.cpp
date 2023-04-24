@@ -1,5 +1,6 @@
 #include "GhostsController.h"
-#include "glm/gtx/hash.hpp"
+#include <random>
+#include "glm/gtx/vector_angle.hpp"
 
 namespace Game {
     void GhostsController::onAttach() {
@@ -92,9 +93,92 @@ namespace Game {
         setMapNeighbors(33, {27, 29});
 
         createCoins();
+        createGhosts();
     }
 
     void GhostsController::update(CgEngine::TimeStep ts) {
+        for (auto& g: ghosts) {
+            if (g.state == GhostState::Home) {
+                timeSinceGhostLeavingHome += ts.getSeconds();
+
+                if (timeSinceGhostLeavingHome >= 3.0f) {
+                    g.state = GhostState::LeavingHome;
+                    timeSinceGhostLeavingHome = 0.0f;
+                }
+                break;
+            }
+        }
+    }
+
+    void GhostsController::fixedUpdate(CgEngine::TimeStep ts) {
+        CgEngine::Entity playerEntity = findEntityById("player");
+        glm::vec3 playerPos = getComponent<CgEngine::TransformComponent>(playerEntity).getGlobalPosition();
+
+        for (auto& g: ghosts) {
+            if (g.state == GhostState::LeavingHome) {
+                getComponent<CgEngine::RigidBodyComponent>(g.entity).setKinematicTarget(g.homePos + glm::vec3(0.0f, 0.0f, 2.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+                g.state = GhostState::Moving;
+                if (random(0, 1) == 0) {
+                    g.lastMapNode = 3;
+                    g.nextMapNode = 4;
+                } else {
+                    g.lastMapNode = 4;
+                    g.nextMapNode = 3;
+                }
+                break;
+            }
+
+            if (g.state == GhostState::Moving) {
+                auto& rigid = getComponent<CgEngine::RigidBodyComponent>(g.entity);
+                if (glm::distance(rigid.getGlobalPosePosition(), mapNodes[g.nextMapNode].pos) < 0.2f) {
+                    // if they can see the player chase him
+                    bool chasePlayer = false;
+                    glm::vec3 playerInDir = glm::normalize(playerPos - mapNodes[g.nextMapNode].pos);
+                    float playerDistance = glm::distance(playerPos, mapNodes[g.nextMapNode].pos);
+                    auto raycastHit = physicsRaycast(mapNodes[g.nextMapNode].pos, playerInDir, playerDistance, {g.entity, playerEntity});
+                    if (!raycastHit.hitFound) {
+                        float smallestAngle = 99.0f;
+                        int smallestAngleIndex = -1;
+                        for (int i: mapNodes[g.nextMapNode].neighbors) {
+                            float angle = glm::angle(playerInDir, glm::normalize(mapNodes[i].pos - mapNodes[g.nextMapNode].pos));
+                            if (angle < smallestAngle) {
+                                smallestAngle = angle;
+                                smallestAngleIndex = i;
+                            }
+                        }
+
+                        if (smallestAngle < glm::radians(10.0f)) {
+                            g.lastMapNode = g.nextMapNode;
+                            g.nextMapNode = smallestAngleIndex;
+                            chasePlayer = true;
+                        }
+                    }
+
+                    if (!chasePlayer) {
+                        uint32_t numNeighbors = mapNodes[g.nextMapNode].neighbors.size();
+                        uint32_t nextIndex = random(0, numNeighbors - 1);
+
+                        // prevent going back
+                        if (mapNodes[g.nextMapNode].neighbors[nextIndex] == g.lastMapNode) {
+                            nextIndex = nextIndex == numNeighbors - 1 ? 0 : nextIndex + 1;
+                        }
+
+                        // prevent going to a node, where another ghost is already going
+                        if (hasAnyGhostNextNode(mapNodes[g.nextMapNode].neighbors[nextIndex])) {
+                            if (numNeighbors > 2) {
+                                nextIndex = nextIndex == numNeighbors - 1 ? 0 : nextIndex + 1;
+                            }
+                        }
+
+                        g.lastMapNode = g.nextMapNode;
+                        g.nextMapNode = mapNodes[g.nextMapNode].neighbors[nextIndex];
+                    }
+                }
+
+                glm::vec3 direction = glm::normalize(mapNodes[g.nextMapNode].pos - mapNodes[g.lastMapNode].pos);
+                rigid.setKinematicTarget(rigid.getGlobalPosePosition() + direction * ts.getSeconds() * 6.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+            }
+        }
     }
 
     void GhostsController::setMapNeighbors(size_t node, std::initializer_list<int> neighbors) {
@@ -104,9 +188,12 @@ namespace Game {
     }
 
     void GhostsController::createCoins() {
+        CgEngine::Entity coinContainer = createEntity();
+        attachComponent<CgEngine::TransformComponent>(coinContainer, CgEngine::TransformComponentParams{glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f)});
+
         std::unordered_set<std::string> visitedEdges;
         for (int i = 0; i < mapNodes.size(); ++i) {
-            createCoinAtPos(mapNodes[i].pos);
+            createCoinAtPos(coinContainer, mapNodes[i].pos);
             for (int j = 0; j < mapNodes[i].neighbors.size(); ++j) {
                 int jIndex = mapNodes[i].neighbors[j];
                 std::string edgeKey = i < jIndex ? std::to_string(i)  + ":" + std::to_string(jIndex) : std::to_string(jIndex)  + ":" + std::to_string(i);
@@ -119,37 +206,70 @@ namespace Game {
                 int coinAmount = static_cast<int>(glm::round(edgeLength / 1.5f));
 
                 for (int c = 1; c < coinAmount; c++) {
-                    createCoinAtPos(lerp(mapNodes[i].pos, mapNodes[jIndex].pos, static_cast<float>(c) / static_cast<float>(coinAmount)));
+                    createCoinAtPos(coinContainer, lerp(mapNodes[i].pos, mapNodes[jIndex].pos, static_cast<float>(c) / static_cast<float>(coinAmount)));
                 }
             }
         }
     }
 
-    void GhostsController::createCoinAtPos(glm::vec3 pos) {
-        Entity e = createEntity();
+    void GhostsController::createCoinAtPos(CgEngine::Entity container, glm::vec3 pos) {
+        CgEngine::Entity e = createEntity(container);
+        setEntityTag(e, "coin");
 
         pos.y -= 0.5f;
 
-        CgEngine::TransformComponentParams transformParams{
-            pos, glm::vec3(0.0f), glm::vec3(0.1f)
-        };
-        CgEngine::MeshRendererComponentParams rendererParams{
-            "", "CG_SphereMesh", "Red", true
-        };
-        CgEngine::SphereColliderComponentParams colliderParams{
-            1.4f, glm::vec3(0.0f), true, "default-physics-material"
-        };
         CgEngine::RigidBodyComponentParams rigidBodyParams{};
         rigidBodyParams.isDynamic = false;
 
-        attachComponent<CgEngine::TransformComponent>(e, transformParams);
-        attachComponent<CgEngine::MeshRendererComponent>(e, rendererParams);
-        attachComponent<CgEngine::SphereColliderComponent>(e, colliderParams);
+        attachComponent<CgEngine::TransformComponent>(e, CgEngine::TransformComponentParams{pos, glm::vec3(0.0f), glm::vec3(0.1f)});
+        attachComponent<CgEngine::MeshRendererComponent>(e, CgEngine::MeshRendererComponentParams{"", "CG_SphereMesh", "Red", true});
+        attachComponent<CgEngine::SphereColliderComponent>(e, CgEngine::SphereColliderComponentParams{1.4f, glm::vec3(0.0f), true, "default-physics-material"});
         attachComponent<CgEngine::RigidBodyComponent>(e, rigidBodyParams);
+    }
+
+    void GhostsController::createGhosts() {
+        CgEngine::Entity ghostContainer = createEntity();
+        attachComponent<CgEngine::TransformComponent>(ghostContainer, CgEngine::TransformComponentParams{glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f)});
+
+        ghosts[0].homePos = glm::vec3(-4.0f, 1.0f, -2.0f);
+        ghosts[1].homePos = glm::vec3(-2.0f, 1.0f, -2.0f);
+        ghosts[2].homePos = glm::vec3(0.0f, 1.0f, -2.0f);
+        ghosts[3].homePos = glm::vec3(2.0f, 1.0f, -2.0f);
+        ghosts[4].homePos = glm::vec3(4.0f, 1.0f, -2.0f);
+
+        CgEngine::RigidBodyComponentParams rigidBodyParams{};
+        rigidBodyParams.isDynamic = true;
+        rigidBodyParams.isKinematic = true;
+
+        for (auto& g : ghosts) {
+            g.entity = createEntity(ghostContainer);
+            setEntityTag(g.entity, "ghost");
+            attachComponent<CgEngine::TransformComponent>(g.entity, CgEngine::TransformComponentParams{g.homePos, glm::vec3(0.0f), glm::vec3(1.0f, 0.8f, 1.0f)});
+            attachComponent<CgEngine::MeshRendererComponent>(g.entity, CgEngine::MeshRendererComponentParams{"", "CG_CapsuleMesh_0.8_1", "Red", true});
+            attachComponent<CgEngine::CapsuleColliderComponent>(g.entity, CgEngine::CapsuleColliderComponentParams{0.8f, 0.4f, glm::vec3(0.0f), false, "default-physics-material"});
+            attachComponent<CgEngine::ScriptComponent>(g.entity, CgEngine::ScriptComponentParams{"singleGhostScript"});
+            attachComponent<CgEngine::RigidBodyComponent>(g.entity, rigidBodyParams);
+        }
     }
 
     glm::vec3 GhostsController::lerp(glm::vec3 x, glm::vec3 y, float t) {
         return x * (1.0f - t) + y * t;
+    }
+
+    uint32_t GhostsController::random(uint32_t min, uint32_t max) {
+        std::random_device randomDevice;
+        std::mt19937_64 eng(randomDevice());
+        std::uniform_int_distribution<uint32_t> uniformDistribution(min, max);
+        return uniformDistribution(eng);
+    }
+
+    bool GhostsController::hasAnyGhostNextNode(uint32_t nodeId) {
+        for (const auto& g: ghosts) {
+            if (g.nextMapNode == nodeId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void GhostsController::debugDrawMap() {
@@ -158,7 +278,5 @@ namespace Game {
                 drawDebugLine(n1.pos, mapNodes[n2].pos, {1.0f, 0.0f, 0.0f});
             }
         }
-
-
     }
 }

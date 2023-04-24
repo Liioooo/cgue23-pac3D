@@ -61,6 +61,8 @@ namespace CgEngine {
         Entity getParent(Entity entity);
         bool hasParent(Entity entity);
         bool hasEntity(Entity entity);
+        void setEntityTag(Entity entity, const std::string& tag);
+        std::string getEntityTag(Entity entity);
         void updateTransforms();
         void onViewportResize(int width, int height);
         int getViewportWidth() const;
@@ -71,7 +73,7 @@ namespace CgEngine {
         void onEvent(Event& event);
         void onRender(SceneRenderer& renderer);
 
-        void executeFixedUpdate();
+        void executeFixedUpdate(TimeStep ts);
 
         template<typename C>
         C& attachComponent(Entity entity) {
@@ -152,6 +154,7 @@ namespace CgEngine {
         Entity nextEntityId = 1;
         uint32_t entityCount = 0;
         std::unordered_map<std::string, Entity> idToEntity{};
+        std::unordered_map<Entity, std::string> entityTags{};
         std::unordered_map<Entity, std::unordered_set<Entity>> children{};
         std::unordered_map<Entity, Entity> parents{};
         std::vector<std::function<void()>> postUpdateFunctions{};

@@ -3,6 +3,7 @@
 #include <Scene/Entity.h>
 #include "PxPhysicsAPI.h"
 #include "PhysicsSimulationEventCallbacks.h"
+#include "PhysicsControllerHitReportCallback.h"
 
 namespace CgEngine {
 
@@ -25,7 +26,7 @@ namespace CgEngine {
 
     struct PhysXSettings {
         const glm::vec3 gravity = {0.0f, -9.81f, 0.0f};
-        const float simulateTimeStep = 1.0f / 60.0f;
+        const float simulateTimeStep = 1.0f / 60.0f; // seconds
         uint32_t solverIterations = 8;
         uint32_t solverVelocityIterations = 4;
     };
@@ -58,6 +59,7 @@ namespace CgEngine {
         physx::PxCpuDispatcher& getPhysxCpuDispatcher();
         physx::PxDefaultAllocator& getPhysxAllocator();
         PhysicsSimulationEventCallbacks& getSimulationEventCallbacks();
+        PhysicsControllerHitReportCallback& getControllerHitReportCallback();
         const PhysXSettings& getPhysxSettings() const;
 
         static physx::PxFilterFlags filterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0, physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1, physx::PxPairFlags& pairFlags, const void* constantBlock,physx::PxU32 constantBlockSize);
@@ -69,6 +71,7 @@ namespace CgEngine {
         physx::PxDefaultAllocator physxAllocator;
         PhysXErrorCallback physxErrorCallback;
         PhysicsSimulationEventCallbacks simulationEventCallbacks;
+        PhysicsControllerHitReportCallback controllerHitReportCallback;
 
         const PhysXSettings physxSettings;
     };

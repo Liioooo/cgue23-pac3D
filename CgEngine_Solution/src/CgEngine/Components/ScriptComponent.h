@@ -19,7 +19,7 @@ namespace CgEngine {
         void onAttach(Scene& scene, ScriptComponentParams& params);
         void onDetach(Scene& scene) override;
 
-        void fixedUpdate();
+        void fixedUpdate(TimeStep ts);
         void update(TimeStep ts);
         void lateUpdate(TimeStep ts);
 
@@ -30,6 +30,11 @@ namespace CgEngine {
         void onTriggerExit(Entity other);
 
         void onEvent(Event& event);
+
+        template<typename S>
+        S* getNativeScript() {
+            return static_cast<S*>(script.get());
+        }
 
     private:
         std::shared_ptr<NativeScript> script;

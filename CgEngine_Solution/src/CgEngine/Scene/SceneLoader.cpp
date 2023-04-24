@@ -85,7 +85,7 @@ namespace CgEngine {
 
     void SceneLoader::createCameraComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         CameraComponentParams params{
-            node.attribute("projection").as_string(),
+            node.attribute("projection").as_string("perspective"),
             node.attribute("near").as_float(0.1f),
             node.attribute("far").as_float(100.0f),
             node.attribute("fov").as_float(60.0f),
@@ -104,7 +104,7 @@ namespace CgEngine {
 
     void SceneLoader::createDirectionalLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         DirectionalLightComponentParams params{
-                hexStringToColor(node.attribute("color").as_string()),
+                hexStringToColor(node.attribute("color").as_string("1 1 1")),
                 node.attribute("intensity").as_float(1.0f),
                 node.attribute("cast-shadows").as_bool(true)
         };
@@ -113,7 +113,7 @@ namespace CgEngine {
 
     void SceneLoader::createPointLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         PointLightComponentParams params{
-                hexStringToColor(node.attribute("color").as_string()),
+                hexStringToColor(node.attribute("color").as_string("1 1 1")),
                 node.attribute("intensity").as_float(1.0f),
                 node.attribute("radius").as_float(5.0f),
                 node.attribute("falloff").as_float(1.0f),
@@ -123,7 +123,7 @@ namespace CgEngine {
 
     void SceneLoader::createSpotLightComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {
         SpotLightComponentParams params{
-                hexStringToColor(node.attribute("color").as_string()),
+                hexStringToColor(node.attribute("color").as_string("1 1 1")),
                 node.attribute("intensity").as_float(1.0f),
                 node.attribute("radius").as_float(5.0f),
                 node.attribute("falloff").as_float(1.0f),

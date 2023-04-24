@@ -121,8 +121,12 @@ namespace CgEngine {
         return physxAllocator;
     }
 
-    PhysicsSimulationEventCallbacks &PhysicsSystem::getSimulationEventCallbacks() {
+    PhysicsSimulationEventCallbacks& PhysicsSystem::getSimulationEventCallbacks() {
         return simulationEventCallbacks;
+    }
+
+    PhysicsControllerHitReportCallback& PhysicsSystem::getControllerHitReportCallback() {
+        return controllerHitReportCallback;
     }
 
     const PhysXSettings &PhysicsSystem::getPhysxSettings() const {
@@ -135,11 +139,13 @@ namespace CgEngine {
             return physx::PxFilterFlag::eDEFAULT;
         }
 
-        pairFlags = physx::PxPairFlag::eCONTACT_DEFAULT;
+        pairFlags = physx::PxPairFlag::eDETECT_DISCRETE_CONTACT;
 
-        if (filterData0.word2 == static_cast<uint32_t>(PhysicsCollisionDetection::Continuous) || filterData1.word2 == static_cast<uint32_t>(PhysicsCollisionDetection::Continuous)) {
+        if (!physx::PxFilterObjectIsKinematic(attributes0) && !physx::PxFilterObjectIsKinematic(attributes1)) {
             pairFlags |= physx::PxPairFlag::eSOLVE_CONTACT;
-            pairFlags |= physx::PxPairFlag::eDETECT_DISCRETE_CONTACT;
+        }
+
+        if (filterData0.word0 == static_cast<uint32_t>(PhysicsCollisionDetection::Continuous) || filterData1.word0 == static_cast<uint32_t>(PhysicsCollisionDetection::Continuous)) {
             pairFlags |= physx::PxPairFlag::eDETECT_CCD_CONTACT;
         }
 

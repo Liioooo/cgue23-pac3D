@@ -12,7 +12,7 @@ namespace Game {
         cameraRaycastExcluded.insert(getOwingEntity());
     }
 
-    void PlayerScript::fixedUpdate() {
+    void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
         glm::vec3 cameraDirection = glm::normalize(glm::quat({0.0f, yaw, 0.0f}) * glm::vec3(0, 0, -1));
         auto forwardDirection = cameraDirection;
 
@@ -26,14 +26,17 @@ namespace Game {
         auto& comp = getComponent<CgEngine::CharacterControllerComponent>();
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
-            comp.move(forwardDirection * 0.1f);
+            comp.move(forwardDirection * ts.getSeconds() * 7.0f);
         } else if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::S)) {
-            comp.move(-cameraDirection * 0.1f);
+            comp.move(-cameraDirection * ts.getSeconds() * 7.0f);
         }
     }
 
 
     void PlayerScript::update(CgEngine::TimeStep ts) {
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
+            getComponent<CgEngine::RigidBodyComponent>(findEntityById("test")).addForce({5, 0.5, 5});
+        }
     }
 
     void PlayerScript::lateUpdate(CgEngine::TimeStep ts) {
@@ -72,7 +75,15 @@ namespace Game {
     }
 
     void PlayerScript::onTriggerEnter(CgEngine::Entity other) {
-        destroyEntity(other);
+        if (getEntityTag(other) == "coin") {
+            destroyEntity(other);
+        }
+    }
+
+    void PlayerScript::onCollisionEnter(CgEngine::Entity other) {
+        if (getEntityTag(other) == "ghost") {
+            CG_LOGGING_INFO("Player {0}", other)
+        }
     }
 
     void PlayerScript::onMouseScrolled(CgEngine::MouseScrolledEvent& event) {

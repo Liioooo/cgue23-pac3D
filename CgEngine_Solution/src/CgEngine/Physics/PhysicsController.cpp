@@ -1,11 +1,8 @@
 #include "PhysicsController.h"
-#include "PhysicsSystem.h"
 #include "Scene/Scene.h"
-#include "GlobalObjectManager.h"
 
 namespace CgEngine {
-    PhysicsController::PhysicsController(physx::PxController* physXController, bool hasGravity, Entity entity, Scene& scene) : AbstractPhysicsActor(&scene, entity), physXController(physXController), hasGravity(hasGravity), entity(entity) {
-        gravity = GlobalObjectManager::getInstance().getPhysicsSystem().getPhysxSettings().gravity;
+    PhysicsController::PhysicsController(physx::PxController* physXController, bool hasGravity, glm::vec3 gravity, Entity entity, Scene& scene) : AbstractPhysicsActor(&scene, entity), physXController(physXController), hasGravity(hasGravity), gravity(gravity), entity(entity) {
         physXController->setUserData(this);
         physXController->getActor()->userData = this;
     }
@@ -21,12 +18,15 @@ namespace CgEngine {
     void PhysicsController::update(float ts) {
         physx::PxControllerFilters filters;
 
-        if (hasGravity && !standsOnGround() && currentJumpSpeed <= 0) {
+        if (hasGravity && currentJumpSpeed <= 0) {
             currentMovement += gravity * ts;
         }
 
         if (currentJumpSpeed > 0) {
             currentJumpSpeed += gravity.y * ts;
+            if (currentJumpSpeed < 0) {
+                currentJumpSpeed = 0.0f;
+            }
         }
 
         currentMovement.y += currentJumpSpeed;

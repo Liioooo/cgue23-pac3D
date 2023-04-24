@@ -81,6 +81,10 @@ namespace CgEngine {
         actor->setKinematicTarget(target, rotation);
     }
 
+    glm::vec3 RigidBodyComponent::getGlobalPosePosition() {
+        return actor->getGlobalPosePosition();
+    }
+
     void RigidBodyComponent::setMaxLinearVelocity(float velocity) {
         actor->setMaxLinearVelocity(velocity);
     }

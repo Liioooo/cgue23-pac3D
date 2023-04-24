@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Scripting/NativeScript.h>
-#include <Logging.h>
+#include "Scripting/NativeScript.h"
+#include "Logging.h"
 
 namespace Game {
 
@@ -12,11 +12,12 @@ namespace Game {
         }
 
         void onAttach() override;
-        void fixedUpdate() override;
+        void fixedUpdate(CgEngine::TimeStep ts) override;
         void update(CgEngine::TimeStep ts) override;
         void lateUpdate(CgEngine::TimeStep ts) override;
 
         void onTriggerEnter(CgEngine::Entity other) override;
+        void onCollisionEnter(CgEngine::Entity other) override;
 
         void onMouseScrolled(CgEngine::MouseScrolledEvent& event) override;
         void onKeyPressed(CgEngine::KeyPressedEvent& event) override;

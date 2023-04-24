@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include <array>
 #include <algorithm>
 #include <cstdint>
 #include <functional>

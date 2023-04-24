@@ -25,4 +25,4 @@ GPU 1:
 
 ## Documentation
 
-Documentation can be found [here](DOCUMENTATION.md).
+Documentation can be found [here](docs/md/DOCUMENTATION.md).

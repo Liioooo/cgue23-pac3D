@@ -3,6 +3,7 @@
 
 #include "Game/FlyingCameraScript.h"
 #include "Game/GhostsController.h"
+#include "Game/SingleGhostScript.h"
 #include "Game/PlayerScript.h"
 
 int main(int argc, char **argv) {
@@ -13,6 +14,7 @@ int main(int argc, char **argv) {
 
     application->registerNativeScript<Game::FlyingCameraScript>("flyingCameraScript");
     application->registerNativeScript<Game::GhostsController>("ghostsController");
+    application->registerNativeScript<Game::SingleGhostScript>("singleGhostScript");
     application->registerNativeScript<Game::PlayerScript>("player");
 
     application->init();
