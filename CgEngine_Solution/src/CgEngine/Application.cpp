@@ -34,7 +34,7 @@ namespace CgEngine {
 
         WindowSpecification windowSpecification;
         windowSpecification.width = iniReader->GetInteger("window", "width", 1280);
-        windowSpecification.width = iniReader->GetInteger("window", "width", 720);
+        windowSpecification.height = iniReader->GetInteger("window", "height", 720);
         windowSpecification.title = iniReader->Get("window", "title", "CG Engine");
         windowSpecification.fullScreen = iniReader->GetBoolean("window", "fullscreen", false);
         windowSpecification.refreshRate = iniReader->GetInteger("window", "refresh_rate", 60);
