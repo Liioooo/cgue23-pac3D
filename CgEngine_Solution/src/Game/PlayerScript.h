@@ -28,8 +28,10 @@ namespace Game {
         float pitch = -0.6f;
         float yaw = 0.0f;
         float cameraDistance = 4.0f;
-        float respawnTimer = 0.0f;
+
+        float respawnTimer = 3.0f;
         uint32_t playerLives = 4;
+
         glm::vec3 cameraOffset = glm::vec3(0.0f, 1.5f, 0.0f);
         std::unordered_set<CgEngine::Entity> cameraRaycastExcluded;
     };

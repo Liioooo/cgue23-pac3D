@@ -12,6 +12,8 @@ namespace Game {
         prevMousePos = CgEngine::Input::getMousePosition();
 
         cameraRaycastExcluded.insert(getOwingEntity());
+
+        setEntityTag(getOwingEntity(), "player");
     }
 
     void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
@@ -25,25 +27,27 @@ namespace Game {
         }
 
         glm::vec3 cameraDirection = glm::normalize(glm::quat({0.0f, yaw, 0.0f}) * glm::vec3(0, 0, -1));
-        auto movementDirection = glm::vec3(0.0f);
+        auto movement = glm::vec3(0.0f);
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
-            movementDirection += cameraDirection;
+            movement += cameraDirection;
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::A)) {
-            movementDirection += glm::rotateY(cameraDirection, glm::radians(90.0f));
+            movement += glm::rotateY(cameraDirection, glm::radians(90.0f));
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::D)) {
-            movementDirection += glm::rotateY(cameraDirection, glm::radians(-90.0f));
+            movement += glm::rotateY(cameraDirection, glm::radians(-90.0f));
         }
 
         auto& comp = getComponent<CgEngine::CharacterControllerComponent>();
 
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::S)) {
-            comp.move(-cameraDirection * ts.getSeconds() * 7.0f);
-        } else if (movementDirection.x != 0 || movementDirection.y != 0 || movementDirection.z != 0) {
-            comp.move(glm::normalize(movementDirection) * ts.getSeconds() * 7.0f);
+            movement = -cameraDirection * ts.getSeconds() * 7.0f;
+        } else {
+            movement = (glm::length(movement) == 0.0f ? movement : normalize(movement)) * ts.getSeconds() * 7.0f;
         }
+
+        comp.move(movement);
     }
 
 
@@ -94,7 +98,7 @@ namespace Game {
     }
 
     void PlayerScript::onCollisionEnter(CgEngine::Entity other) {
-        if (getEntityTag(other) == "ghost") {
+        if (getEntityTag(other) == "ghost" && respawnTimer <= 0.0f) {
             getComponent<CgEngine::CharacterControllerComponent>().setPosition({0.0f, 2.0f, 10.0f});
             pitch = -0.6f;
             yaw = 0.0f;
@@ -119,8 +123,8 @@ namespace Game {
     void PlayerScript::onKeyPressed(CgEngine::KeyPressedEvent& event) {
         if (event.getKeyCode() == CgEngine::KeyCode::Space) {
             auto& comp = getComponent<CgEngine::CharacterControllerComponent>();
-            if (comp.standsOnGround()) {
-                comp.jump(0.6);
+            if (comp.isGrounded() && respawnTimer <= 0.0f) {
+                comp.jump(0.5f);
             }
         }
     }

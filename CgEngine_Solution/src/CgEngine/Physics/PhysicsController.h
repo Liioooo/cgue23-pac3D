@@ -22,20 +22,23 @@ namespace CgEngine {
         void setPosition(glm::vec3 pos);
         void jump(float strength);
 
-        bool standsOnGround() const;
+        bool isGrounded() const;
 
     private:
         physx::PxController* physXController;
         bool hasGravity;
         Entity entity;
 
-        glm::vec3 currentMovement = glm::vec3(0.0f);
-        float currentJumpSpeed = 0;
+        glm::vec3 movement = glm::vec3(0.0f);
+        glm::vec3 velocity = glm::vec3(0.0f);
+        float nextJumpStrength = 0.0f;
         glm::vec3 gravity;
-        physx::PxControllerCollisionFlags collisionFlags;
+        bool grounded = false;
 
         glm::vec3 desiredPosition;
         bool shouldTeleport = false;
+
+        void updateIsGrounded();
     };
 
 }

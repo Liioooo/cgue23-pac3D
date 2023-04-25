@@ -21,7 +21,7 @@ namespace CgEngine {
         void move(glm::vec3 dir);
         void setPosition(glm::vec3 pos);
         void jump(float strength);
-        bool standsOnGround();
+        bool isGrounded();
 
     private:
         PhysicsController* physicsController;

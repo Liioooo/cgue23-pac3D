@@ -28,6 +28,7 @@ namespace CgEngine {
         sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
         sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
         sceneDesc.kineKineFilteringMode = physx::PxPairFilteringMode::eKEEP;
+        sceneDesc.userData = this;
 
 
         CG_ASSERT(sceneDesc.isValid(), "PhysX SceneDesc is invalid!")
@@ -166,10 +167,10 @@ namespace CgEngine {
 
         for (uint32_t i = 0; i < numSteps; i++) {
             accumulator -= simulateTimeStep;
-            physXScene->simulate(simulateTimeStep);
-            physXScene->fetchResults(true);
             scene.executeFixedUpdate(simulateTimeStep);
             updateControllers(simulateTimeStep);
+            physXScene->simulate(simulateTimeStep);
+            physXScene->fetchResults(true);
         }
         return true;
     }

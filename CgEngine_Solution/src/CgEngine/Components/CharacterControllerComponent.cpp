@@ -22,7 +22,7 @@ namespace CgEngine {
         physicsController->jump(strength);
     }
 
-    bool CharacterControllerComponent::standsOnGround() {
-        return physicsController->standsOnGround();
+    bool CharacterControllerComponent::isGrounded() {
+        return physicsController->isGrounded();
     }
 }
