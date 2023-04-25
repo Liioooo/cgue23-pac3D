@@ -16,22 +16,28 @@ namespace CgEngine {
     }
 
     void PhysicsController::update(float ts) {
-        physx::PxControllerFilters filters;
 
-        if (hasGravity && currentJumpSpeed <= 0) {
-            currentMovement += gravity * ts;
-        }
+        if (shouldTeleport) {
+            physXController->setPosition(PhysXUtils::glmToExtendedPhysXVec(desiredPosition));
+            shouldTeleport = false;
+        } else {
+            physx::PxControllerFilters filters;
 
-        if (currentJumpSpeed > 0) {
-            currentJumpSpeed += gravity.y * ts;
-            if (currentJumpSpeed < 0) {
-                currentJumpSpeed = 0.0f;
+            if (hasGravity && currentJumpSpeed <= 0) {
+                currentMovement += gravity * ts;
             }
+
+            if (currentJumpSpeed > 0) {
+                currentJumpSpeed += gravity.y * ts;
+                if (currentJumpSpeed < 0) {
+                    currentJumpSpeed = 0.0f;
+                }
+            }
+
+            currentMovement.y += currentJumpSpeed;
+
+            collisionFlags = physXController->move(PhysXUtils::glmToPhysXVec(currentMovement), 0.0f, ts, filters);
         }
-
-        currentMovement.y += currentJumpSpeed;
-
-        collisionFlags = physXController->move(PhysXUtils::glmToPhysXVec(currentMovement), 0.0f, ts, filters);
 
         currentMovement = {0.0f, 0.0f, 0.0f};
     }
@@ -52,6 +58,11 @@ namespace CgEngine {
 
     void PhysicsController::move(glm::vec3 dir) {
         currentMovement += dir;
+    }
+
+    void PhysicsController::setPosition(glm::vec3 pos) {
+        desiredPosition = pos;
+        shouldTeleport = true;
     }
 
     void PhysicsController::jump(float strength) {

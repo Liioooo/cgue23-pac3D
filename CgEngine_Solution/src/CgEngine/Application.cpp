@@ -66,6 +66,22 @@ namespace CgEngine {
         }
     }
 
+    void Application::shutdown() {
+        isRunning = false;
+    }
+
+    float Application::getTime() {
+        return static_cast<float>(glfwGetTime());
+    }
+
+    ApplicationOptions& Application::getApplicationOptions() {
+        return applicationOptions;
+    }
+
+    Window &Application::getWindow() {
+        return *window;
+    }
+
     void Application::onEvent(Event& event) {
         EventDispatcher eventDispatcher(event);
 
@@ -78,20 +94,8 @@ namespace CgEngine {
         }
     }
 
-    Window &Application::getWindow() {
-        return *window;
-    }
-
-    float Application::getTime() {
-        return static_cast<float>(glfwGetTime());
-    }
-
-    ApplicationOptions& Application::getApplicationOptions() {
-        return applicationOptions;
-    }
-
     void Application::onWindowClose(WindowCloseEvent &event) {
-        isRunning = false;
+        shutdown();
         event.stopPropagation();
     }
 

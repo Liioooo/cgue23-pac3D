@@ -23,6 +23,7 @@ namespace CgEngine {
     };
 
     class Application {
+        friend class Input;
     public:
         explicit Application(const std::string& settingsIni);
         ~Application();
@@ -31,8 +32,7 @@ namespace CgEngine {
 
         void init();
         void run();
-        void onEvent(Event& event);
-        Window& getWindow();
+        void shutdown();
         float getTime();
         ApplicationOptions& getApplicationOptions();
 
@@ -51,6 +51,8 @@ namespace CgEngine {
         float lastFrameTime = getTime();
         TimeStep timeStep{};
 
+        Window& getWindow();
+        void onEvent(Event& event);
         void onWindowClose(WindowCloseEvent& event);
         void onWindowResize(WindowResizeEvent& event);
         void onKeyPressed(KeyPressedEvent& event);

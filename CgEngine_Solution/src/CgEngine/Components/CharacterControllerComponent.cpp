@@ -14,6 +14,10 @@ namespace CgEngine {
         physicsController->move(dir);
     }
 
+    void CharacterControllerComponent::setPosition(glm::vec3 pos) {
+        physicsController->setPosition(pos);
+    }
+
     void CharacterControllerComponent::jump(float strength) {
         physicsController->jump(strength);
     }

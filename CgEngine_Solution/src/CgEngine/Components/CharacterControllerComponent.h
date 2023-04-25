@@ -19,6 +19,7 @@ namespace CgEngine {
         void onDetach(Scene& scene) override;
 
         void move(glm::vec3 dir);
+        void setPosition(glm::vec3 pos);
         void jump(float strength);
         bool standsOnGround();
 

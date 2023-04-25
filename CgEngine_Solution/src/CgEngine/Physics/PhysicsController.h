@@ -19,6 +19,7 @@ namespace CgEngine {
         void updateTransforms();
 
         void move(glm::vec3 dir);
+        void setPosition(glm::vec3 pos);
         void jump(float strength);
 
         bool standsOnGround() const;
@@ -32,6 +33,9 @@ namespace CgEngine {
         float currentJumpSpeed = 0;
         glm::vec3 gravity;
         physx::PxControllerCollisionFlags collisionFlags;
+
+        glm::vec3 desiredPosition;
+        bool shouldTeleport = false;
     };
 
 }

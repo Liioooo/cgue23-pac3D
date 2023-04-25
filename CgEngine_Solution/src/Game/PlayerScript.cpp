@@ -3,6 +3,7 @@
 #include "Events/KeyCodes.h"
 #include "glm/gtx/common.hpp"
 #include "glm/gtx/rotate_vector.hpp"
+#include "Application.h"
 
 namespace Game {
     void PlayerScript::onAttach() {
@@ -13,6 +14,15 @@ namespace Game {
     }
 
     void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
+        if (respawnTimer > 0.0f) {
+            respawnTimer -= ts.getSeconds();
+            CG_LOGGING_INFO("Respawn in: {0} Seconds", respawnTimer);
+            if (respawnTimer < 0.0f) {
+                CG_LOGGING_INFO("Remaining lives: {0}", playerLives);
+            }
+            return;
+        }
+
         glm::vec3 cameraDirection = glm::normalize(glm::quat({0.0f, yaw, 0.0f}) * glm::vec3(0, 0, -1));
         auto movementDirection = glm::vec3(0.0f);
 
@@ -81,7 +91,15 @@ namespace Game {
 
     void PlayerScript::onCollisionEnter(CgEngine::Entity other) {
         if (getEntityTag(other) == "ghost") {
-            CG_LOGGING_INFO("Player {0}", other)
+            getComponent<CgEngine::CharacterControllerComponent>().setPosition({0.0f, 2.0f, 10.0f});
+            pitch = -0.6f;
+            yaw = 0.0f;
+            respawnTimer = 3.0f;
+            playerLives--;
+            if (playerLives == 0) {
+                CG_LOGGING_INFO("You lose!")
+                CgEngine::Application::get().shutdown();
+            }
         }
     }
 
