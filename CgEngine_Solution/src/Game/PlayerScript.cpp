@@ -14,30 +14,29 @@ namespace Game {
 
     void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
         glm::vec3 cameraDirection = glm::normalize(glm::quat({0.0f, yaw, 0.0f}) * glm::vec3(0, 0, -1));
-        auto forwardDirection = cameraDirection;
+        auto movementDirection = glm::vec3(0.0f);
 
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
+            movementDirection += cameraDirection;
+        }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::A)) {
-            forwardDirection = glm::rotateY(cameraDirection, glm::radians(40.0f));
+            movementDirection += glm::rotateY(cameraDirection, glm::radians(90.0f));
         }
         if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::D)) {
-            forwardDirection = glm::rotateY(cameraDirection, glm::radians(-40.0f));
+            movementDirection += glm::rotateY(cameraDirection, glm::radians(-90.0f));
         }
 
         auto& comp = getComponent<CgEngine::CharacterControllerComponent>();
 
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::W)) {
-            comp.move(forwardDirection * ts.getSeconds() * 7.0f);
-        } else if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::S)) {
+        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::S)) {
             comp.move(-cameraDirection * ts.getSeconds() * 7.0f);
+        } else if (movementDirection.x != 0 || movementDirection.y != 0 || movementDirection.z != 0) {
+            comp.move(glm::normalize(movementDirection) * ts.getSeconds() * 7.0f);
         }
     }
 
 
-    void PlayerScript::update(CgEngine::TimeStep ts) {
-        if (CgEngine::Input::isKeyPressed(CgEngine::KeyCode::Enter)) {
-            getComponent<CgEngine::RigidBodyComponent>(findEntityById("test")).addForce({5, 0.5, 5});
-        }
-    }
+    void PlayerScript::update(CgEngine::TimeStep ts) {}
 
     void PlayerScript::lateUpdate(CgEngine::TimeStep ts) {
         auto mousePos = CgEngine::Input::getMousePosition();
