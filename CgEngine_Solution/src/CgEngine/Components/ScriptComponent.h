@@ -32,8 +32,8 @@ namespace CgEngine {
         void onEvent(Event& event);
 
         template<typename S>
-        S* getNativeScript() {
-            return static_cast<S*>(script.get());
+        S& getNativeScript() {
+            return *static_cast<S*>(script.get());
         }
 
     private:

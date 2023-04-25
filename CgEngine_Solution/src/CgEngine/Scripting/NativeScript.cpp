@@ -3,11 +3,11 @@
 #include "Rendering/SceneRenderer.h"
 
 namespace CgEngine {
-    void NativeScript::_setScene(Scene* scene) {
+    void NativeScript::setScene(Scene* scene) {
         owningScene = scene;
     }
 
-    void NativeScript::_setEntity(Entity entity) {
+    void NativeScript::setEntity(Entity entity) {
         owningEntity = entity;
     }
 
@@ -31,8 +31,16 @@ namespace CgEngine {
         return owningScene->getParent(owningEntity);
     }
 
+    Entity NativeScript::getParentEntity(Entity entity) {
+        return owningScene->getParent(entity);
+    }
+
     const std::unordered_set<Entity>& NativeScript::getChildEntities() {
         return owningScene->getChildren(owningEntity);
+    }
+
+    const std::unordered_set<Entity>& NativeScript::getChildEntities(Entity entity) {
+        return owningScene->getChildren(entity);
     }
 
     Entity NativeScript::createEntity() {

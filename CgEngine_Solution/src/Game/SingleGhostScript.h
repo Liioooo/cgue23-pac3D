@@ -10,6 +10,7 @@ namespace Game {
             return std::make_shared<SingleGhostScript>();
         }
 
+    protected:
         void onCollisionEnter(CgEngine::Entity other) override;
 
     };

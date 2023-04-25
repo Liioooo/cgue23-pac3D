@@ -11,6 +11,7 @@ namespace Game {
             return std::make_shared<PlayerScript>();
         }
 
+    protected:
         void onAttach() override;
         void fixedUpdate(CgEngine::TimeStep ts) override;
         void update(CgEngine::TimeStep ts) override;

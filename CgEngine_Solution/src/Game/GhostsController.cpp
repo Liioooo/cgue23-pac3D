@@ -181,6 +181,10 @@ namespace Game {
         }
     }
 
+    uint32_t GhostsController::getTotalCoinAmount() {
+        return totalCoinAmount;
+    }
+
     void GhostsController::setMapNeighbors(size_t node, std::initializer_list<int> neighbors) {
         for (const auto& n: neighbors) {
             mapNodes[node].neighbors.push_back(n);
@@ -225,6 +229,8 @@ namespace Game {
         attachComponent<CgEngine::MeshRendererComponent>(e, CgEngine::MeshRendererComponentParams{"", "CG_SphereMesh", "Red", true});
         attachComponent<CgEngine::SphereColliderComponent>(e, CgEngine::SphereColliderComponentParams{1.4f, glm::vec3(0.0f), true, "default-physics-material"});
         attachComponent<CgEngine::RigidBodyComponent>(e, rigidBodyParams);
+
+        totalCoinAmount++;
     }
 
     void GhostsController::createGhosts() {

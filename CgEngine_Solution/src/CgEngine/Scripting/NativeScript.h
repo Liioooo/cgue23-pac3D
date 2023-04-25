@@ -10,11 +10,14 @@ namespace CgEngine {
 
     class NativeScript {
     public:
+        friend class ScriptComponent;
+
+    protected:
         NativeScript() = default;
         ~NativeScript() = default;
 
-        void _setScene(Scene* scene);
-        void _setEntity(Entity entity);
+        void setScene(Scene* scene);
+        void setEntity(Entity entity);
 
         virtual void onAttach() {};
         virtual void onDetach() {};
@@ -32,13 +35,13 @@ namespace CgEngine {
         virtual void onMouseScrolled(MouseScrolledEvent& event) {}
         virtual void onKeyPressed(KeyPressedEvent& event) {}
 
-
-    protected:
         Entity getOwingEntity();
         void destroyEntity(Entity entity);
         Entity findEntityById(const std::string& id);
         Entity getParentEntity();
+        Entity getParentEntity(Entity entity);
         const std::unordered_set<Entity>& getChildEntities();
+        const std::unordered_set<Entity>& getChildEntities(Entity entity);
         Entity createEntity();
         Entity createEntity(Entity parent);
         void setEntityTag(Entity entity, const std::string& tag);

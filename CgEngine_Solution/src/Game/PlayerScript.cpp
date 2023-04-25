@@ -4,6 +4,7 @@
 #include "glm/gtx/common.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 #include "Application.h"
+#include "GhostsController.h"
 
 namespace Game {
     void PlayerScript::onAttach() {
@@ -85,7 +86,10 @@ namespace Game {
 
     void PlayerScript::onTriggerEnter(CgEngine::Entity other) {
         if (getEntityTag(other) == "coin") {
+            CgEngine::Entity coinContainer = getParentEntity(other);
+            auto& ghostsController = getComponent<CgEngine::ScriptComponent>(getParentEntity(coinContainer)).getNativeScript<GhostsController>();
             destroyEntity(other);
+            CG_LOGGING_INFO("Left Coins: {0}/{1}", getChildEntities(coinContainer).size(), ghostsController.getTotalCoinAmount());
         }
     }
 

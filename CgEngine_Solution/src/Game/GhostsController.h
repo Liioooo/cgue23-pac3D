@@ -30,6 +30,9 @@ namespace Game {
             return std::make_shared<GhostsController>();
         }
 
+        uint32_t getTotalCoinAmount();
+
+    protected:
         void onAttach() override;
         void update(CgEngine::TimeStep ts) override;
 
@@ -38,6 +41,7 @@ namespace Game {
     private:
         std::vector<MapNode> mapNodes;
         std::array<Ghost, 5> ghosts;
+        uint32_t totalCoinAmount = 0;
 
         float timeSinceGhostLeavingHome = 0.0f;
 

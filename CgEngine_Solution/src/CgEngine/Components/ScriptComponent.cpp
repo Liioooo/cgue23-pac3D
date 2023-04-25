@@ -5,8 +5,8 @@
 namespace CgEngine {
     void ScriptComponent::onAttach(Scene &scene, ScriptComponentParams &params) {
         script = GlobalObjectManager::getInstance().getScriptManager().getScriptInstance(params.scriptName);
-        script->_setEntity(entity);
-        script->_setScene(&scene);
+        script->setEntity(entity);
+        script->setScene(&scene);
         script->onAttach();
     }
 
