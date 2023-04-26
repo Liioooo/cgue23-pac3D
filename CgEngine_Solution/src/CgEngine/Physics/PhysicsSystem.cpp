@@ -84,9 +84,9 @@ namespace CgEngine {
         tolerancesScale.speed = 100.0f;
 
         physx::PxPvd* pvd = nullptr;
-        pvd = physx::PxCreatePvd(*physxFoundation);
-        physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 1000);
-        pvd->connect(*transport,physx::PxPvdInstrumentationFlag::eALL);
+        //pvd = physx::PxCreatePvd(*physxFoundation);
+        //physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 1000);
+        //pvd->connect(*transport,physx::PxPvdInstrumentationFlag::eALL);
 
         physxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *physxFoundation, tolerancesScale, false, pvd);
         CG_ASSERT(physxPhysics, "Error while creating PhysXPhysics")
