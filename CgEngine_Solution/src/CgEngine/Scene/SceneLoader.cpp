@@ -15,11 +15,15 @@ namespace CgEngine {
 
     void SceneLoader::createEntity(Scene *scene, Entity parent, const pugi::xml_node& node) {
         const auto& idAttr = node.attribute("id");
+        const auto& tagAttr = node.attribute("tag");
         Entity entity;
         if (parent == CG_ENTITY_UNAVAILABLE) {
             entity = idAttr.empty() ? scene->createEntity() : scene->createEntity(idAttr.as_string());
         } else {
             entity = idAttr.empty() ? scene->createEntity(parent) : scene->createEntity(parent, idAttr.as_string());
+        }
+        if (!tagAttr.empty()) {
+            scene->setEntityTag(entity, tagAttr.as_string());
         }
 
         const auto& componentsNode = node.child("Components");

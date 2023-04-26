@@ -12,8 +12,6 @@ namespace Game {
         prevMousePos = CgEngine::Input::getMousePosition();
 
         cameraRaycastExcluded.insert(getOwingEntity());
-
-        setEntityTag(getOwingEntity(), "player");
     }
 
     void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
