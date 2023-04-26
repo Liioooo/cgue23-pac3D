@@ -1,5 +1,7 @@
 #version 450 core
 
+layout(early_fragment_tests) in;
+
 layout (binding = 0, std140) uniform CameraData {
     mat4 viewProjection;
     mat4 projection;

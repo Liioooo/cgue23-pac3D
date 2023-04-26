@@ -1,5 +1,7 @@
 #version 450 core
 
+layout(early_fragment_tests) in;
+
 uniform vec3 u_Color;
 
 out vec4 o_FragColor;

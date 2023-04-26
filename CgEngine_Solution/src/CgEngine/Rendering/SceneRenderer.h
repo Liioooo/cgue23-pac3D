@@ -33,6 +33,7 @@ namespace CgEngine {
         bool activeRendering = false;
 
         RenderPass* shadowMapRenderPass;
+        RenderPass* preDepthRenderPass;
         RenderPass* geometryRenderPass;
         RenderPass* screenRenderPass;
         RenderPass* skyboxRenderPass;
@@ -43,7 +44,7 @@ namespace CgEngine {
         Material* skyboxMaterial;
         Material* physicsCollidersMaterial;
         Material* normalsDebugMaterial;
-        Material* shadowMapMaterial;
+        Material* emptyMaterial;
 
         Texture2DArray* dirShadowMaps;
         Texture2D* bloomFilteredTexture;
@@ -52,6 +53,7 @@ namespace CgEngine {
         std::vector<Framebuffer*> bloomFramebuffers;
 
         void shadowMapPass();
+        void preDepthPass();
         void geometryPass();
         void skyboxPass();
         void physicsCollidersPass();

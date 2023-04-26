@@ -5,6 +5,8 @@
 
 namespace CgEngine {
     SceneRenderer::SceneRenderer(uint32_t viewportWidth, uint32_t viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {
+        emptyMaterial = new Material("EmptyMaterial");
+
         {
             ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
 
@@ -32,8 +34,25 @@ namespace CgEngine {
             shadowMapRenderPassSpec.backfaceCulling = true;
 
             shadowMapRenderPass = new RenderPass(shadowMapRenderPassSpec);
+        }
+        {
+            FramebufferSpecification preDepthFramebufferSpec;
+            preDepthFramebufferSpec.height = viewportHeight;
+            preDepthFramebufferSpec.width = viewportWidth;
+            preDepthFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+            preDepthFramebufferSpec.hasDepthStencilAttachment = false;
+            preDepthFramebufferSpec.hasDepthAttachment = true;
 
-            shadowMapMaterial = new Material("ShadowMapMaterial");
+            auto* framebuffer = new Framebuffer(preDepthFramebufferSpec);
+
+            RenderPassSpecification preDepthRenderPassSpec;
+            preDepthRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("preDepth");
+            preDepthRenderPassSpec.framebuffer = framebuffer;
+            preDepthRenderPassSpec.clearColorBuffer = false;
+            preDepthRenderPassSpec.clearDepthBuffer = true;
+            preDepthRenderPassSpec.depthCompareOperator = DepthCompareOperator::Less;
+
+            preDepthRenderPass = new RenderPass(preDepthRenderPassSpec);
         }
         {
             FramebufferSpecification geoFramebufferSpec;
@@ -41,6 +60,9 @@ namespace CgEngine {
             geoFramebufferSpec.width = viewportWidth;
             geoFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
             geoFramebufferSpec.colorAttachments = {FramebufferFormat::RGBA16F};
+            geoFramebufferSpec.hasDepthStencilAttachment = false;
+            geoFramebufferSpec.useExistingDepthAttachment = true;
+            geoFramebufferSpec.existingDepthAttachment = preDepthRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId();
             geoFramebufferSpec.samples = 1;
 
             auto* framebuffer = new Framebuffer(geoFramebufferSpec);
@@ -48,6 +70,9 @@ namespace CgEngine {
             RenderPassSpecification geoRenderPassSpec;
             geoRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr");
             geoRenderPassSpec.framebuffer = framebuffer;
+            geoRenderPassSpec.depthCompareOperator = DepthCompareOperator::LessOrEqual;
+            geoRenderPassSpec.clearDepthBuffer = false;
+            geoRenderPassSpec.depthWrite = false;
 
             geometryRenderPass = new RenderPass(geoRenderPassSpec);
         }
@@ -145,6 +170,7 @@ namespace CgEngine {
 
     SceneRenderer::~SceneRenderer() {
         delete shadowMapRenderPass;
+        delete preDepthRenderPass;
         delete geometryRenderPass;
         delete skyboxRenderPass;
         delete physicsCollidersRenderPass;
@@ -156,7 +182,7 @@ namespace CgEngine {
         delete physicsCollidersMaterial;
         delete normalsDebugMaterial;
         delete screenMaterial;
-        delete shadowMapMaterial;
+        delete emptyMaterial;
 
         delete dirShadowMaps;
         delete bloomTexture;
@@ -188,8 +214,12 @@ namespace CgEngine {
         if (needsResize && viewportWidth != 0 && viewportHeight != 0) {
             needsResize = false;
 
+            preDepthRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
+            geometryRenderPass->getSpecification().framebuffer->getSpecification().existingDepthAttachment = preDepthRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId();
             geometryRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
             screenRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
+
+            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
 
 //            delete bloomFilteredTexture;
 //            bloomFilteredTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
@@ -265,6 +295,7 @@ namespace CgEngine {
         ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
 
         shadowMapPass();
+        preDepthPass();
         geometryPass();
         skyboxPass();
         if (applicationOptions.debugShowPhysicsColliders) {
@@ -363,7 +394,18 @@ namespace CgEngine {
 
         for (const auto [mk, command]: shadowMapDrawCommandQueue) {
             const auto& transforms = meshTransforms[mk];
-            Renderer::executeDrawCommand(*command.vao, *shadowMapMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
+            Renderer::executeDrawCommand(*command.vao, *emptyMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
+        }
+
+        Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::preDepthPass() {
+        Renderer::beginRenderPass(*preDepthRenderPass);
+
+        for (const auto [mk, command]: drawCommandQueue) {
+            const auto& transforms = meshTransforms[mk];
+            Renderer::executeDrawCommand(*command.vao, *emptyMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
         }
 
         Renderer::endRenderPass();
