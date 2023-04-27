@@ -24,7 +24,7 @@ namespace CgEngine {
 
         void addActor(PhysicsActor* actor);
         void removeActor(PhysicsActor* actor);
-        PhysicsController* createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float slopeLimit);
+        PhysicsController* createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float stepDownOffset, float slopeLimit);
         void simulate(TimeStep ts, Scene& scene);
 
         PhysicsRaycastHit raycast(glm::vec3 origin, glm::vec3 direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities);

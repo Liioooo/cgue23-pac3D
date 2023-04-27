@@ -194,6 +194,7 @@ namespace CgEngine {
         CharacterControllerComponentParams params{
             node.attribute("has-gravity").as_bool(true),
             node.attribute("step-offset").as_float(0.0f),
+            node.attribute("step-down-offset").as_float(0.0f),
             node.attribute("slope-limit").as_float(0.0f)
         };
         scene->attachComponent<CharacterControllerComponent>(entity, params);

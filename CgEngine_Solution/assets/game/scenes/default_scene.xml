@@ -263,7 +263,7 @@
         <Components>
             <TransformComponent position="0 2 10" rotation="0 0 0" scale="1 1 1" />
             <CapsuleColliderComponent radius="0.5" half-height="0.1" />
-            <CharacterControllerComponent slope-limit="30" step-offset="0.1" />
+            <CharacterControllerComponent slope-limit="30" step-offset="0.1" step-down-offset="0.1" />
             <ScriptComponent script-name="player" />
         </Components>
         <Entity>

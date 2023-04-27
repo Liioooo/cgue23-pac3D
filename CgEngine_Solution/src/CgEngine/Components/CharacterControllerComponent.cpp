@@ -3,7 +3,7 @@
 
 namespace CgEngine {
     void CharacterControllerComponent::onAttach(Scene& scene, CharacterControllerComponentParams& params) {
-        physicsController = scene.getPhysicsScene().createController(scene, entity, params.hasGravity, params.stepOffset, params.slopeLimit);
+        physicsController = scene.getPhysicsScene().createController(scene, entity, params.hasGravity, params.stepOffset, params.stepDownOffset, params.slopeLimit);
     }
 
     void CharacterControllerComponent::onDetach(Scene& scene) {

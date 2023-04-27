@@ -10,7 +10,7 @@ namespace CgEngine {
 
     class PhysicsController : public AbstractPhysicsActor {
     public:
-        PhysicsController(physx::PxController* physXController, bool hasGravity, glm::vec3 gravity, Entity entity, Scene& scene);
+        PhysicsController(physx::PxController* physXController, bool hasGravity, glm::vec3 gravity, float stepDownOffset, Entity entity, Scene& scene);
         ~PhysicsController();
 
         PhysicsActorType getPhysicsActorType() const override;
@@ -27,11 +27,13 @@ namespace CgEngine {
     private:
         physx::PxController* physXController;
         bool hasGravity;
+        float stepDownOffset;
         Entity entity;
 
         glm::vec3 movement = glm::vec3(0.0f);
         glm::vec3 velocity = glm::vec3(0.0f);
         float nextJumpStrength = 0.0f;
+        bool isJumping = false;
         glm::vec3 gravity;
         bool grounded = false;
 
@@ -39,6 +41,7 @@ namespace CgEngine {
         bool shouldTeleport = false;
 
         void updateIsGrounded();
+        float getHeightOverGround();
     };
 
 }

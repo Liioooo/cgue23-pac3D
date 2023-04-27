@@ -8,6 +8,7 @@ namespace CgEngine {
     struct CharacterControllerComponentParams {
         bool hasGravity;
         float stepOffset;
+        float stepDownOffset;
         float slopeLimit;
     };
 

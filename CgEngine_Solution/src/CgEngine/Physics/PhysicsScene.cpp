@@ -55,7 +55,7 @@ namespace CgEngine {
         physXScene->removeActor(actor->getPhysxActor());
     }
 
-    PhysicsController* PhysicsScene::createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float slopeLimit) {
+    PhysicsController* PhysicsScene::createController(Scene& scene, Entity entity, bool hasGravity, float stepOffset, float stepDownOffset, float slopeLimit) {
         auto& physicsSystem = GlobalObjectManager::getInstance().getPhysicsSystem();
 
         physx::PxController* physXController = nullptr;
@@ -102,7 +102,7 @@ namespace CgEngine {
 
         CG_ASSERT(physXController != nullptr, "Cannot create PhysicsController! Entity using Controller must have: BoxColliderComponent or CapsuleColliderComponent")
 
-        return new PhysicsController(physXController, hasGravity, physicsSystem.getPhysxSettings().gravity, entity, scene);
+        return new PhysicsController(physXController, hasGravity, physicsSystem.getPhysxSettings().gravity, stepDownOffset, entity, scene);
     }
 
     void PhysicsScene::simulate(TimeStep ts, Scene& scene) {

@@ -1,9 +1,11 @@
 #include "PhysicsController.h"
 #include "Scene/Scene.h"
 #include "PhysicsScene.h"
+#include "Asserts.h"
 
 namespace CgEngine {
-    PhysicsController::PhysicsController(physx::PxController* physXController, bool hasGravity, glm::vec3 gravity, Entity entity, Scene& scene) : AbstractPhysicsActor(&scene, entity), physXController(physXController), hasGravity(hasGravity), gravity(gravity), entity(entity) {
+    PhysicsController::PhysicsController(physx::PxController* physXController, bool hasGravity, glm::vec3 gravity, float stepDownOffset, Entity entity, Scene& scene)
+    : AbstractPhysicsActor(&scene, entity), physXController(physXController), hasGravity(hasGravity), gravity(gravity), stepDownOffset(stepDownOffset), entity(entity) {
         physXController->setUserData(this);
         physXController->getActor()->userData = this;
     }
@@ -26,6 +28,7 @@ namespace CgEngine {
 
             if (grounded && velocity.y < 0.0f) {
                 velocity.y = 0.0f;
+                isJumping = false;
             }
 
             updateIsGrounded();
@@ -34,15 +37,26 @@ namespace CgEngine {
                 velocity += glm::sqrt(nextJumpStrength * -3.0f * gravity);
                 nextJumpStrength = 0.0f;
                 grounded = false;
+                isJumping = true;
             }
 
             if (glm::length(movement) != 0.0f || !grounded) {
-                velocity += gravity * ts;
-                movement.y += velocity.y * ts;
+                if (hasGravity) {
+                    velocity += gravity * ts;
+                    movement.y += velocity.y * ts;
+                }
 
                 physx::PxControllerCollisionFlags collisionFlags = physXController->move(PhysXUtils::glmToPhysXVec(movement), 0.001f, ts, filters);
                 if (collisionFlags & physx::PxControllerCollisionFlag::eCOLLISION_DOWN) {
                     grounded = true;
+                }
+
+                if (!(collisionFlags & physx::PxControllerCollisionFlag::eCOLLISION_DOWN) && !isJumping) {
+                    float heightOverGround = getHeightOverGround();
+                    if (heightOverGround <= stepDownOffset) {
+                        physXController->move(PhysXUtils::glmToPhysXVec({0.0f, -heightOverGround, 0.0f}), 0.001f, ts, filters);
+                        grounded = true;
+                    }
                 }
             }
 
@@ -75,6 +89,8 @@ namespace CgEngine {
     }
 
     void PhysicsController::jump(float strength) {
+        CG_ASSERT(hasGravity, "Cannot jump is gravity is disabled")
+
         nextJumpStrength = strength;
     }
 
@@ -83,9 +99,13 @@ namespace CgEngine {
     }
 
     void PhysicsController::updateIsGrounded() {
-        auto* physicsScene = static_cast<PhysicsScene*>(physXController->getScene()->userData);
+        float heightOverGround = getHeightOverGround();
+        grounded = heightOverGround >= 0.0f && ((grounded && heightOverGround < 0.05f) || (heightOverGround < 0.001f));
+    }
 
-        auto raycastHit = physicsScene->raycast(PhysXUtils::phsXExtendedToGlmVec(physXController->getFootPosition()), glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)), 1000.0f, std::unordered_set<Entity>{});
-        grounded = raycastHit.hitFound && ((grounded && raycastHit.hitDistance < 0.05f) || (raycastHit.hitDistance < 0.001f));
+    float PhysicsController::getHeightOverGround() {
+        auto* physicsScene = static_cast<PhysicsScene*>(physXController->getScene()->userData);
+        auto raycastHit = physicsScene->raycast(PhysXUtils::phsXExtendedToGlmVec(physXController->getFootPosition()), glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f)), std::numeric_limits<float>::max(), std::unordered_set<Entity>{});
+        return raycastHit.hitFound ? raycastHit.hitDistance : -1.0f;
     }
 }
