@@ -2,7 +2,7 @@
 
 #include "Logging.h"
 
-#ifdef _DEBUG
+#ifdef CG_ENABLE_DEBUG_FEATURES
     #if defined(PLATFORM_WIN32)
 		#define CG_DEBUG_BREAK() __debugbreak();
 	#elif defined(PLATFORM_UNIX)
@@ -11,12 +11,11 @@
 	#else
 		#error "Platform doesn't support debugbreak yet!"
 	#endif
-	#define CG_ENABLE_ASSERTS
 #else
     #define CG_DEBUG_BREAK()
 #endif
 
-#ifdef CG_ENABLE_ASSERTS
+#ifdef CG_ENABLE_DEBUG_FEATURES
     #define CG_ASSERT(check, message) { if (!(check)) { CG_LOGGING_ERROR(message) CG_DEBUG_BREAK() }}
 #else
     #define CG_ASSERT(...)
