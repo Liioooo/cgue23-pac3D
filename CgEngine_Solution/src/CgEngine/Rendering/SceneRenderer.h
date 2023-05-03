@@ -47,10 +47,7 @@ namespace CgEngine {
         Material* emptyMaterial;
 
         Texture2DArray* dirShadowMaps;
-        Texture2D* bloomFilteredTexture;
-        Texture2D* bloomDownsampleStagingTexture;
         Texture2D* bloomTexture;
-        std::vector<Framebuffer*> bloomFramebuffers;
 
         void shadowMapPass();
         void preDepthPass();

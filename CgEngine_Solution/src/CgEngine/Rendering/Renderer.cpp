@@ -104,7 +104,7 @@ namespace CgEngine {
         uint32_t blackCubeMapTextureData = 0xff000000;
         blackCubeTexture = new TextureCube(TextureFormat::RGBA, 1, 1, &blackCubeMapTextureData, MipMapFiltering::Nearest);
 
-        brdfLUT = new Texture2D(FileSystem::getAsEnginePath("ibl_brdf_lut.png"), true, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+        brdfLUT = new Texture2D(FileSystem::getAsEnginePath("ibl_brdf_lut.png"), false, TextureWrap::Clamp, MipMapFiltering::Bilinear);
 
         transformsBuffer = new ShaderStorageBuffer(0);
     }
@@ -298,7 +298,7 @@ namespace CgEngine {
 
         CG_ASSERT(sphereMap.isLoaded(), "HDRI could not be loaded!");
 
-        TextureCube cubeMap(TextureFormat::Float32, MAP_SIZE, MAP_SIZE, MipMapFiltering::Bilinear);
+        TextureCube cubeMap(TextureFormat::Float32A, MAP_SIZE, MAP_SIZE, MipMapFiltering::Bilinear);
 
         auto& sphereToCubeShader = *resourceManager.getResource<ComputeShader>("sphereToCube");
         sphereToCubeShader.bind();
@@ -312,7 +312,7 @@ namespace CgEngine {
 
         uint32_t mipCount = TextureUtils::calculateMipCount(MAP_SIZE, MAP_SIZE);
 
-        prefilterMap = new TextureCube(TextureFormat::Float32, MAP_SIZE, MAP_SIZE, MipMapFiltering::Trilinear);
+        prefilterMap = new TextureCube(TextureFormat::Float32A, MAP_SIZE, MAP_SIZE, MipMapFiltering::Trilinear);
         prefilterMap->generateMipMaps();
 
         auto& prefilterMapShader = *resourceManager.getResource<ComputeShader>("prefilterMap");
@@ -328,7 +328,7 @@ namespace CgEngine {
             prefilterMapShader.waitForMemoryBarrier();
         }
 
-        irradianceMap = new TextureCube(TextureFormat::Float32, 32, 32, MipMapFiltering::Bilinear);
+        irradianceMap = new TextureCube(TextureFormat::Float32A, 32, 32, MipMapFiltering::Bilinear);
 
         auto& irradianceMapShader = *resourceManager.getResource<ComputeShader>("irradianceMap");
         irradianceMapShader.bind();

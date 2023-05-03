@@ -90,14 +90,8 @@ namespace CgEngine {
             skyboxMaterial = new Material("skyboxMaterial");
         }
         {
-//            bloomFilteredTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-//            bloomFilteredTexture->generateMipMaps();
-//
-//            bloomDownsampleStagingTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-//            bloomDownsampleStagingTexture->generateMipMaps();
-//
-//            bloomTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-//            bloomTexture->generateMipMaps();
+            bloomTexture = new Texture2D(TextureFormat::Float32, viewportWidth / 2, viewportHeight / 2, TextureWrap::Clamp, MipMapFiltering::Bilinear);
+            bloomTexture->generateMipMaps();
         }
         {
             RenderPassSpecification physicsCollidersRenderPassSpec;
@@ -463,40 +457,40 @@ namespace CgEngine {
     }
 
     void SceneRenderer::bloomPass() {
-        auto& bloomShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<ComputeShader>("bloom");
-        bloomShader.bind();
-
-        uint32_t mipWidth = bloomFilteredTexture->getWidth();
-        uint32_t mipHeight = bloomFilteredTexture->getHeight();
-
-        auto groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
-        auto groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
-
-        bloomShader.setInt("u_Mode", 0);
-
-        bloomShader.setInt("u_LOD", 0);
-        bloomShader.setFloat("u_Threshold", 1.0f);
-        bloomShader.setFloat("u_Knee", 0.1f);
-        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
-        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 1);
-        bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, 0);
-        bloomShader.dispatch(groupsX, groupsY, 1);
-        bloomShader.waitForMemoryBarrier();
-
-        bloomShader.setInt("u_Mode", 1);
-        uint32_t mipCount = TextureUtils::calculateMipCount(bloomFilteredTexture->getWidth(), bloomFilteredTexture->getHeight()) - 2;
-        for (int i = 1; i < mipCount; i++) {
-            mipWidth = bloomFilteredTexture->getWidthForMip(i);
-            mipHeight = bloomFilteredTexture->getHeightForMip(i);
-            groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
-            groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
-
-            bloomShader.setInt("u_LOD", i - 1);
-            bloomShader.setTexture2D(*bloomFilteredTexture, 0);
-            bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, i);
-
-            bloomShader.dispatch(groupsX, groupsY, 1);
-            bloomShader.waitForMemoryBarrier();
+//        auto& bloomShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<ComputeShader>("bloom");
+//        bloomShader.bind();
+//
+//        uint32_t mipWidth = bloomFilteredTexture->getWidth();
+//        uint32_t mipHeight = bloomFilteredTexture->getHeight();
+//
+//        auto groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
+//        auto groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
+//
+//        bloomShader.setInt("u_Mode", 0);
+//
+//        bloomShader.setInt("u_LOD", 0);
+//        bloomShader.setFloat("u_Threshold", 1.0f);
+//        bloomShader.setFloat("u_Knee", 0.1f);
+//        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+//        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 1);
+//        bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, 0);
+//        bloomShader.dispatch(groupsX, groupsY, 1);
+//        bloomShader.waitForMemoryBarrier();
+//
+//        bloomShader.setInt("u_Mode", 1);
+//        uint32_t mipCount = TextureUtils::calculateMipCount(bloomFilteredTexture->getWidth(), bloomFilteredTexture->getHeight()) - 2;
+//        for (int i = 1; i < mipCount; i++) {
+//            mipWidth = bloomFilteredTexture->getWidthForMip(i);
+//            mipHeight = bloomFilteredTexture->getHeightForMip(i);
+//            groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
+//            groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
+//
+//            bloomShader.setInt("u_LOD", i - 1);
+//            bloomShader.setTexture2D(*bloomFilteredTexture, 0);
+//            bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, i);
+//
+//            bloomShader.dispatch(groupsX, groupsY, 1);
+//            bloomShader.waitForMemoryBarrier();
 
 
 //            bloomShader.setInt("u_LOD", i);
@@ -505,7 +499,7 @@ namespace CgEngine {
 //
 //            bloomShader.dispatch(groupsX, groupsY, 1);
 //            bloomShader.waitForMemoryBarrier();
-        }
+//        }
 
 //        auto& bloomUpsampleShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("upsample");
 //        bloomUpsampleShader.bind();
@@ -562,9 +556,9 @@ namespace CgEngine {
 //            bloomShader.waitForMemoryBarrier();
 //        }
 
-        for (int i = 0; i < bloomFramebuffers.size(); i++) {
-            bloomFramebuffers[i]->bind();
-        }
+//        for (int i = 0; i < bloomFramebuffers.size(); i++) {
+//            bloomFramebuffers[i]->bind();
+//        }
     }
 
     void SceneRenderer::screenPass() {

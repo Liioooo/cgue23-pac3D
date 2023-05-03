@@ -274,7 +274,7 @@ namespace CgEngine {
     }
 
     void ComputeShader::setImage2D(Texture2D &texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level) {
-        glBindImageTexture(textureUnit, texture.getRendererId(), level, GL_FALSE, 0, static_cast<GLuint>(storageAccess), TextureUtils::getOpenGLTextureFormat(texture.getFormat()));
+        glBindImageTexture(textureUnit, texture.getRendererId(), level, GL_FALSE, 0, static_cast<GLuint>(storageAccess), TextureUtils::getOpenGLTextureFormatForImageBind(texture.getFormat()));
     }
 
     void ComputeShader::setTextureCube(TextureCube &texture, uint32_t textureUnit) {
@@ -283,6 +283,6 @@ namespace CgEngine {
     }
 
     void ComputeShader::setImageCube(TextureCube& texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level) {
-        glBindImageTexture(textureUnit, texture.getRendererId(), level, GL_TRUE, 0, static_cast<GLuint>(storageAccess), TextureUtils::getOpenGLTextureFormat(texture.getFormat()));
+        glBindImageTexture(textureUnit, texture.getRendererId(), level, GL_TRUE, 0, static_cast<GLuint>(storageAccess), TextureUtils::getOpenGLTextureFormatForImageBind(texture.getFormat()));
     }
 }

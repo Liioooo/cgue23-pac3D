@@ -8,22 +8,43 @@
 namespace CgEngine {
 
     namespace TextureUtils {
-        int getOpenGLTextureFormat(TextureFormat format) {
+        int getOpenGLTextureInternalFormat(TextureFormat format) {
             switch (format) {
-                case TextureFormat::RGB:     return GL_RGB;
-                case TextureFormat::RGBA:    return GL_RGBA;
-                case TextureFormat::Float16: return GL_RGBA16F;
-                case TextureFormat::Float32: return GL_RGBA32F;
-                case TextureFormat::Depth:   return GL_DEPTH_COMPONENT32F;
+                case TextureFormat::RGB:        return GL_RGB;
+                case TextureFormat::RGBA:       return GL_RGBA;
+                case TextureFormat::Float16A:   return GL_RGBA16F;
+                case TextureFormat::Float32A:   return GL_RGBA32F;
+                case TextureFormat::Float16:    return GL_RGB16F;
+                case TextureFormat::Float32:    return GL_RGB32F;
+                case TextureFormat::Depth:      return GL_DEPTH_COMPONENT32F;
             }
             return 0;
         }
 
-        int getTextureFormatType(TextureFormat format) {
-            if (format == TextureFormat::Float16 || format == TextureFormat::Float32 || format == TextureFormat::Depth) {
-                return GL_FLOAT;
+        int getOpenGLTextureFormatForImageBind(TextureFormat format) {
+            if (format == TextureFormat::Float32 || format == TextureFormat::Float32A) {
+                return GL_RGBA32F;
             }
-            return GL_UNSIGNED_BYTE;
+            if (format == TextureFormat::Float16 || format == TextureFormat::Float16A) {
+                return GL_RGBA16F;
+            }
+            return GL_RGBA8;
+        }
+
+        int getOpenGLTextureType(TextureFormat format) {
+            if (format == TextureFormat::RGB || format == TextureFormat::RGBA) {
+                return GL_UNSIGNED_BYTE;
+            }
+            return GL_FLOAT;
+        }
+
+        int getOpenGLTextureFormat(TextureFormat format) {
+            if (format == TextureFormat::RGBA || format == TextureFormat::Float16A || format == TextureFormat::Float32A) {
+                return GL_RGBA;
+            } else if (format == TextureFormat::Depth) {
+                return GL_DEPTH_COMPONENT;
+            }
+            return GL_RGB;
         }
 
         int getTextureWrap(TextureWrap wrap) {
@@ -78,9 +99,10 @@ namespace CgEngine {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
 
-        GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-        GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format == TextureFormat::Depth ? GL_DEPTH_COMPONENT : GL_RGBA, type, nullptr);
+        GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
+        GLenum glFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getOpenGLTextureType(format);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
     }
 
     Texture2D::Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, const void* data, MipMapFiltering mipMapFiltering, float anisotropicFiltering) : format(format), width(width), height(height) {
@@ -93,9 +115,10 @@ namespace CgEngine {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
 
-        GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-        GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format == TextureFormat::Depth ? GL_DEPTH_COMPONENT : GL_RGBA, type, data);
+        GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
+        GLenum glFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getOpenGLTextureType(format);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, glFormat, type, data);
 
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -108,11 +131,23 @@ namespace CgEngine {
         unsigned char* data;
 
         if (stbi_is_hdr(path.c_str())) {
-            data = (unsigned char*)(stbi_loadf(path.c_str(), &loadWidth, &loadHeight, &channels, 0));
-            format = TextureFormat::Float32;
+            stbi_info(path.c_str(), &loadWidth, &loadHeight, &channels);
+            if (channels <= 3) {
+                data = (unsigned char*)(stbi_loadf(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb));
+                format = TextureFormat::Float32;
+            } else {
+                data = (unsigned char*)(stbi_loadf(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb_alpha));
+                format = TextureFormat::Float32A;
+            }
         } else {
-            data = stbi_load(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb);
-            format = TextureFormat::RGB;
+            stbi_info(path.c_str(), &loadWidth, &loadHeight, &channels);
+            if (channels <= 3) {
+                data = stbi_load(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb);
+                format = TextureFormat::RGB;
+            } else {
+                data = stbi_load(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb_alpha);
+                format = TextureFormat::RGBA;
+            }
         }
 
         if (data) {
@@ -134,9 +169,9 @@ namespace CgEngine {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
 
-            GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-            GLenum type = TextureUtils::getTextureFormatType(format);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, internalFormat, type, data);
+            GLint glFormat = TextureUtils::getOpenGLTextureFormat(format);
+            GLenum type = TextureUtils::getOpenGLTextureType(format);
+            glTexImage2D(GL_TEXTURE_2D, 0, channels == 3 ? GL_SRGB : GL_SRGB_ALPHA, width, height, 0, glFormat, type, data);
 
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
@@ -149,9 +184,10 @@ namespace CgEngine {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
 
-            GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-            GLenum type = TextureUtils::getTextureFormatType(format);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, GL_RGB, type, data);
+            GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
+            GLint glFormat = TextureUtils::getOpenGLTextureFormat(format);
+            GLenum type = TextureUtils::getOpenGLTextureType(format);
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, glFormat, type, data);
 
             glGenerateMipmap(GL_TEXTURE_2D);
         }
@@ -221,9 +257,10 @@ namespace CgEngine {
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, textureWrap);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, textureWrap);
 
-        GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-        GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, width, height, count, 0, format == TextureFormat::Depth ? GL_DEPTH_COMPONENT : GL_RGBA, type, nullptr);
+        GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
+        GLenum glFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getOpenGLTextureType(format);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, width, height, count, 0, glFormat, type, nullptr);
     }
 
     Texture2DArray::~Texture2DArray() {
@@ -273,16 +310,17 @@ namespace CgEngine {
         glGenTextures(1, &id);
         glBindTexture(GL_TEXTURE_CUBE_MAP, id);
 
-        GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-        GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, width, height, 0, GL_RGB, type, nullptr);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalFormat, width, height, 0, GL_RGB, type, nullptr);
+        GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
+        GLenum glFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getOpenGLTextureType(format);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internalFormat, width, height, 0, GL_RGB, type, nullptr);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internalFormat, width, height, 0, GL_RGB, type, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internalFormat, width, height, 0, GL_RGB, type, nullptr);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internalFormat, width, height, 0, GL_RGB, type, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internalFormat, width, height, 0, glFormat, type, nullptr);
 
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_CUBE_MAP);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -298,16 +336,17 @@ namespace CgEngine {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        GLint internalFormat = TextureUtils::getOpenGLTextureFormat(format);
-        GLenum type = TextureUtils::getTextureFormatType(format);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
+        GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
+        GLenum glFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getOpenGLTextureType(format);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internalFormat, width, height, 0, glFormat, type, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internalFormat, width, height, 0, glFormat, type, data);
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internalFormat, width, height, 0, glFormat, type, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internalFormat, width, height, 0, glFormat, type, data);
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internalFormat, width, height, 0, GL_RGBA, type, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internalFormat, width, height, 0, glFormat, type, data);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internalFormat, width, height, 0, glFormat, type, data);
     }
 
     TextureCube::~TextureCube() {

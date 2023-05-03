@@ -3,7 +3,7 @@
 namespace CgEngine {
 
     enum class TextureFormat {
-        RGB, RGBA, Float16, Float32, Depth
+        RGB, RGBA, Float16A, Float32A, Float16, Float32, Depth
     };
 
     enum class TextureWrap {
@@ -15,8 +15,10 @@ namespace CgEngine {
     };
 
     namespace TextureUtils {
+        int getOpenGLTextureInternalFormat(TextureFormat format);
+        int getOpenGLTextureFormatForImageBind(TextureFormat format);
+        int getOpenGLTextureType(TextureFormat format);
         int getOpenGLTextureFormat(TextureFormat format);
-        int getTextureFormatType(TextureFormat format);
         int getTextureWrap(TextureWrap wrap);
         void setClampBorderColor(const glm::vec4& color, unsigned int textureType);
         void applyMipMapFiltering(MipMapFiltering mipMapFiltering, unsigned int textureType);
