@@ -7,7 +7,7 @@ namespace CgEngine {
         delete specification.framebuffer;
     }
 
-    RenderPassSpecification& RenderPass::getSpecification() {
+    const RenderPassSpecification& RenderPass::getSpecification() {
         return specification;
     }
 }

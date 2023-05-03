@@ -12,8 +12,10 @@ namespace CgEngine {
     Framebuffer::~Framebuffer() {
         if (!specification.screenTarget) {
             glDeleteFramebuffers(1, &id);
-            for (const auto &item: colorAttachments) {
-                glDeleteTextures(1, &item);
+            if (!specification.useExistingColorAttachment) {
+                for (const auto &item: colorAttachments) {
+                    glDeleteTextures(1, &item);
+                }
             }
             if ((specification.hasDepthStencilAttachment || specification.hasDepthAttachment) && (!specification.useExistingDepthAttachment || !specification.useExistingDepthStencilAttachment)) {
                 glDeleteTextures(1, &depthAttachment);
@@ -46,10 +48,17 @@ namespace CgEngine {
             return;
         }
 
+        if (!forceRecreate && (specification.useExistingColorAttachment || specification.colorAttachments.empty()) && ((specification.useExistingDepthAttachment || specification.useExistingDepthStencilAttachment) || !(specification.hasDepthAttachment || specification.hasDepthStencilAttachment))) {
+            return;
+        }
+
         if (id) {
             glDeleteFramebuffers(1, &id);
-            for (const auto &item: colorAttachments) {
-                glDeleteTextures(1, &item);
+            if (!specification.useExistingColorAttachment) {
+                for (const auto &item: colorAttachments) {
+                    glDeleteTextures(1, &item);
+                }
+                colorAttachments.clear();
             }
             if ((specification.hasDepthStencilAttachment || specification.hasDepthAttachment) && (!specification.useExistingDepthAttachment || !specification.useExistingDepthStencilAttachment)) {
                 glDeleteTextures(1, &depthAttachment);
@@ -61,49 +70,55 @@ namespace CgEngine {
 
         bool multisample = specification.samples > 1;
 
-        uint32_t index = 0;
-        for (const auto &format: specification.colorAttachments) {
+        CG_ASSERT(!specification.useExistingColorAttachment || specification.colorAttachments.empty(), "Already using existing Color Attachment")
+        CG_ASSERT(!(specification.hasDepthStencilAttachment && specification.hasDepthAttachment), "Framebuffer can't have 2 Depth Attachments")
+        CG_ASSERT(!(specification.hasDepthStencilAttachment || specification.hasDepthAttachment) || !(specification.useExistingDepthAttachment || specification.useExistingDepthStencilAttachment), "Already using existing Depth Attachment")
 
-            colorAttachments.push_back(0);
+        if (!specification.useExistingColorAttachment) {
+            uint32_t index = 0;
+            for (const auto &format: specification.colorAttachments) {
 
-            if (multisample) {
-                glGenTextures(1, &colorAttachments.back());
-                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, colorAttachments.back());
-                if (format == FramebufferFormat::RGBA16F) {
-                    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, specification.samples, GL_RGBA16F, specification.width, specification.height, GL_FALSE);
+                colorAttachments.push_back(0);
+
+                if (multisample) {
+                    glGenTextures(1, &colorAttachments.back());
+                    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, colorAttachments.back());
+                    if (format == FramebufferFormat::RGBA16F) {
+                        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, specification.samples, GL_RGBA16F, specification.width, specification.height, GL_FALSE);
+                    } else {
+                        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, specification.samples, GL_RGBA8, specification.width, specification.height, GL_FALSE);
+                    }
+                    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D_MULTISAMPLE, colorAttachments.back(), 0);
                 } else {
-                    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, specification.samples, GL_RGBA8, specification.width, specification.height, GL_FALSE);
-                }
-                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+                    glGenTextures(1, &colorAttachments.back());
+                    glBindTexture(GL_TEXTURE_2D, colorAttachments.back());
+                    if (format == FramebufferFormat::RGBA16F) {
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, specification.width, specification.height, 0, GL_RGBA, GL_FLOAT, nullptr);
+                    } else {
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, specification.width, specification.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+                    }
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    glBindTexture(GL_TEXTURE_2D, 0);
 
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D_MULTISAMPLE, colorAttachments.back(), 0);
-            } else {
-                glGenTextures(1, &colorAttachments.back());
-                glBindTexture(GL_TEXTURE_2D, colorAttachments.back());
-                if (format == FramebufferFormat::RGBA16F) {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, specification.width, specification.height, 0, GL_RGBA, GL_FLOAT, nullptr);
-                } else {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, specification.width, specification.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+                    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, colorAttachments.back(), 0);
                 }
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glBindTexture(GL_TEXTURE_2D, 0);
 
-                glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, colorAttachments.back(), 0);
+                index++;
             }
-
-            index++;
+        } else {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, specification.existingColorAttachment, specification.existingColorAttachmentLevel);
+            colorAttachments.push_back(specification.existingColorAttachment);
         }
 
-        if (specification.colorAttachments.empty()) {
+        if (specification.colorAttachments.empty() && !specification.useExistingColorAttachment) {
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
         }
-
-        CG_ASSERT(!(specification.hasDepthStencilAttachment && specification.hasDepthAttachment), "Framebuffer can't have 2 Depth Attachments")
-        CG_ASSERT(!(specification.hasDepthStencilAttachment || specification.hasDepthAttachment) || !(specification.useExistingDepthAttachment || specification.useExistingDepthStencilAttachment), "Already using existing Depth Attachment")
 
         if (specification.hasDepthStencilAttachment) {
             if (multisample) {
@@ -144,17 +159,66 @@ namespace CgEngine {
         }
 
         if (specification.useExistingDepthStencilAttachment) {
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, specification.existingDepthAttachment, 0);
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, specification.existingDepthAttachment, specification.existingDepthAttachmentLevel);
             depthAttachment = specification.existingDepthAttachment;
         }
 
         if (specification.useExistingDepthAttachment) {
-            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, specification.existingDepthAttachment, 0);
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, specification.existingDepthAttachment, specification.existingDepthAttachmentLevel);
             depthAttachment = specification.existingDepthAttachment;
         }
 
         CG_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Framebuffer::setColorAttachment(uint32_t attachment, uint32_t level) {
+        glBindFramebuffer(GL_FRAMEBUFFER, id);
+        if (!specification.useExistingColorAttachment) {
+            for (const auto &item: colorAttachments) {
+                glDeleteTextures(1, &item);
+            }
+            specification.colorAttachments.clear();
+        }
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, attachment, level);
+        specification.useExistingColorAttachment = true;
+        specification.existingColorAttachment = attachment;
+        specification.existingColorAttachmentLevel = level;
+        colorAttachments.clear();
+        colorAttachments.push_back(attachment);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Framebuffer::setDepthAttachment(uint32_t attachment, uint32_t level) {
+        glBindFramebuffer(GL_FRAMEBUFFER, id);
+        if (specification.hasDepthStencilAttachment || specification.hasDepthAttachment) {
+            specification.hasDepthStencilAttachment = false;
+            specification.hasDepthAttachment = false;
+            glDeleteTextures(1, &depthAttachment);
+        }
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, attachment, level);
+        specification.existingDepthAttachmentLevel = level;
+        depthAttachment = attachment;
+        specification.existingDepthAttachment = attachment;
+        specification.useExistingDepthAttachment = true;
+        specification.useExistingDepthStencilAttachment = false;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void Framebuffer::setDepthStencilAttachment(uint32_t attachment, uint32_t level) {
+        glBindFramebuffer(GL_FRAMEBUFFER, id);
+        if (specification.hasDepthStencilAttachment || specification.hasDepthAttachment) {
+            specification.hasDepthStencilAttachment = false;
+            specification.hasDepthAttachment = false;
+            glDeleteTextures(1, &depthAttachment);
+        }
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, attachment, level);
+        specification.existingDepthAttachmentLevel = level;
+        depthAttachment = attachment;
+        specification.existingDepthAttachment = attachment;
+        specification.useExistingDepthStencilAttachment = true;
+        specification.useExistingDepthAttachment = false;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -170,7 +234,7 @@ namespace CgEngine {
         return depthAttachment;
     }
 
-    FramebufferSpecification &Framebuffer::getSpecification() {
+    const FramebufferSpecification& Framebuffer::getSpecification() {
         return specification;
     }
 }

@@ -215,7 +215,7 @@ namespace CgEngine {
             needsResize = false;
 
             preDepthRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
-            geometryRenderPass->getSpecification().framebuffer->getSpecification().existingDepthAttachment = preDepthRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId();
+            geometryRenderPass->getSpecification().framebuffer->setDepthAttachment(preDepthRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId(), 0);
             geometryRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
             screenRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
 

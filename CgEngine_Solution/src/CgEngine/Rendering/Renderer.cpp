@@ -123,13 +123,13 @@ namespace CgEngine {
         CG_ASSERT(currentRenderPass == nullptr, "There already is an active RenderPass!")
 
         currentRenderPass = &renderPass;
-        RenderPassSpecification& spec = renderPass.getSpecification();
+        const RenderPassSpecification& spec = renderPass.getSpecification();
 
         spec.shader->bind();
         spec.framebuffer->bind();
 
         if (spec.clearColorBuffer) {
-            glm::vec4& clearColor = spec.framebuffer->getSpecification().clearColor;
+            const glm::vec4& clearColor = spec.framebuffer->getSpecification().clearColor;
             glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
             glClear(GL_COLOR_BUFFER_BIT);
         }

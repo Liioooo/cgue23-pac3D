@@ -10,12 +10,16 @@ namespace CgEngine {
         uint32_t width;
         uint32_t height;
         glm::vec4 clearColor;
-        bool hasDepthStencilAttachment = true;
-        bool hasDepthAttachment = false;
-        bool useExistingDepthStencilAttachment = false;
-        bool useExistingDepthAttachment = false;
+        bool hasDepthStencilAttachment = true; // creates a new Texture and attaches it, if true, else does nothing
+        bool hasDepthAttachment = false; // creates a new Texture and attaches it, if true, else does nothing
+        bool useExistingDepthStencilAttachment = false; // attaches 'existingDepthAttachment' as DepthStencilAttachment
+        bool useExistingDepthAttachment = false; // attaches 'existingDepthAttachment' as DepthAttachment
         uint32_t existingDepthAttachment;
-        std::vector<FramebufferFormat> colorAttachments;
+        uint32_t existingDepthAttachmentLevel = 0;
+        std::vector<FramebufferFormat> colorAttachments; // creates new Textures and attaches them
+        bool useExistingColorAttachment = false; // attaches 'existingColorAttachment' as ColorAttachment0
+        uint32_t existingColorAttachment;
+        uint32_t existingColorAttachmentLevel = 0;
         uint32_t samples = 1;
         bool screenTarget = false;
     };
@@ -28,10 +32,13 @@ namespace CgEngine {
         void bind();
         void unbind();
         void resize(uint32_t width, uint32_t height, bool forceRecreate);
+        void setColorAttachment(uint32_t attachment, uint32_t level);
+        void setDepthAttachment(uint32_t attachment, uint32_t level);
+        void setDepthStencilAttachment(uint32_t attachment, uint32_t level);
         uint32_t getRendererId() const;
         uint32_t getColorAttachmentRendererId(size_t index) const;
         uint32_t getDepthAttachmentRendererId() const;
-        FramebufferSpecification& getSpecification();
+        const FramebufferSpecification& getSpecification();
 
     private:
         FramebufferSpecification specification;

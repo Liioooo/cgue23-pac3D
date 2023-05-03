@@ -114,7 +114,7 @@ namespace CgEngine {
 
             for(uint32_t i = 0; i < actorCount; i++) {
                 auto* actor = static_cast<PhysicsActor*>(activeActors[i]->userData);
-                if (actor  && actor->getPhysicsActorType() == PhysicsActorType::Actor && !actor->isSleeping()) {
+                if (actor && actor->getPhysicsActorType() == PhysicsActorType::Actor && !actor->isSleeping()) {
                     actor->updateTransforms();
                 }
             }

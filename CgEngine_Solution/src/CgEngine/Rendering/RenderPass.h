@@ -35,7 +35,7 @@ namespace CgEngine {
         explicit RenderPass(RenderPassSpecification spec);
         ~RenderPass();
 
-        RenderPassSpecification& getSpecification();
+        const RenderPassSpecification& getSpecification();
 
     private:
         RenderPassSpecification specification;
