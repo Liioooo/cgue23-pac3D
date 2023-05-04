@@ -12,6 +12,6 @@ uniform float u_Intensity;
 out vec4 o_FragColor;
 
 void main() {
-    o_FragColor = textureLod(u_Texture, fs_in.TexCoord, u_Lod) * u_Intensity;
+    o_FragColor = clamp(textureLod(u_Texture, fs_in.TexCoord, u_Lod) * u_Intensity, vec4(0.0f), vec4(10.0f));
     o_FragColor.a = 1.0f;
 }

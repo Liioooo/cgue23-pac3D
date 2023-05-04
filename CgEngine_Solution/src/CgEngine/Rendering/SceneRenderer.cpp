@@ -90,8 +90,48 @@ namespace CgEngine {
             skyboxMaterial = new Material("skyboxMaterial");
         }
         {
-            bloomTexture = new Texture2D(TextureFormat::Float32, viewportWidth / 2, viewportHeight / 2, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-            bloomTexture->generateMipMaps();
+            float bloomWidth = static_cast<float>(viewportWidth) / 2.0f;
+            float bloomHeight = static_cast<float>(viewportHeight) / 2.0f;
+            for (auto & bloomTexture : bloomTextures) {
+                bloomTexture = new Texture2D(TextureFormat::Float32, static_cast<uint32_t>(bloomWidth), static_cast<uint32_t>(bloomHeight), TextureWrap::Clamp, MipMapFiltering::Bilinear);
+                bloomWidth /= 2.0f;
+                bloomHeight /= 2.0f;
+            }
+
+            FramebufferSpecification bloomFramebufferSpec;
+            bloomFramebufferSpec.width = viewportWidth / 2;
+            bloomFramebufferSpec.height = viewportHeight / 2;
+            bloomFramebufferSpec.clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+            bloomFramebufferSpec.hasDepthStencilAttachment = false;
+            bloomFramebufferSpec.useExistingColorAttachment = true;
+            bloomFramebufferSpec.existingColorAttachment = bloomTextures[0]->getRendererId();
+            bloomFramebufferSpec.existingColorAttachmentLevel = 0;
+
+            auto* framebuffer = new Framebuffer(bloomFramebufferSpec);
+
+            RenderPassSpecification bloomDownSamplePassSpec;
+            bloomDownSamplePassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("bloomDownSample");
+            bloomDownSamplePassSpec.clearColorBuffer = true;
+            bloomDownSamplePassSpec.clearDepthBuffer = false;
+            bloomDownSamplePassSpec.depthTest = false;
+            bloomDownSamplePassSpec.depthWrite = false;
+            bloomDownSamplePassSpec.framebuffer = framebuffer;
+
+            bloomDownSamplePass = new RenderPass(bloomDownSamplePassSpec);
+
+            RenderPassSpecification bloomUpSamplePassSpec;
+            bloomUpSamplePassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("bloomUpSample");
+            bloomUpSamplePassSpec.clearColorBuffer = false;
+            bloomUpSamplePassSpec.clearDepthBuffer = false;
+            bloomUpSamplePassSpec.depthTest = false;
+            bloomUpSamplePassSpec.depthWrite = false;
+            bloomUpSamplePassSpec.useBlending = true;
+            bloomUpSamplePassSpec.blendingEquation = BlendingEquation::Add;
+            bloomUpSamplePassSpec.srcBlendingFunction = BlendingFunction::One;
+            bloomUpSamplePassSpec.destBlendingFunction = BlendingFunction::One;
+            bloomUpSamplePassSpec.framebuffer = framebuffer;
+
+            bloomUpSamplePass = new RenderPass(bloomUpSamplePassSpec);
         }
         {
             RenderPassSpecification physicsCollidersRenderPassSpec;
@@ -155,6 +195,7 @@ namespace CgEngine {
 
             screenMaterial = new Material("screenMaterial");
             screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+            screenMaterial->setTexture2D("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
         }
 
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
@@ -167,6 +208,8 @@ namespace CgEngine {
         delete preDepthRenderPass;
         delete geometryRenderPass;
         delete skyboxRenderPass;
+        delete bloomDownSamplePass;
+        delete bloomUpSamplePass;
         delete physicsCollidersRenderPass;
         delete normalsDebugRenderPass;
         delete debugLinesRenderPass;
@@ -179,7 +222,10 @@ namespace CgEngine {
         delete emptyMaterial;
 
         delete dirShadowMaps;
-        delete bloomTexture;
+
+        for (int i = 0; i < bloomTextures.size(); i++) {
+            delete bloomTextures[i];
+        }
 
         delete ubCameraData;
         delete ubLightData;
@@ -209,26 +255,21 @@ namespace CgEngine {
             needsResize = false;
 
             preDepthRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
-            geometryRenderPass->getSpecification().framebuffer->setDepthAttachment(preDepthRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId(), 0);
             geometryRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
+            geometryRenderPass->getSpecification().framebuffer->setDepthAttachment(preDepthRenderPass->getSpecification().framebuffer->getDepthAttachmentRendererId(), 0, viewportWidth, viewportHeight);
             screenRenderPass->getSpecification().framebuffer->resize(viewportWidth, viewportHeight, false);
 
-            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+            float bloomWidth = static_cast<float>(viewportWidth) / 2.0f;
+            float bloomHeight = static_cast<float>(viewportHeight) / 2.0f;
+            for (int i = 0; i < bloomTextures.size(); i++) {
+                delete bloomTextures[i];
+                bloomTextures[i] = new Texture2D(TextureFormat::Float32, static_cast<uint32_t>(bloomWidth), static_cast<uint32_t>(bloomHeight), TextureWrap::Clamp, MipMapFiltering::Bilinear);
+                bloomWidth /= 2.0f;
+                bloomHeight /= 2.0f;
+            }
 
-//            delete bloomFilteredTexture;
-//            bloomFilteredTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-//            bloomFilteredTexture->generateMipMaps();
-//
-//            delete bloomDownsampleStagingTexture;
-//            bloomDownsampleStagingTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-//            bloomDownsampleStagingTexture->generateMipMaps();
-//
-//            delete bloomTexture;
-//            bloomTexture = new Texture2D(TextureFormat::Float32, viewportWidth, viewportHeight, TextureWrap::Clamp, MipMapFiltering::Bilinear);
-//            bloomTexture->generateMipMaps();
-//
-//            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
-//            screenMaterial->setTexture2D("u_BloomTexture", *bloomFilteredTexture, 1);
+            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+            screenMaterial->setTexture2D("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
         }
 
         UBCameraData cameraData{};
@@ -236,6 +277,9 @@ namespace CgEngine {
         cameraData.view = glm::inverse(cameraTransform);
         cameraData.viewProjection = cameraData.projection * cameraData.view;
         cameraData.position = cameraTransform[3];
+        cameraData.exposure = camera.getExposure();
+        cameraData.bloomIntensity = camera.getBloomIntensity();
+        cameraData.bloomThreshold = camera.getBloomThreshold();
         ubCameraData->setData(cameraData);
 
         UBLightData lightData{};
@@ -301,7 +345,9 @@ namespace CgEngine {
         if (applicationOptions.debugRenderLines) {
             debugLinesPass();
         }
-//        bloomPass();
+        if (applicationOptions.enableBloom) {
+            bloomPass();
+        }
         screenPass();
 
         drawCommandQueue.clear();
@@ -457,108 +503,33 @@ namespace CgEngine {
     }
 
     void SceneRenderer::bloomPass() {
-//        auto& bloomShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<ComputeShader>("bloom");
-//        bloomShader.bind();
-//
-//        uint32_t mipWidth = bloomFilteredTexture->getWidth();
-//        uint32_t mipHeight = bloomFilteredTexture->getHeight();
-//
-//        auto groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
-//        auto groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
-//
-//        bloomShader.setInt("u_Mode", 0);
-//
-//        bloomShader.setInt("u_LOD", 0);
-//        bloomShader.setFloat("u_Threshold", 1.0f);
-//        bloomShader.setFloat("u_Knee", 0.1f);
-//        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
-//        bloomShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 1);
-//        bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, 0);
-//        bloomShader.dispatch(groupsX, groupsY, 1);
-//        bloomShader.waitForMemoryBarrier();
-//
-//        bloomShader.setInt("u_Mode", 1);
-//        uint32_t mipCount = TextureUtils::calculateMipCount(bloomFilteredTexture->getWidth(), bloomFilteredTexture->getHeight()) - 2;
-//        for (int i = 1; i < mipCount; i++) {
-//            mipWidth = bloomFilteredTexture->getWidthForMip(i);
-//            mipHeight = bloomFilteredTexture->getHeightForMip(i);
-//            groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
-//            groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
-//
-//            bloomShader.setInt("u_LOD", i - 1);
-//            bloomShader.setTexture2D(*bloomFilteredTexture, 0);
-//            bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, i);
-//
-//            bloomShader.dispatch(groupsX, groupsY, 1);
-//            bloomShader.waitForMemoryBarrier();
+        auto& downSampleShader = *bloomDownSamplePass->getSpecification().shader;
 
+        bloomDownSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[0]->getRendererId(), 0, viewportWidth / 2, viewportHeight / 2);
+        Renderer::beginRenderPass(*bloomDownSamplePass);
+        downSampleShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+        downSampleShader.setBool("u_UseThreshold", true);
+        Renderer::renderFullScreenQuad(*emptyMaterial);
+        Renderer::endRenderPass();
 
-//            bloomShader.setInt("u_LOD", i);
-//            bloomShader.setTexture2D(*bloomDownsampleStagingTexture, 0);
-//            bloomShader.setImage2D(*bloomFilteredTexture, 2, ShaderStorageAccess::WriteOnly, i);
-//
-//            bloomShader.dispatch(groupsX, groupsY, 1);
-//            bloomShader.waitForMemoryBarrier();
-//        }
+        downSampleShader.setBool("u_UseThreshold", false);
+        for (uint32_t i = 0; i < bloomTextures.size() - 1; ++i) {
+            bloomDownSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[i + 1]->getRendererId(), 0, bloomTextures[i + 1]->getWidth(), bloomTextures[i + 1]->getHeight());
+            Renderer::beginRenderPass(*bloomDownSamplePass);
+            downSampleShader.setTexture2D(bloomTextures[i]->getRendererId(), 0);
+            Renderer::renderFullScreenQuad(*emptyMaterial);
+            Renderer::endRenderPass();
+        }
 
-//        auto& bloomUpsampleShader = *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("upsample");
-//        bloomUpsampleShader.bind();
-//
-//        uint32_t mFBO;
-//        glGenFramebuffers(1, &mFBO);
-//        glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-//
-//        glEnable(GL_BLEND);
-//        glBlendFunc(GL_ONE, GL_ONE);
-//        glBlendEquation(GL_FUNC_ADD);
-//
-//        for (int i = mipCount - 1; i > 0; i--) {
-//            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomFilteredTexture->getRendererId(), i - 1);
-//            glViewport(0, 0, bloomFilteredTexture->getWidthForMip(i - 1), bloomFilteredTexture->getHeightForMip(i - 1));
-//
-//            bloomUpsampleShader.setInt("u_LOD", i);
-//            bloomFilteredTexture->bind(0);
-//
-//            Renderer::rendererData.quadVAO->bind();
-//            glDrawElements(GL_TRIANGLES, Renderer::rendererData.quadVAO->getIndexCount(), GL_UNSIGNED_INT, nullptr);
-//        }
-//
-//        glDisable(GL_BLEND);
-//        glDeleteFramebuffers(1, &mFBO);
-//
-//
-//        bloomShader.setInt("u_Mode", 2);
-//        mipWidth = bloomFilteredTexture->getWidthForMip(mipCount - 2);
-//        mipHeight = bloomFilteredTexture->getHeightForMip(mipCount - 2);
-//        groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
-//        groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
-//
-//        bloomShader.setInt("u_LOD", mipCount - 2);
-//        bloomShader.setTexture2D(*bloomFilteredTexture, 0);
-//        bloomShader.setImage2D(*bloomTexture, 2, ShaderStorageAccess::WriteOnly, mipCount - 2);
-//
-//        bloomShader.dispatch(groupsX, groupsY, 1);
-//        bloomShader.waitForMemoryBarrier();
-//
-//        bloomShader.setInt("u_Mode", 3);
-//        for (int i = mipCount - 3; i >= 0; i--) {
-//            mipWidth = bloomFilteredTexture->getWidthForMip(i);
-//            mipHeight = bloomFilteredTexture->getHeightForMip(i);
-//            groupsX = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipWidth) / 4.0f));
-//            groupsY = static_cast<uint32_t>(glm::ceil(static_cast<float>(mipHeight) / 4.0f));
-//
-//            bloomShader.setInt("u_LOD", i);
-//            bloomShader.setTexture2D(*bloomFilteredTexture, 0);
-//            bloomShader.setTexture2D(*bloomTexture, 1);
-//            bloomShader.setImage2D(*bloomTexture, 2, ShaderStorageAccess::WriteOnly, i);
-//
-//            bloomShader.dispatch(groupsX, groupsY, 1);
-//            bloomShader.waitForMemoryBarrier();
-//        }
+        auto& upSampleShader = *bloomUpSamplePass->getSpecification().shader;
 
-//        for (int i = 0; i < bloomFramebuffers.size(); i++) {
-//            bloomFramebuffers[i]->bind();
-//        }
+        for (uint32_t i = bloomTextures.size() - 1; i > 0; i--) {
+            bloomUpSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[i - 1]->getRendererId(), 0, bloomTextures[i - 1]->getWidth(), bloomTextures[i - 1]->getHeight());
+            Renderer::beginRenderPass(*bloomUpSamplePass);
+            upSampleShader.setTexture2D(bloomTextures[i]->getRendererId(), 0);
+            Renderer::renderFullScreenQuad(*emptyMaterial);
+            Renderer::endRenderPass();
+        }
     }
 
     void SceneRenderer::screenPass() {

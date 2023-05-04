@@ -37,6 +37,8 @@ namespace CgEngine {
         RenderPass* geometryRenderPass;
         RenderPass* screenRenderPass;
         RenderPass* skyboxRenderPass;
+        RenderPass* bloomDownSamplePass;
+        RenderPass* bloomUpSamplePass;
         RenderPass* physicsCollidersRenderPass;
         RenderPass* normalsDebugRenderPass;
         RenderPass* debugLinesRenderPass;
@@ -47,7 +49,7 @@ namespace CgEngine {
         Material* emptyMaterial;
 
         Texture2DArray* dirShadowMaps;
-        Texture2D* bloomTexture;
+        std::array<Texture2D*, 7> bloomTextures;
 
         void shadowMapPass();
         void preDepthPass();
@@ -67,7 +69,10 @@ namespace CgEngine {
             glm::mat4 projection;
             glm::mat4 view;
             glm::vec3 position;
-            float _padding0_;
+            float exposure;
+            float bloomIntensity;
+            float bloomThreshold;
+            glm::vec2 _padding_;
         };
         UniformBuffer<UBCameraData>* ubCameraData;
 

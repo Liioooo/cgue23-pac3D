@@ -20,6 +20,7 @@ namespace CgEngine {
 
         float anisotropicFiltering;
         uint32_t shadowMapResolution;
+        bool enableBloom;
     };
 
     class Application {

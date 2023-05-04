@@ -38,6 +38,10 @@ namespace CgEngine {
         static DepthCompareOperator depthCompareOperator;
         static bool depthTest;
         static bool depthWrite;
+        static bool useBlending;
+        static BlendingEquation blendingEquation;
+        static BlendingFunction srcBlendingFunction;
+        static BlendingFunction destBlendingFunction;
 
         static Texture2D* whiteTexture;
         static Texture2D* brdfLUT;

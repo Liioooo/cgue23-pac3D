@@ -12,6 +12,10 @@ namespace CgEngine {
     DepthCompareOperator Renderer::depthCompareOperator;
     bool Renderer::depthTest;
     bool Renderer::depthWrite;
+    bool Renderer::useBlending;
+    BlendingEquation Renderer::blendingEquation;
+    BlendingFunction Renderer::srcBlendingFunction;
+    BlendingFunction Renderer::destBlendingFunction;
     Texture2D* Renderer::whiteTexture;
     Texture2D* Renderer::brdfLUT;
     TextureCube* Renderer::blackCubeTexture;
@@ -95,6 +99,14 @@ namespace CgEngine {
         glDepthMask(GL_TRUE);
         depthCompareOperator = DepthCompareOperator::Less;
         glDepthFunc(static_cast<GLint>(depthCompareOperator));
+
+        useBlending = false;
+        glDisable(GL_BLEND);
+        blendingEquation = BlendingEquation::Add;
+        glBlendEquation(static_cast<GLint>(blendingEquation));
+        srcBlendingFunction = BlendingFunction::SrcAlpha;
+        destBlendingFunction = BlendingFunction::OneMinusSrcAlpha;
+        glBlendFunc(static_cast<GLint>(srcBlendingFunction), static_cast<GLint>(destBlendingFunction));
 
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
@@ -182,6 +194,23 @@ namespace CgEngine {
         if (depthCompareOperator != spec.depthCompareOperator) {
             depthCompareOperator = spec.depthCompareOperator;
             glDepthFunc(static_cast<GLint>(depthCompareOperator));
+        }
+        if (useBlending != spec.useBlending) {
+            useBlending = spec.useBlending;
+            if (useBlending) {
+                glEnable(GL_BLEND);
+            } else {
+                glDisable(GL_BLEND);
+            }
+        }
+        if (blendingEquation != spec.blendingEquation) {
+            blendingEquation = spec.blendingEquation;
+            glBlendEquation(static_cast<GLint>(blendingEquation));
+        }
+        if (srcBlendingFunction != spec.srcBlendingFunction || destBlendingFunction != spec.destBlendingFunction) {
+            srcBlendingFunction = spec.srcBlendingFunction;
+            destBlendingFunction = spec.destBlendingFunction;
+            glBlendFunc(static_cast<GLint>(srcBlendingFunction), static_cast<GLint>(destBlendingFunction));
         }
     }
 

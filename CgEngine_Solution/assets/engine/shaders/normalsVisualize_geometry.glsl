@@ -8,6 +8,9 @@ layout (binding = 0, std140) uniform CameraData {
     mat4 projection;
     mat4 view;
     vec3 position;
+    float exposure;
+    float bloomIntensity;
+    float bloomThreshold;
 } u_CameraData;
 
 in VS_OUT {

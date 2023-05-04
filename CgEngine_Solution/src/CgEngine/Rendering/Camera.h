@@ -23,6 +23,15 @@ namespace CgEngine {
         float getOrthographicFar() const;
         void setOrthographicFar(float orthographicFar);
 
+        float getExposure() const;
+        void setExposure(float exposure);
+
+        float getBloomIntensity() const;
+        void setBloomIntensity(float intensity);
+
+        float getBloomThreshold() const;
+        void setBloomThreshold(float threshold);
+
         float getAspectRatio() const;
 
         const glm::mat4& getProjectionMatrix() const;
@@ -39,6 +48,11 @@ namespace CgEngine {
         float orthographicSize = 10.0f;
         float orthographicNear = -1.0f;
         float orthographicFar = 1.0f;
+
+        float exposure = 1.0f;
+
+        float bloomIntensity = 1.0f;
+        float bloomThreshold = 0.0f;
 
         float aspectRatio = 1;
 

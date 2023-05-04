@@ -61,8 +61,32 @@ namespace CgEngine {
     }
 
     void Camera::setOrthographicFar(float orthographicFar) {
-        Camera::orthographicFar = orthographicFar;
+        this->orthographicFar = orthographicFar;
         calculateProjection();
+    }
+
+    float Camera::getExposure() const {
+        return exposure;
+    }
+
+    void Camera::setExposure(float exposure) {
+        this->exposure = exposure;
+    }
+
+    float Camera::getBloomIntensity() const {
+        return bloomIntensity;
+    }
+
+    void Camera::setBloomIntensity(float intensity) {
+        this->bloomIntensity = intensity;
+    }
+
+    float Camera::getBloomThreshold() const {
+        return bloomThreshold;
+    }
+
+    void Camera::setBloomThreshold(float threshold) {
+        this->bloomThreshold = threshold;
     }
 
     float Camera::getAspectRatio() const {

@@ -95,6 +95,10 @@ namespace CgEngine {
             node.attribute("fov").as_float(60.0f),
             node.attribute("ortho-size").as_float(10.0f),
             node.attribute("primary").as_bool(false),
+            node.attribute("exposure").as_float(1.0f),
+            node.attribute("bloom-intensity").as_float(1.0f),
+            node.attribute("bloom-threshold").as_float(0.2f),
+
         };
         scene->attachComponent<CameraComponent>(entity, params);
     }

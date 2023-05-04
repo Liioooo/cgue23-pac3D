@@ -7,6 +7,9 @@ namespace CgEngine {
 
         isPrimaryCam = params.isPrimary;
         camera.setViewportSize(scene.getViewportWidth(), scene.getViewportHeight());
+        camera.setExposure(params.exposure);
+        camera.setBloomIntensity(params.bloomIntensity);
+        camera.setBloomThreshold(params.bloomThreshold);
 
         if (params.projection == "perspective") {
             camera.setProjectionType(CameraProjectionType::Perspective);

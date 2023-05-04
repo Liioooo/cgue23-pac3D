@@ -32,9 +32,9 @@ namespace CgEngine {
         void bind();
         void unbind();
         void resize(uint32_t width, uint32_t height, bool forceRecreate);
-        void setColorAttachment(uint32_t attachment, uint32_t level);
-        void setDepthAttachment(uint32_t attachment, uint32_t level);
-        void setDepthStencilAttachment(uint32_t attachment, uint32_t level);
+        void setColorAttachment(uint32_t attachment, uint32_t level, uint32_t width, uint32_t height);
+        void setDepthAttachment(uint32_t attachment, uint32_t level, uint32_t width, uint32_t height);
+        void setDepthStencilAttachment(uint32_t attachment, uint32_t level, uint32_t width, uint32_t height);
         uint32_t getRendererId() const;
         uint32_t getColorAttachmentRendererId(size_t index) const;
         uint32_t getDepthAttachmentRendererId() const;

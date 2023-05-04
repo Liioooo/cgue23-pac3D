@@ -9,7 +9,7 @@
     <Entity>
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            <SkyboxComponent hdri-path="blue_lagoon_night_2k.hdr" lod="0.2" intensity="0.1" />
+            <SkyboxComponent hdri-path="kloppenheim_02_2k.hdr" lod="0.1" intensity="0.01" />
         </Components>
     </Entity>
     <Entity>
@@ -269,13 +269,14 @@
         <Entity>
             <Components>
                 <TransformComponent position="0 0 5" rotation="0 0 0" scale="1 1 1" />
-                <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="80" />
+                <CameraComponent primary="true" projection="perspective" near="0.1" far="500" fov="80" exposure="1.0" bloom-threshold="0.6" bloom-intensity="0.6" />
             </Components>
         </Entity>
         <Entity>
             <Components>
                 <TransformComponent position="0 0 0" rotation="0 0 0" scale="0.5 0.4 0.5" />
-                <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" />
+                <MeshRendererComponent mesh="CG_CapsuleMesh_1_1" material="Player" />
+                <PointLightComponent color="#e9f022" intensity="1" radius="4" falloff="0.6" />
             </Components>
         </Entity>
     </Entity>

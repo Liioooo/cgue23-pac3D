@@ -12,6 +12,9 @@ namespace CgEngine {
         float cfov;
         float orthoSize;
         bool isPrimary;
+        float exposure;
+        float bloomIntensity;
+        float bloomThreshold;
     };
 
     class CameraComponent : public Component {

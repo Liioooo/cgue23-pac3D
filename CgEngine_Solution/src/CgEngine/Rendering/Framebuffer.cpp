@@ -173,7 +173,7 @@ namespace CgEngine {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Framebuffer::setColorAttachment(uint32_t attachment, uint32_t level) {
+    void Framebuffer::setColorAttachment(uint32_t attachment, uint32_t level, uint32_t width, uint32_t height) {
         glBindFramebuffer(GL_FRAMEBUFFER, id);
         if (!specification.useExistingColorAttachment) {
             for (const auto &item: colorAttachments) {
@@ -181,16 +181,18 @@ namespace CgEngine {
             }
             specification.colorAttachments.clear();
         }
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, attachment, level);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, attachment, level);
         specification.useExistingColorAttachment = true;
         specification.existingColorAttachment = attachment;
         specification.existingColorAttachmentLevel = level;
+        specification.width = width;
+        specification.height = height;
         colorAttachments.clear();
         colorAttachments.push_back(attachment);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Framebuffer::setDepthAttachment(uint32_t attachment, uint32_t level) {
+    void Framebuffer::setDepthAttachment(uint32_t attachment, uint32_t level, uint32_t width, uint32_t height) {
         glBindFramebuffer(GL_FRAMEBUFFER, id);
         if (specification.hasDepthStencilAttachment || specification.hasDepthAttachment) {
             specification.hasDepthStencilAttachment = false;
@@ -203,10 +205,12 @@ namespace CgEngine {
         specification.existingDepthAttachment = attachment;
         specification.useExistingDepthAttachment = true;
         specification.useExistingDepthStencilAttachment = false;
+        specification.width = width;
+        specification.height = height;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void Framebuffer::setDepthStencilAttachment(uint32_t attachment, uint32_t level) {
+    void Framebuffer::setDepthStencilAttachment(uint32_t attachment, uint32_t level, uint32_t width, uint32_t height) {
         glBindFramebuffer(GL_FRAMEBUFFER, id);
         if (specification.hasDepthStencilAttachment || specification.hasDepthAttachment) {
             specification.hasDepthStencilAttachment = false;
@@ -219,6 +223,8 @@ namespace CgEngine {
         specification.existingDepthAttachment = attachment;
         specification.useExistingDepthStencilAttachment = true;
         specification.useExistingDepthAttachment = false;
+        specification.width = width;
+        specification.height = height;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

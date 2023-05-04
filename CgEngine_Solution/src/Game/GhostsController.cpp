@@ -255,6 +255,7 @@ namespace Game {
             attachComponent<CgEngine::CapsuleColliderComponent>(g.entity, CgEngine::CapsuleColliderComponentParams{0.8f, 0.4f, glm::vec3(0.0f), false, "default-physics-material"});
             attachComponent<CgEngine::ScriptComponent>(g.entity, CgEngine::ScriptComponentParams{"singleGhostScript"});
             attachComponent<CgEngine::RigidBodyComponent>(g.entity, rigidBodyParams);
+            attachComponent<CgEngine::PointLightComponent>(g.entity, CgEngine::PointLightComponentParams{glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 4.0f, 0.8f});
         }
     }
 

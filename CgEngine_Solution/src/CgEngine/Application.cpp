@@ -31,6 +31,7 @@ namespace CgEngine {
         applicationOptions.debugRenderLines = iniReader->GetBoolean("application", "debug_render_lines", false);
         applicationOptions.anisotropicFiltering = static_cast<float>(iniReader->GetReal("application", "anisotropic_filtering", 1.0));
         applicationOptions.shadowMapResolution = iniReader->GetInteger("application", "shadow_map_resolution", 2048);
+        applicationOptions.enableBloom = iniReader->GetBoolean("application", "enable_bloom", true);
 
         WindowSpecification windowSpecification;
         windowSpecification.width = iniReader->GetInteger("window", "width", 1280);
