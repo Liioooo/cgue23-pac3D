@@ -5,15 +5,42 @@
 #include "Asserts.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "glad/glad.h"
+#include <regex>
 
 namespace CgEngine {
 
     namespace ShaderUtils {
-        static std::string loadShaderSourceCode(const std::string& name, const std::string& type) {
-            if (!FileSystem::checkFileExists(FileSystem::getAsEnginePath("shaders/" + name + "_" + type + ".glsl"))) {
+        static std::string loadShaderSourceCodeWithType(const std::string& name, const std::string& type) {
+            return preprocessShaderCode(ShaderUtils::loadShaderSourceCode(name + "_" + type + ".glsl", false));
+        }
+
+        static std::string loadShaderSourceCode(const std::string& name, bool useCache) {
+            if (!FileSystem::checkFileExists(FileSystem::getAsEnginePath("shaders/" + name))) {
                 return "";
             }
-            return FileSystem::readFileToString(FileSystem::getAsEnginePath("shaders/" + name + "_" + type + ".glsl"));
+            return FileSystem::readFileToString(FileSystem::getAsEnginePath("shaders/" + name));
+        }
+
+        static std::string preprocessShaderCode(std::string code) {
+            const auto r = std::regex("#include\\s+\"(.*)\"");
+
+            std::vector<std::pair<std::string, std::string>> results;
+
+            std::string current = code;
+
+            std::smatch matches;
+            while (std::regex_search(current, matches, r)) {
+                results.emplace_back(matches[0], matches[1]);
+                current = matches.suffix();
+            }
+
+            for (const auto& result: results) {
+                std::string importCode = ShaderUtils::loadShaderSourceCode(result.second, true);
+                CG_ASSERT(!importCode.empty(), "Unable to load Shader: " + result.second)
+                code.replace(code.find(result.first), result.first.length(), importCode);
+            }
+
+            return code;
         }
 
         static void checkErrors(uint32_t id, const std::string &type) {
@@ -97,9 +124,9 @@ namespace CgEngine {
     }
 
     Shader::Shader(std::string name) : name(std::move(name)) {
-        std::string vertexSource = ShaderUtils::loadShaderSourceCode(this->name, "vertex");
-        std::string fragmentSource = ShaderUtils::loadShaderSourceCode(this->name, "fragment");
-        std::string geometrySource = ShaderUtils::loadShaderSourceCode(this->name, "geometry");
+        std::string vertexSource = ShaderUtils::loadShaderSourceCodeWithType(this->name, "vertex");
+        std::string fragmentSource = ShaderUtils::loadShaderSourceCodeWithType(this->name, "fragment");
+        std::string geometrySource = ShaderUtils::loadShaderSourceCodeWithType(this->name, "geometry");
 
         programId = glCreateProgram();
 
@@ -196,7 +223,7 @@ namespace CgEngine {
     }
 
     ComputeShader::ComputeShader(std::string name) : name(std::move(name)) {
-        std::string source = ShaderUtils::loadShaderSourceCode(this->name, "comp");
+        std::string source = ShaderUtils::loadShaderSourceCodeWithType(this->name, "comp");
 
         programId = glCreateProgram();
 

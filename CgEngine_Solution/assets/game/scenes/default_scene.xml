@@ -9,7 +9,7 @@
     <Entity>
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            <SkyboxComponent hdri-path="kloppenheim_02_2k.hdr" lod="0.1" intensity="0.01" />
+            <SkyboxComponent hdri-path="kloppenheim_02_2k.hdr" lod="0.1" intensity="0.05" />
         </Components>
     </Entity>
     <Entity>
