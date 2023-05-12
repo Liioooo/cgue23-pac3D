@@ -1,14 +1,6 @@
 #version 450 core
 
-layout (binding = 0, std140) uniform CameraData {
-    mat4 viewProjection;
-    mat4 projection;
-    mat4 view;
-    vec3 position;
-    float exposure;
-    float bloomIntensity;
-    float bloomThreshold;
-} u_CameraData;
+#include "common/CameraDataBuffer.glsl"
 
 layout (location = 0) in vec3 a_Pos;
 

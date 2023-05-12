@@ -25,6 +25,7 @@ namespace CgEngine {
         static void createSphereColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createCapsuleColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createCharacterControllerComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
+        static void createUiCanvasComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
 
         static glm::vec3 stringTupleToVec3(const std::string& s);
         static glm::vec3 hexStringToColor(const std::string& s);

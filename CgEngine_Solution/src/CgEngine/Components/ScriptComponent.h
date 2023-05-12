@@ -33,7 +33,7 @@ namespace CgEngine {
 
         template<typename S>
         S& getNativeScript() {
-            return *static_cast<S*>(script.get());
+            return *dynamic_cast<S*>(script.get());
         }
 
     private:

@@ -22,6 +22,7 @@ namespace CgEngine {
         void beginScene(const Camera& camera, glm::mat4 cameraTransform, const SceneLightEnvironment& lightEnvironment, const SceneEnvironment& sceneEnvironment);
         void endScene();
         void submitMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform);
+        void submitUiElements(const std::unordered_map<std::string, UiElement*>& uiElements);
         void submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform);
         void submitDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 
@@ -39,6 +40,7 @@ namespace CgEngine {
         RenderPass* skyboxRenderPass;
         RenderPass* bloomDownSamplePass;
         RenderPass* bloomUpSamplePass;
+        RenderPass* uiCirclePass;
         RenderPass* physicsCollidersRenderPass;
         RenderPass* normalsDebugRenderPass;
         RenderPass* debugLinesRenderPass;
@@ -60,6 +62,7 @@ namespace CgEngine {
         void debugLinesPass();
         void bloomPass();
         void screenPass();
+        void uiPass();
         void clearPass(RenderPass& renderPass);
 
         void setupShadowMapData(glm::vec3 dirLightDirection, const glm::mat4& cameraViewProjection, const Camera& camera);
@@ -68,6 +71,7 @@ namespace CgEngine {
             glm::mat4 viewProjection;
             glm::mat4 projection;
             glm::mat4 view;
+            glm::mat4 uiProjectionMatrix;
             glm::vec3 position;
             float exposure;
             float bloomIntensity;
@@ -153,6 +157,10 @@ namespace CgEngine {
             float environmentIntensity;
             bool dirLightCastShadows;
         } currentSceneEnvironment;
+
+        std::map<uint32_t, UiDrawInfo> uiDrawInfoQueue;
+
+        glm::mat4 uiProjectionMatrix;
 
     };
 

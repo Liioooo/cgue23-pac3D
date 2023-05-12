@@ -7,13 +7,14 @@
 #include "Components/CameraComponent.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/PointLightComponent.h"
-#include <Components/SpotLightComponent.h>
-#include <Components/SkyboxComponent.h>
-#include <Components/BoxColliderComponent.h>
-#include <Components/SphereColliderComponent.h>
-#include <Components/CApsuleColliderComponent.h>
-#include <Components/RigidBodyComponent.h>
-#include <Components/CharacterControllerComponent.h>
+#include "Components/SpotLightComponent.h"
+#include "Components/SkyboxComponent.h"
+#include "Components/BoxColliderComponent.h"
+#include "Components/SphereColliderComponent.h"
+#include "Components/CApsuleColliderComponent.h"
+#include "Components/RigidBodyComponent.h"
+#include "Components/CharacterControllerComponent.h"
+#include "Components/UiCanvasComponent.h"
 #include "ComponentArray.h"
 
 namespace CgEngine {
@@ -34,6 +35,8 @@ namespace CgEngine {
             registerComponentType<CapsuleColliderComponent>();
             registerComponentType<RigidBodyComponent>();
             registerComponentType<CharacterControllerComponent>();
+            registerComponentType<CharacterControllerComponent>();
+            registerComponentType<UiCanvasComponent>();
         }
 
         template<typename C>

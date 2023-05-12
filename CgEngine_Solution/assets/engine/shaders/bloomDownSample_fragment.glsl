@@ -1,20 +1,12 @@
 #version 450 core
 
+#include "common/CameraDataBuffer.glsl"
+
 in VS_OUT {
     vec2 TexCoord;
 } fs_in;
 
 layout (binding = 0) uniform sampler2D u_BloomTexture;
-
-layout (binding = 0, std140) uniform CameraData {
-    mat4 viewProjection;
-    mat4 projection;
-    mat4 view;
-    vec3 position;
-    float exposure;
-    float bloomIntensity;
-    float bloomThreshold;
-} u_CameraData;
 
 out vec3 o_FragColor;
 

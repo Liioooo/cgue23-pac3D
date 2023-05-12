@@ -1,17 +1,9 @@
 #version 450 core
 
+#include "common/CameraDataBuffer.glsl"
+
 layout (triangles) in;
 layout (line_strip, max_vertices = 6) out;
-
-layout (binding = 0, std140) uniform CameraData {
-    mat4 viewProjection;
-    mat4 projection;
-    mat4 view;
-    vec3 position;
-    float exposure;
-    float bloomIntensity;
-    float bloomThreshold;
-} u_CameraData;
 
 in VS_OUT {
     vec3 Normal;

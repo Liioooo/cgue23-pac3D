@@ -13,16 +13,29 @@ namespace CgEngine {
         glm::vec3 color;
     };
 
+    struct UiCircleVertex {
+        glm::vec4 posUV;
+        glm::vec4 lineColor;
+        glm::vec4 fillColor;
+        float lineWidth;
+    };
+
+    struct UiDrawInfo {
+        uint32_t circleIndexCount = 0;
+        std::vector<UiCircleVertex> circleVertices;
+    };
+
     class Renderer {
     public:
         static void init();
         static void shutdown();
         static void beginRenderPass(RenderPass& renderPass);
         static void endRenderPass();
-        static void renderFullScreenQuad(const Material& material);
+        static void renderUnitQuad(const Material& material);
         static void renderUnitCube(const Material& material);
         static void renderLines(const std::vector<LineDrawInfo>& lines);
         static void executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount);
+        static void renderUiCircles(const std::vector<UiCircleVertex>& vertices, uint32_t indexCount);
 
         static Texture2D& getWhiteTexture();
         static Texture2D& getBrdfLUTTexture();
@@ -50,6 +63,8 @@ namespace CgEngine {
         static VertexArrayObject* quadVAO;
         static VertexArrayObject* unitCubeVAO;
         static VertexArrayObject* linesVAO;
+
+        static VertexArrayObject* uiCircleVAO;
 
         static ShaderStorageBuffer* transformsBuffer;
     };

@@ -130,7 +130,7 @@ namespace Game {
 
             if (g.state == GhostState::Moving) {
                 auto& rigid = getComponent<CgEngine::RigidBodyComponent>(g.entity);
-                if (glm::distance(rigid.getGlobalPosePosition(), mapNodes[g.nextMapNode].pos) < 0.2f) {
+                if (glm::distance(rigid.getGlobalPosePosition(), mapNodes[g.nextMapNode].pos) < 0.4f) {
                     // if they can see the player chase him
                     bool chasePlayer = false;
                     glm::vec3 playerInDir = glm::normalize(playerPos - mapNodes[g.nextMapNode].pos);
@@ -175,7 +175,7 @@ namespace Game {
                     }
                 }
 
-                glm::vec3 direction = glm::normalize(mapNodes[g.nextMapNode].pos - mapNodes[g.lastMapNode].pos);
+                glm::vec3 direction = glm::normalize(mapNodes[g.nextMapNode].pos - rigid.getGlobalPosePosition());
                 rigid.setKinematicTarget(rigid.getGlobalPosePosition() + direction * ts.getSeconds() * 6.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
             }
         }

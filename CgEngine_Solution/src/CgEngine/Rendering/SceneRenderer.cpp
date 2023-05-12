@@ -197,6 +197,23 @@ namespace CgEngine {
             screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
             screenMaterial->setTexture2D("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
         }
+        {
+            RenderPassSpecification uiCircleRenderPassSpec;
+            uiCircleRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("uiCircle");
+            uiCircleRenderPassSpec.clearColorBuffer = false;
+            uiCircleRenderPassSpec.clearDepthBuffer = false;
+            uiCircleRenderPassSpec.depthTest = false;
+            uiCircleRenderPassSpec.depthWrite = false;
+            uiCircleRenderPassSpec.useBlending = true;
+            uiCircleRenderPassSpec.blendingEquation = BlendingEquation::Add;
+            uiCircleRenderPassSpec.srcBlendingFunction = BlendingFunction::SrcAlpha;
+            uiCircleRenderPassSpec.destBlendingFunction = BlendingFunction::OneMinusSrcAlpha;
+            uiCircleRenderPassSpec.framebuffer = screenRenderPass->getSpecification().framebuffer;
+
+            uiCirclePass = new RenderPass(uiCircleRenderPassSpec);
+
+            uiProjectionMatrix = glm::ortho(0.0f, static_cast<float>(viewportWidth), 0.0f, static_cast<float>(viewportHeight));
+        }
 
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
         ubLightData = new UniformBuffer<UBLightData>("LightData", 1, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
@@ -210,6 +227,7 @@ namespace CgEngine {
         delete skyboxRenderPass;
         delete bloomDownSamplePass;
         delete bloomUpSamplePass;
+        delete uiCirclePass;
         delete physicsCollidersRenderPass;
         delete normalsDebugRenderPass;
         delete debugLinesRenderPass;
@@ -270,12 +288,15 @@ namespace CgEngine {
 
             screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
             screenMaterial->setTexture2D("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
+
+            uiProjectionMatrix = glm::ortho(0.0f, static_cast<float>(viewportWidth), 0.0f, static_cast<float>(viewportHeight));
         }
 
         UBCameraData cameraData{};
         cameraData.projection = camera.getProjectionMatrix();
         cameraData.view = glm::inverse(cameraTransform);
         cameraData.viewProjection = cameraData.projection * cameraData.view;
+        cameraData.uiProjectionMatrix = uiProjectionMatrix;
         cameraData.position = cameraTransform[3];
         cameraData.exposure = camera.getExposure();
         cameraData.bloomIntensity = camera.getBloomIntensity();
@@ -349,10 +370,13 @@ namespace CgEngine {
             bloomPass();
         }
         screenPass();
+        uiPass();
 
         drawCommandQueue.clear();
         shadowMapDrawCommandQueue.clear();
         meshTransforms.clear();
+
+        uiDrawInfoQueue.clear();
 
         physicsCollidersDrawCommandQueue.clear();
         physicsCollidersMeshTransforms.clear();
@@ -392,6 +416,26 @@ namespace CgEngine {
                     shadowMapDrawCommand.indexCount = submesh.indexCount;
                     shadowMapDrawCommand.instanceCount++;
                 }
+            }
+        }
+    }
+
+    void SceneRenderer::submitUiElements(const std::unordered_map<std::string, UiElement*>& uiElements) {
+        for (const auto& [_, element]: uiElements) {
+            UiDrawInfo& drawInfo = uiDrawInfoQueue[element->getZIndex()];
+
+            if (element->getType() == UIElementType::Circle) {
+
+                auto* circleElement = dynamic_cast<UiCircle*>(element);
+
+                for (const auto& v: element->getVertices()) {
+                    UiCircleVertex& vertex = drawInfo.circleVertices.emplace_back();
+                    vertex.posUV = v;
+                    vertex.fillColor = circleElement->getFillColor();
+                    vertex.lineColor = circleElement->getLineColor();
+                    vertex.lineWidth = circleElement->getLineWidth();
+                }
+                drawInfo.circleIndexCount += 6;
             }
         }
     }
@@ -509,7 +553,7 @@ namespace CgEngine {
         Renderer::beginRenderPass(*bloomDownSamplePass);
         downSampleShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
         downSampleShader.setBool("u_UseThreshold", true);
-        Renderer::renderFullScreenQuad(*emptyMaterial);
+        Renderer::renderUnitQuad(*emptyMaterial);
         Renderer::endRenderPass();
 
         downSampleShader.setBool("u_UseThreshold", false);
@@ -517,7 +561,7 @@ namespace CgEngine {
             bloomDownSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[i + 1]->getRendererId(), 0, bloomTextures[i + 1]->getWidth(), bloomTextures[i + 1]->getHeight());
             Renderer::beginRenderPass(*bloomDownSamplePass);
             downSampleShader.setTexture2D(bloomTextures[i]->getRendererId(), 0);
-            Renderer::renderFullScreenQuad(*emptyMaterial);
+            Renderer::renderUnitQuad(*emptyMaterial);
             Renderer::endRenderPass();
         }
 
@@ -527,18 +571,26 @@ namespace CgEngine {
             bloomUpSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[i - 1]->getRendererId(), 0, bloomTextures[i - 1]->getWidth(), bloomTextures[i - 1]->getHeight());
             Renderer::beginRenderPass(*bloomUpSamplePass);
             upSampleShader.setTexture2D(bloomTextures[i]->getRendererId(), 0);
-            Renderer::renderFullScreenQuad(*emptyMaterial);
+            Renderer::renderUnitQuad(*emptyMaterial);
             Renderer::endRenderPass();
         }
     }
 
     void SceneRenderer::screenPass() {
         Renderer::beginRenderPass(*screenRenderPass);
-        Renderer::renderFullScreenQuad(*screenMaterial);
+        Renderer::renderUnitQuad(*screenMaterial);
         Renderer::endRenderPass();
     }
 
-    void SceneRenderer::clearPass(RenderPass &renderPass) {
+    void SceneRenderer::uiPass() {
+        for (const auto& [zIndex, drawInfo]: uiDrawInfoQueue) {
+            Renderer::beginRenderPass(*uiCirclePass);
+            Renderer::renderUiCircles(drawInfo.circleVertices, drawInfo.circleIndexCount);
+            Renderer::endRenderPass();
+        }
+    }
+
+    void SceneRenderer::clearPass(RenderPass& renderPass) {
         Renderer::beginRenderPass(renderPass);
         Renderer::endRenderPass();
     }

@@ -65,6 +65,8 @@ namespace CgEngine {
             createCapsuleColliderComponent(scene, entity, node);
         } else if (name == "CharacterControllerComponent") {
             createCharacterControllerComponent(scene, entity, node);
+        } else if (name == "UiCanvasComponent") {
+            createUiCanvasComponent(scene, entity, node);
         }
     }
 
@@ -204,7 +206,14 @@ namespace CgEngine {
         scene->attachComponent<CharacterControllerComponent>(entity, params);
     }
 
-    glm::vec3 SceneLoader::stringTupleToVec3(const std::string &s) {
+    void SceneLoader::createUiCanvasComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
+        UiCanvasComponentParams params{
+            node.children()
+        };
+        scene->attachComponent<UiCanvasComponent>(entity, params);
+    }
+
+    glm::vec3 SceneLoader::stringTupleToVec3(const std::string& s) {
         size_t p0 = 0;
         size_t p1 = s.find(' ');
         float x = std::stof(s.substr(p0, p1));
@@ -216,7 +225,7 @@ namespace CgEngine {
         return {x, y, z};
     }
 
-    glm::vec3 SceneLoader::hexStringToColor(const std::string &s) {
+    glm::vec3 SceneLoader::hexStringToColor(const std::string& s) {
         uint64_t color = std::stoul(s.substr(1), nullptr, 16);
         float r = ((color >> 16) & 0xFF) / 255.0f;
         float g = ((color >> 8) & 0xFF) / 255.0f;
@@ -224,7 +233,7 @@ namespace CgEngine {
         return {r, g, b};
     }
 
-    std::vector<uint32_t> SceneLoader::getListFromString(const std::string &s) {
+    std::vector<uint32_t> SceneLoader::getListFromString(const std::string& s) {
         std::vector<uint32_t> result{};
         std::stringstream ss(s);
         std::string item;

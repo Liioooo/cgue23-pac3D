@@ -22,6 +22,7 @@ namespace CgEngine {
     VertexArrayObject* Renderer::quadVAO;
     VertexArrayObject* Renderer::unitCubeVAO;
     VertexArrayObject* Renderer::linesVAO;
+    VertexArrayObject* Renderer::uiCircleVAO;
     ShaderStorageBuffer* Renderer::transformsBuffer;
 
 
@@ -87,6 +88,29 @@ namespace CgEngine {
         linesVertexBuffer->setLayout({{ShaderDataType::Float3, false}, {ShaderDataType::Float3, false}});
         linesVAO->addVertexBuffer(linesVertexBuffer);
 
+        uint32_t maxUiQuads = 5000;
+        uint32_t maxUiIndices = maxUiQuads * 6;
+        auto* uiIndices = new uint32_t[maxUiIndices];
+
+        uint32_t offset = 0;
+        for (uint32_t i = 0; i < maxUiIndices; i += 6) {
+            uiIndices[i + 0] = offset + 0;
+            uiIndices[i + 1] = offset + 1;
+            uiIndices[i + 2] = offset + 2;
+
+            uiIndices[i + 3] = offset + 2;
+            uiIndices[i + 4] = offset + 3;
+            uiIndices[i + 5] = offset + 0;
+
+            offset += 4;
+        }
+
+        uiCircleVAO = new VertexArrayObject();
+        auto uiCircleVertexBuffer = std::make_shared<VertexBuffer>(0, VertexBufferUsage::Dynamic);
+        uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float, false}});
+        uiCircleVAO->addVertexBuffer(uiCircleVertexBuffer);
+        uiCircleVAO->setIndexBuffer(uiIndices, maxUiIndices);
+
         isWireframe = false;
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         isBackFaceCulling = true;
@@ -139,18 +163,6 @@ namespace CgEngine {
 
         spec.shader->bind();
         spec.framebuffer->bind();
-
-        if (spec.clearColorBuffer) {
-            const glm::vec4& clearColor = spec.framebuffer->getSpecification().clearColor;
-            glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-            glClear(GL_COLOR_BUFFER_BIT);
-        }
-        if (spec.clearDepthBuffer) {
-            glClear(GL_DEPTH_BUFFER_BIT);
-        }
-        if (spec.clearStencilBuffer) {
-            glClear(GL_STENCIL_BUFFER_BIT);
-        }
 
         if (isWireframe != spec.wireframe) {
             isWireframe = spec.wireframe;
@@ -212,6 +224,18 @@ namespace CgEngine {
             destBlendingFunction = spec.destBlendingFunction;
             glBlendFunc(static_cast<GLint>(srcBlendingFunction), static_cast<GLint>(destBlendingFunction));
         }
+
+        if (spec.clearColorBuffer) {
+            const glm::vec4& clearColor = spec.framebuffer->getSpecification().clearColor;
+            glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+            glClear(GL_COLOR_BUFFER_BIT);
+        }
+        if (spec.clearDepthBuffer) {
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
+        if (spec.clearStencilBuffer) {
+            glClear(GL_STENCIL_BUFFER_BIT);
+        }
     }
 
     void Renderer::endRenderPass() {
@@ -220,7 +244,7 @@ namespace CgEngine {
         currentRenderPass = nullptr;
     }
 
-    void Renderer::renderFullScreenQuad(const Material &material) {
+    void Renderer::renderUnitQuad(const Material &material) {
         CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
 
         material.uploadToShader(*currentRenderPass->getSpecification().shader);
@@ -276,6 +300,12 @@ namespace CgEngine {
         vao.bind();
         transformsBuffer->setData(transforms.data(), transforms.size() * sizeof(glm::mat4));
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)(baseIndex * sizeof(uint32_t)), instanceCount, baseVertex);
+    }
+
+    void Renderer::renderUiCircles(const std::vector<UiCircleVertex>& vertices, uint32_t indexCount) {
+        uiCircleVAO->bind();
+        uiCircleVAO->getVertexBuffers()[0]->setData(vertices.data(), vertices.size() * sizeof(UiCircleVertex), VertexBufferUsage::Dynamic);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
     }
 
     Texture2D& Renderer::getWhiteTexture() {

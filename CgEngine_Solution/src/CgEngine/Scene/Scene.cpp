@@ -164,6 +164,11 @@ namespace CgEngine {
         }
         executePostUpdateFunctions();
         updateTransforms();
+
+        for (auto it = componentManager->begin<UiCanvasComponent>(); it != componentManager->end<UiCanvasComponent>(); it++) {
+            const auto& entityTransform = componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix();
+            it->update(entityTransform, viewportWidth, viewportHeight);
+        }
     }
 
     void Scene::onEvent(Event& event) {
@@ -232,6 +237,10 @@ namespace CgEngine {
 
         for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
             renderer.submitMesh(it->getMeshVertices(), it->getMeshNodes(), it->getMaterial(), it->getCastShadows(), componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix());
+        }
+
+        for (auto it = componentManager->cbegin<UiCanvasComponent>(); it != componentManager->cend<UiCanvasComponent>(); it++) {
+            renderer.submitUiElements(it->getUiElements());
         }
 
         executeOnRenderFunctions(renderer);
