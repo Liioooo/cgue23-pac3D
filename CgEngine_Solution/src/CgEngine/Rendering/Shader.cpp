@@ -203,19 +203,8 @@ namespace CgEngine {
         glUniformMatrix4fv(ShaderUtils::getUniformLocation(programId, uniformLocations, name), 1, GL_FALSE, glm::value_ptr(mat));
     }
 
-    void Shader::setTexture2D(uint32_t textureRendererId, uint32_t textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D, textureRendererId);
-    }
-
-    void Shader::setTexture2DArray(uint32_t textureRendererId, uint32_t textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, textureRendererId);
-    }
-
-    void Shader::setTextureCube(uint32_t textureRendererId, uint32_t textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureRendererId);
+    void Shader::setTexture(uint32_t textureRendererId, uint32_t textureUnit) {
+        glBindTextureUnit(textureUnit, textureRendererId);
     }
 
     ComputeShader *ComputeShader::createResource(const std::string &name) {
@@ -291,13 +280,11 @@ namespace CgEngine {
     }
 
     void ComputeShader::setTexture2D(Texture2D& texture2D, uint32_t textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D, texture2D.getRendererId());
+        glBindTextureUnit(textureUnit, texture2D.getRendererId());
     }
 
     void ComputeShader::setTexture2D(uint32_t textureRendererId, uint32_t textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D, textureRendererId);
+        glBindTextureUnit(textureUnit, textureRendererId);
     }
 
     void ComputeShader::setImage2D(Texture2D &texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level) {
@@ -305,8 +292,8 @@ namespace CgEngine {
     }
 
     void ComputeShader::setTextureCube(TextureCube &texture, uint32_t textureUnit) {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture.getRendererId());
+        glBindTextureUnit(textureUnit, texture.getRendererId());
+
     }
 
     void ComputeShader::setImageCube(TextureCube& texture, uint32_t textureUnit, ShaderStorageAccess storageAccess, uint32_t level) {

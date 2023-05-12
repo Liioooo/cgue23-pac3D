@@ -90,7 +90,7 @@ namespace CgEngine {
     }
 
     Texture2D::Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, MipMapFiltering mipMapFiltering, float anisotropicFiltering) : format(format), width(width), height(height) {
-        glGenTextures(1, &id);
+        glCreateTextures(GL_TEXTURE_2D, 1, &id);
         glBindTexture(GL_TEXTURE_2D, id);
 
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
@@ -106,7 +106,7 @@ namespace CgEngine {
     }
 
     Texture2D::Texture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, const void* data, MipMapFiltering mipMapFiltering, float anisotropicFiltering) : format(format), width(width), height(height) {
-        glGenTextures(1, &id);
+        glCreateTextures(GL_TEXTURE_2D, 1, &id);
         glBindTexture(GL_TEXTURE_2D, id);
 
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
@@ -160,7 +160,7 @@ namespace CgEngine {
         height = loadHeight;
 
         if (srgb) {
-            glGenTextures(1, &id);
+            glCreateTextures(GL_TEXTURE_2D, 1, &id);
             glBindTexture(GL_TEXTURE_2D, id);
 
             TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
@@ -175,7 +175,7 @@ namespace CgEngine {
 
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
-            glGenTextures(1, &id);
+            glCreateTextures(GL_TEXTURE_2D, 1, &id);
             glBindTexture(GL_TEXTURE_2D, id);
 
             TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D);
@@ -230,8 +230,7 @@ namespace CgEngine {
     }
 
     void Texture2D::bind(uint32_t slot) {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, id);
+        glBindTextureUnit(slot, id);
     }
 
     void Texture2D::generateMipMaps() {
@@ -249,7 +248,7 @@ namespace CgEngine {
     }
 
     Texture2DArray::Texture2DArray(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, uint32_t count, MipMapFiltering mipMapFiltering) : format(format), width(width), height(height), count(count) {
-        glGenTextures(1, &id);
+        glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &id);
         glBindTexture(GL_TEXTURE_2D_ARRAY, id);
 
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_2D_ARRAY);
@@ -288,8 +287,7 @@ namespace CgEngine {
     }
 
     void Texture2DArray::bind(uint32_t slot) {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, id);
+        glBindTextureUnit(slot, id);
     }
 
     void Texture2DArray::generateMipMaps() {
@@ -307,7 +305,7 @@ namespace CgEngine {
     }
 
     TextureCube::TextureCube(TextureFormat format, uint32_t width, uint32_t height, MipMapFiltering mipMapFiltering) : format(format), width(width), height(height) {
-        glGenTextures(1, &id);
+        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &id);
         glBindTexture(GL_TEXTURE_CUBE_MAP, id);
 
         GLint internalFormat = TextureUtils::getOpenGLTextureInternalFormat(format);
@@ -329,7 +327,7 @@ namespace CgEngine {
     }
 
     TextureCube::TextureCube(TextureFormat format, uint32_t width, uint32_t height, const void* data, MipMapFiltering mipMapFiltering) {
-        glGenTextures(1, &id);
+        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &id);
         glBindTexture(GL_TEXTURE_CUBE_MAP, id);
         TextureUtils::applyMipMapFiltering(mipMapFiltering, GL_TEXTURE_CUBE_MAP);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -370,8 +368,7 @@ namespace CgEngine {
     }
 
     void TextureCube::bind(uint32_t slot) {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+        glBindTextureUnit(slot, id);
     }
 
     void TextureCube::generateMipMaps() {

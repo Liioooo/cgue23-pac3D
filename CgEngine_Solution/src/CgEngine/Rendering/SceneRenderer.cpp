@@ -194,8 +194,8 @@ namespace CgEngine {
             screenRenderPass = new RenderPass(screenRenderPassSpec);
 
             screenMaterial = new Material("screenMaterial");
-            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
-            screenMaterial->setTexture2D("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
+            screenMaterial->setTexture("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+            screenMaterial->setTexture("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
         }
         {
             RenderPassSpecification uiCircleRenderPassSpec;
@@ -286,8 +286,8 @@ namespace CgEngine {
                 bloomHeight /= 2.0f;
             }
 
-            screenMaterial->setTexture2D("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
-            screenMaterial->setTexture2D("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
+            screenMaterial->setTexture("u_FinalImage", geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+            screenMaterial->setTexture("u_BloomTexture", bloomTextures[0]->getRendererId(), 1);
 
             uiProjectionMatrix = glm::ortho(0.0f, static_cast<float>(viewportWidth), 0.0f, static_cast<float>(viewportHeight));
         }
@@ -336,7 +336,7 @@ namespace CgEngine {
 
         ubLightData->setData(lightData);
 
-        skyboxMaterial->setTextureCube("u_Texture", sceneEnvironment.prefilterMap->getRendererId(), 0);
+        skyboxMaterial->setTextureCube("u_Texture", *sceneEnvironment.prefilterMap, 0);
         skyboxMaterial->set("u_Intensity", sceneEnvironment.environmentIntensity);
         skyboxMaterial->set("u_Lod", sceneEnvironment.environmentLod);
 
@@ -498,11 +498,11 @@ namespace CgEngine {
     void SceneRenderer::geometryPass() {
         Renderer::beginRenderPass(*geometryRenderPass);
 
-        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.irradianceMapId, 5);
-        geometryRenderPass->getSpecification().shader->setTextureCube(currentSceneEnvironment.prefilterMapId, 6);
-        geometryRenderPass->getSpecification().shader->setTexture2D(Renderer::getBrdfLUTTexture().getRendererId(), 7);
+        geometryRenderPass->getSpecification().shader->setTexture(currentSceneEnvironment.irradianceMapId, 5);
+        geometryRenderPass->getSpecification().shader->setTexture(currentSceneEnvironment.prefilterMapId, 6);
+        geometryRenderPass->getSpecification().shader->setTexture(Renderer::getBrdfLUTTexture().getRendererId(), 7);
         geometryRenderPass->getSpecification().shader->setFloat("u_EnvironmentIntensity", currentSceneEnvironment.environmentIntensity);
-        geometryRenderPass->getSpecification().shader->setTexture2DArray(dirShadowMaps->getRendererId(), 8);
+        geometryRenderPass->getSpecification().shader->setTexture(dirShadowMaps->getRendererId(), 8);
 
         for (const auto [mk, command]: drawCommandQueue) {
             const auto& transforms = meshTransforms[mk];
@@ -551,7 +551,7 @@ namespace CgEngine {
 
         bloomDownSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[0]->getRendererId(), 0, viewportWidth / 2, viewportHeight / 2);
         Renderer::beginRenderPass(*bloomDownSamplePass);
-        downSampleShader.setTexture2D(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
+        downSampleShader.setTexture(geometryRenderPass->getSpecification().framebuffer->getColorAttachmentRendererId(0), 0);
         downSampleShader.setBool("u_UseThreshold", true);
         Renderer::renderUnitQuad(*emptyMaterial);
         Renderer::endRenderPass();
@@ -560,7 +560,7 @@ namespace CgEngine {
         for (uint32_t i = 0; i < bloomTextures.size() - 1; ++i) {
             bloomDownSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[i + 1]->getRendererId(), 0, bloomTextures[i + 1]->getWidth(), bloomTextures[i + 1]->getHeight());
             Renderer::beginRenderPass(*bloomDownSamplePass);
-            downSampleShader.setTexture2D(bloomTextures[i]->getRendererId(), 0);
+            downSampleShader.setTexture(bloomTextures[i]->getRendererId(), 0);
             Renderer::renderUnitQuad(*emptyMaterial);
             Renderer::endRenderPass();
         }
@@ -570,7 +570,7 @@ namespace CgEngine {
         for (uint32_t i = bloomTextures.size() - 1; i > 0; i--) {
             bloomUpSamplePass->getSpecification().framebuffer->setColorAttachment(bloomTextures[i - 1]->getRendererId(), 0, bloomTextures[i - 1]->getWidth(), bloomTextures[i - 1]->getHeight());
             Renderer::beginRenderPass(*bloomUpSamplePass);
-            upSampleShader.setTexture2D(bloomTextures[i]->getRendererId(), 0);
+            upSampleShader.setTexture(bloomTextures[i]->getRendererId(), 0);
             Renderer::renderUnitQuad(*emptyMaterial);
             Renderer::endRenderPass();
         }

@@ -140,20 +140,15 @@ namespace CgEngine {
     }
 
     void Material::setTexture2D(const std::string &name, const Texture2D& texture, uint32_t textureSlot) {
-        tex2DValues[name] = {texture.getRendererId(), textureSlot};
-        return;
-    }
-
-    void Material::setTexture2D(const std::string &name, uint32_t textureRenderId, uint32_t textureSlot) {
-        tex2DValues[name] = {textureRenderId, textureSlot};
+        texValues[name] = {texture.getRendererId(), textureSlot};
     }
 
     void Material::setTextureCube(const std::string &name, const TextureCube& texture, uint32_t textureSlot) {
-        texCubeValues[name] = {texture.getRendererId(), textureSlot};
+        texValues[name] = {texture.getRendererId(), textureSlot};
     }
 
-    void Material::setTextureCube(const std::string &name, uint32_t textureRenderId, uint32_t textureSlot) {
-        texCubeValues[name] = {textureRenderId, textureSlot};
+    void Material::setTexture(const std::string &name, uint32_t textureRenderId, uint32_t textureSlot) {
+        texValues[name] = {textureRenderId, textureSlot};
     }
 
     bool Material::getBool(const std::string &name) const {
@@ -188,12 +183,8 @@ namespace CgEngine {
         return mat4Values.at(name);
     }
 
-    const MaterialTextureData &Material::getTexture2D(const std::string &name) const {
-        return tex2DValues.at(name);
-    }
-
-    const MaterialTextureData &Material::getTextureCube(const std::string &name) const {
-        return texCubeValues.at(name);
+    const MaterialTextureData &Material::getTexture(const std::string &name) const {
+        return texValues.at(name);
     }
 
     void Material::uploadToShader(Shader& shader) const {
@@ -221,11 +212,8 @@ namespace CgEngine {
         for (const auto &item: mat4Values) {
             shader.setMat4(item.first, item.second);
         }
-        for (const auto &item: tex2DValues) {
-            shader.setTexture2D(item.second.textureRendererId, item.second.textureSlot);
-        }
-        for (const auto &item: texCubeValues) {
-            shader.setTextureCube(item.second.textureRendererId, item.second.textureSlot);
+        for (const auto &item: texValues) {
+            shader.setTexture(item.second.textureRendererId, item.second.textureSlot);
         }
     }
 }

@@ -29,9 +29,8 @@ namespace CgEngine {
         void set(const std::string& name, glm::mat3 value);
         void set(const std::string& name, glm::mat4 value);
         void setTexture2D(const std::string& name, const Texture2D& texture, uint32_t textureSlot);
-        void setTexture2D(const std::string& name, uint32_t textureRenderId, uint32_t textureSlot);
-        void setTextureCube(const std::string& name, uint32_t textureRenderId, uint32_t textureSlot);
         void setTextureCube(const std::string& name, const TextureCube& texture, uint32_t textureSlot);
+        void setTexture(const std::string& name, uint32_t textureRenderId, uint32_t textureSlot);
 
         bool getBool(const std::string& name) const;
         int getInt(const std::string& name) const;
@@ -41,8 +40,7 @@ namespace CgEngine {
         const glm::vec4& getVec4(const std::string& name) const;
         const glm::mat3& getMat3(const std::string& name) const;
         const glm::mat4& getMat4(const std::string& name) const;
-        const MaterialTextureData& getTexture2D(const std::string& name) const;
-        const MaterialTextureData& getTextureCube(const std::string& name) const;
+        const MaterialTextureData& getTexture(const std::string& name) const;
 
         void uploadToShader(Shader& shader) const;
 
@@ -58,8 +56,7 @@ namespace CgEngine {
         std::unordered_map<std::string, glm::vec4> vec4Values{};
         std::unordered_map<std::string, glm::mat3> mat3Values{};
         std::unordered_map<std::string, glm::mat4> mat4Values{};
-        std::unordered_map<std::string, MaterialTextureData> tex2DValues{};
-        std::unordered_map<std::string, MaterialTextureData> texCubeValues{};
+        std::unordered_map<std::string, MaterialTextureData> texValues{};
     };
 
 }

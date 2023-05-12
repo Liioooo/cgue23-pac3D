@@ -45,9 +45,7 @@ namespace CgEngine {
         void setVec4(const std::string& name, const glm::vec4& vec);
         void setMat3(const std::string& name, const glm::mat3& mat);
         void setMat4(const std::string& name, const glm::mat4& mat);
-        void setTexture2D(uint32_t textureRendererId, uint32_t textureUnit);
-        void setTexture2DArray(uint32_t textureRendererId, uint32_t textureUnit);
-        void setTextureCube(uint32_t textureRendererId, uint32_t textureUnit);
+        void setTexture(uint32_t textureRendererId, uint32_t textureUnit);
 
     private:
         std::string name;
