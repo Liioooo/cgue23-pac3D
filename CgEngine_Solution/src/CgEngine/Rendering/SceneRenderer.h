@@ -158,6 +158,13 @@ namespace CgEngine {
             bool dirLightCastShadows;
         } currentSceneEnvironment;
 
+        struct UiDrawInfo {
+            uint32_t circleIndexCount = 0;
+            std::vector<UiCircleVertex> circleVertices;
+            std::array<const Texture2D*, 16> textureSlots{};
+            uint32_t filledTextureSlots = 0;
+        };
+
         std::map<uint32_t, UiDrawInfo> uiDrawInfoQueue;
 
         glm::mat4 uiProjectionMatrix;

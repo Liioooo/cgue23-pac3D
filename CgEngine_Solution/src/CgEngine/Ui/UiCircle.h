@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UiElement.h"
+#include "Rendering/Texture.h"
 
 namespace CgEngine {
 
@@ -15,10 +16,12 @@ namespace CgEngine {
         void setLineWidth(float lineWidth);
         void setLineColor(const glm::vec4& lineColor);
         void setFillColor(const glm::vec4& fillColor);
+        void setTexture(Texture2D* texture);
 
         float getLineWidth() const;
         const glm::vec4& getLineColor() const;
         const glm::vec4& getFillColor() const;
+        const Texture2D* getTexture() const;
 
         const std::vector<glm::vec4>& getVertices() const override;
 
@@ -32,6 +35,8 @@ namespace CgEngine {
         float lineWidth{};
         glm::vec4 lineColor{};
         glm::vec4 fillColor{};
+
+        Texture2D* texture = nullptr;
 
         bool dirty = true;
 

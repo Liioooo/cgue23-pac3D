@@ -1,4 +1,6 @@
+#include "FileSystem.h"
 #include "UiCanvasComponent.h"
+#include "GlobalObjectManager.h"
 #include "Ui/UiCircle.h"
 #include "Asserts.h"
 #include "glm/gtx/matrix_transform_2d.hpp"
@@ -80,6 +82,13 @@ namespace CgEngine {
         element->setLineWidth(elementNode.attribute("line-width").as_float(0.0f));
         element->setLineColor(stringTupleToVec4(elementNode.attribute("line-color").as_string("0 0 0 1")));
         element->setFillColor(stringTupleToVec4(elementNode.attribute("fill-color").as_string("0 0 0 1")));
+
+        std::string textureName = elementNode.attribute("texture").as_string("");
+        if (!textureName.empty()) {
+            std::string texturePath = FileSystem::getAsGamePath(textureName);
+            auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+            element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
+        }
 
         element->setWidth(elementNode.attribute("width").as_int(100));
         element->setHeight(elementNode.attribute("height").as_int(100));

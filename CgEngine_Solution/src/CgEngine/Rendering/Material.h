@@ -20,6 +20,10 @@ namespace CgEngine {
         const std::string& getName() const;
         const Uuid& getUuid() const;
 
+        bool operator ==(const Material& other) const {
+            return uuid == other.uuid;
+        }
+
         void set(const std::string& name, bool value);
         void set(const std::string& name, int value);
         void set(const std::string& name, float value);

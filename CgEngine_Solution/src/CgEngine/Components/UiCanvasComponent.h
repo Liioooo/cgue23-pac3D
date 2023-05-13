@@ -31,7 +31,6 @@ namespace CgEngine {
 
     private:
         std::unordered_map<std::string, UiElement*> uiElements;
-        std::vector<UiElement*> zSortedUiElements;
         uint32_t vWidth = 0;
         uint32_t vHeight = 0;
 

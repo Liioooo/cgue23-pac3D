@@ -23,6 +23,10 @@ namespace CgEngine {
         this->fillColor = fillColor;
     }
 
+    void UiCircle::setTexture(CgEngine::Texture2D* texture) {
+        this->texture = texture;
+    }
+
     float UiCircle::getLineWidth() const {
         return lineWidth;
     }
@@ -33,6 +37,10 @@ namespace CgEngine {
 
     const glm::vec4& UiCircle::getFillColor() const {
         return fillColor;
+    }
+
+    const Texture2D* UiCircle::getTexture() const {
+        return texture;
     }
 
     const std::vector<glm::vec4>& UiCircle::getVertices() const {

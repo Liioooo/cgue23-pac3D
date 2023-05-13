@@ -8,6 +8,10 @@ namespace CgEngine {
     public:
         Uuid();
 
+        bool operator ==(const Uuid& other) const {
+            return uuid == other.uuid;
+        }
+
         uint32_t getUuid() const;
 
     private:

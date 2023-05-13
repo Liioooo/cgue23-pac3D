@@ -34,13 +34,17 @@ namespace CgEngine {
         Texture2D(const std::string& path, bool srgb, TextureWrap wrap = TextureWrap::Repeat, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear, float anisotropicFiltering = 1.0f);
         ~Texture2D();
 
+        bool operator ==(const Texture2D& other) const {
+            return id == other.id;
+        }
+
         uint32_t getWidth() const;
         uint32_t getHeight() const;
         uint32_t getWidthForMip(uint32_t mip) const;
         uint32_t getHeightForMip(uint32_t mip) const;
         TextureFormat getFormat() const;
         uint32_t getRendererId() const;
-        void bind(uint32_t slot);
+        void bind(uint32_t slot) const;
         void generateMipMaps();
         void setClampBorderColor(const glm::vec4& color);
         bool isLoaded() const;
@@ -58,12 +62,16 @@ namespace CgEngine {
         Texture2DArray(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap, uint32_t count, MipMapFiltering mipMapFiltering = MipMapFiltering::Trilinear);
         ~Texture2DArray();
 
+        bool operator ==(const Texture2DArray& other) const {
+            return id == other.id;
+        }
+
         uint32_t getWidth() const;
         uint32_t getHeight() const;
         uint32_t getCount() const;
         TextureFormat getFormat() const;
         uint32_t getRendererId() const;
-        void bind(uint32_t slot);
+        void bind(uint32_t slot) const;
         void generateMipMaps();
         void setClampBorderColor(const glm::vec4& color);
 
@@ -83,11 +91,15 @@ namespace CgEngine {
         TextureCube(TextureFormat format, uint32_t width, uint32_t height, const void* data, MipMapFiltering mipMapFiltering = MipMapFiltering::Bilinear);
         ~TextureCube();
 
+        bool operator ==(const TextureCube& other) const {
+            return id == other.id;
+        }
+
         uint32_t getWidth() const;
         uint32_t getHeight() const;
         TextureFormat getFormat() const;
         uint32_t getRendererId() const;
-        void bind(uint32_t slot);
+        void bind(uint32_t slot) const;
         void generateMipMaps();
 
     private:

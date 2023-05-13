@@ -428,14 +428,35 @@ namespace CgEngine {
 
                 auto* circleElement = dynamic_cast<UiCircle*>(element);
 
+                const auto* texture = circleElement->getTexture();
+                float textureIndex = -1;
+                if (texture != nullptr) {
+                    for (uint32_t i = 0; i < drawInfo.filledTextureSlots; i++) {
+                        if (*drawInfo.textureSlots[i] == *texture) {
+                            textureIndex = static_cast<float>(i);
+                            break;
+                        }
+                    }
+                    if (textureIndex < 0.0f) {
+                        textureIndex = static_cast<float>(drawInfo.filledTextureSlots);
+                        drawInfo.textureSlots[drawInfo.filledTextureSlots] = texture;
+                        drawInfo.filledTextureSlots++;
+                    }
+                }
+
                 for (const auto& v: element->getVertices()) {
                     UiCircleVertex& vertex = drawInfo.circleVertices.emplace_back();
                     vertex.posUV = v;
                     vertex.fillColor = circleElement->getFillColor();
                     vertex.lineColor = circleElement->getLineColor();
                     vertex.lineWidth = circleElement->getLineWidth();
+                    vertex.textureIndex = textureIndex;
                 }
                 drawInfo.circleIndexCount += 6;
+
+                CG_ASSERT(drawInfo.circleIndexCount <= Renderer::maxUiIndices, "Cannot render that many UICircles")
+                CG_ASSERT(drawInfo.filledTextureSlots < drawInfo.textureSlots.size(), "Cannot render that many different Textures on a single z-index")
+
             }
         }
     }
@@ -584,6 +605,11 @@ namespace CgEngine {
 
     void SceneRenderer::uiPass() {
         for (const auto& [zIndex, drawInfo]: uiDrawInfoQueue) {
+
+            for (uint32_t i = 0; i < drawInfo.filledTextureSlots; i++) {
+                drawInfo.textureSlots[i]->bind(i);
+            }
+
             Renderer::beginRenderPass(*uiCirclePass);
             Renderer::renderUiCircles(drawInfo.circleVertices, drawInfo.circleIndexCount);
             Renderer::endRenderPass();

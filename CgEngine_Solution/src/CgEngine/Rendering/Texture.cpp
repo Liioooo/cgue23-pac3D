@@ -229,7 +229,7 @@ namespace CgEngine {
         return id;
     }
 
-    void Texture2D::bind(uint32_t slot) {
+    void Texture2D::bind(uint32_t slot) const {
         glBindTextureUnit(slot, id);
     }
 
@@ -286,7 +286,7 @@ namespace CgEngine {
         return id;
     }
 
-    void Texture2DArray::bind(uint32_t slot) {
+    void Texture2DArray::bind(uint32_t slot) const {
         glBindTextureUnit(slot, id);
     }
 
@@ -367,7 +367,7 @@ namespace CgEngine {
         return id;
     }
 
-    void TextureCube::bind(uint32_t slot) {
+    void TextureCube::bind(uint32_t slot) const {
         glBindTextureUnit(slot, id);
     }
 

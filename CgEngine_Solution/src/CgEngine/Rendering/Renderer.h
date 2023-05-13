@@ -18,11 +18,7 @@ namespace CgEngine {
         glm::vec4 lineColor;
         glm::vec4 fillColor;
         float lineWidth;
-    };
-
-    struct UiDrawInfo {
-        uint32_t circleIndexCount = 0;
-        std::vector<UiCircleVertex> circleVertices;
+        float textureIndex;
     };
 
     class Renderer {
@@ -42,6 +38,9 @@ namespace CgEngine {
         static TextureCube& getBlackCubeTexture();
         static Material* getDefaultPBRMaterial();
         static std::pair<TextureCube*, TextureCube*> createEnvironmentMap(const std::string& hdriPath);
+
+        static const uint32_t maxUiQuads = 5000;
+        static const uint32_t maxUiIndices = maxUiQuads * 6;
 
     private:
         static RenderPass* currentRenderPass;

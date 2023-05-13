@@ -88,8 +88,6 @@ namespace CgEngine {
         linesVertexBuffer->setLayout({{ShaderDataType::Float3, false}, {ShaderDataType::Float3, false}});
         linesVAO->addVertexBuffer(linesVertexBuffer);
 
-        uint32_t maxUiQuads = 5000;
-        uint32_t maxUiIndices = maxUiQuads * 6;
         auto* uiIndices = new uint32_t[maxUiIndices];
 
         uint32_t offset = 0;
@@ -107,7 +105,7 @@ namespace CgEngine {
 
         uiCircleVAO = new VertexArrayObject();
         auto uiCircleVertexBuffer = std::make_shared<VertexBuffer>(0, VertexBufferUsage::Dynamic);
-        uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float, false}});
+        uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float, false}, {ShaderDataType::Float, false}});
         uiCircleVAO->addVertexBuffer(uiCircleVertexBuffer);
         uiCircleVAO->setIndexBuffer(uiIndices, maxUiIndices);
 
