@@ -41,6 +41,7 @@ namespace CgEngine {
         RenderPass* bloomDownSamplePass;
         RenderPass* bloomUpSamplePass;
         RenderPass* uiCirclePass;
+        RenderPass* uiRectPass;
         RenderPass* physicsCollidersRenderPass;
         RenderPass* normalsDebugRenderPass;
         RenderPass* debugLinesRenderPass;
@@ -161,6 +162,8 @@ namespace CgEngine {
         struct UiDrawInfo {
             uint32_t circleIndexCount = 0;
             std::vector<UiCircleVertex> circleVertices;
+            uint32_t rectIndexCount = 0;
+            std::vector<UiRectVertex> rectVertices;
             std::array<const Texture2D*, 16> textureSlots{};
             uint32_t filledTextureSlots = 0;
         };
@@ -169,6 +172,7 @@ namespace CgEngine {
 
         glm::mat4 uiProjectionMatrix;
 
+        float findDrawInfoTextureIndex(UiDrawInfo& drawInfo, const Texture2D* texture) const;
     };
 
 }

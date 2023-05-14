@@ -40,7 +40,7 @@ namespace CgEngine {
         this->zIndex = zIndex;
     }
 
-    void UiElement::update(const glm::mat3& entityTransform, uint32_t viewportWidth, uint32_t viewportHeight, bool viewportDirty) {
+    void UiElement::update(uint32_t viewportWidth, uint32_t viewportHeight, bool viewportDirty) {
         if (dirty || viewportDirty) {
 
             absolutePos = {0.0f, 0.0f};
@@ -86,7 +86,7 @@ namespace CgEngine {
             }
         }
 
-        updateVertices(entityTransform, dirty || viewportDirty);
+        updateElement(dirty || viewportDirty);
 
         dirty = false;
     }

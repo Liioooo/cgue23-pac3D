@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "pugixml.hpp"
 #include "Ui/UiCircle.h"
+#include "Ui/UiRect.h"
 
 namespace CgEngine {
 
@@ -16,9 +17,10 @@ namespace CgEngine {
 
         void onAttach(Scene& scene, UiCanvasComponentParams& params);
 
-        void update(const glm::mat4& entityTransform, uint32_t viewportWidth, uint32_t viewportHeight);
+        void update(uint32_t viewportWidth, uint32_t viewportHeight);
 
-        UiCircle* addCircleUi(const std::string& id);
+        UiCircle* addUiCircle(const std::string& id);
+        UiRect* addUiRect(const std::string& id);
 
         void removeUIElement(const std::string& id);
 
@@ -35,6 +37,10 @@ namespace CgEngine {
         uint32_t vHeight = 0;
 
         void createElementCircle(const pugi::xml_node& elementNode);
+        void createElementRect(const pugi::xml_node& elementNode);
+
+        template<typename E>
+        E* createElement(const pugi::xml_node& elementNode);
 
         std::pair<float, UIPosUnit> stringToPosAndUnit(const std::string& s);
         UIXAlignment stringToXAlignment(const std::string& s);

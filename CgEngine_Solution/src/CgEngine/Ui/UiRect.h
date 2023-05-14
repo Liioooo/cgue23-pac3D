@@ -5,13 +5,13 @@
 
 namespace CgEngine {
 
-    class UiCircle : public UiElement {
+    class UiRect : public UiElement {
     public:
-        explicit UiCircle() : UiElement(UIElementType::Circle) {};
-        ~UiCircle() override = default;
+        explicit UiRect() : UiElement(UIElementType::Rect) {};
+        ~UiRect() override = default;
 
         void setWidth(float width);
-        float getWidth() const;
+        void setHeight(float height);
 
         void setLineWidth(float lineWidth);
         void setLineColor(const glm::vec4& lineColor);
@@ -23,13 +23,15 @@ namespace CgEngine {
         const glm::vec4& getFillColor() const;
         const Texture2D* getTexture() const;
 
+        const glm::vec2& getSize() const;
+
         const std::vector<glm::vec4>& getVertices() const override;
 
     protected:
         void updateElement(bool absolutePosDirty) override;
 
     private:
-        float width{};
+        glm::vec2 size;
 
         float lineWidth{};
         glm::vec4 lineColor{};

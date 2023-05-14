@@ -17,6 +17,16 @@ namespace CgEngine {
         glm::vec4 posUV;
         glm::vec4 lineColor;
         glm::vec4 fillColor;
+        float width;
+        float lineWidth;
+        float textureIndex;
+    };
+
+    struct UiRectVertex {
+        glm::vec4 posUV;
+        glm::vec4 lineColor;
+        glm::vec4 fillColor;
+        glm::vec2 size;
         float lineWidth;
         float textureIndex;
     };
@@ -32,6 +42,7 @@ namespace CgEngine {
         static void renderLines(const std::vector<LineDrawInfo>& lines);
         static void executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount);
         static void renderUiCircles(const std::vector<UiCircleVertex>& vertices, uint32_t indexCount);
+        static void renderUiRects(const std::vector<UiRectVertex>& vertices, uint32_t indexCount);
 
         static Texture2D& getWhiteTexture();
         static Texture2D& getBrdfLUTTexture();
@@ -64,6 +75,7 @@ namespace CgEngine {
         static VertexArrayObject* linesVAO;
 
         static VertexArrayObject* uiCircleVAO;
+        static VertexArrayObject* uiRectVAO;
 
         static ShaderStorageBuffer* transformsBuffer;
     };

@@ -23,6 +23,7 @@ namespace CgEngine {
     VertexArrayObject* Renderer::unitCubeVAO;
     VertexArrayObject* Renderer::linesVAO;
     VertexArrayObject* Renderer::uiCircleVAO;
+    VertexArrayObject* Renderer::uiRectVAO;
     ShaderStorageBuffer* Renderer::transformsBuffer;
 
 
@@ -105,9 +106,15 @@ namespace CgEngine {
 
         uiCircleVAO = new VertexArrayObject();
         auto uiCircleVertexBuffer = std::make_shared<VertexBuffer>(0, VertexBufferUsage::Dynamic);
-        uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float, false}, {ShaderDataType::Float, false}});
+        uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float, false}, {ShaderDataType::Float, false}, {ShaderDataType::Float, false}});
         uiCircleVAO->addVertexBuffer(uiCircleVertexBuffer);
         uiCircleVAO->setIndexBuffer(uiIndices, maxUiIndices);
+
+        uiRectVAO = new VertexArrayObject();
+        auto uiRectVertexBuffer = std::make_shared<VertexBuffer>(0, VertexBufferUsage::Dynamic);
+        uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float2, false}, {ShaderDataType::Float, false}, {ShaderDataType::Float, false}});
+        uiRectVAO->addVertexBuffer(uiCircleVertexBuffer);
+        uiRectVAO->setIndexBuffer(uiIndices, maxUiIndices);
 
         isWireframe = false;
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -303,6 +310,12 @@ namespace CgEngine {
     void Renderer::renderUiCircles(const std::vector<UiCircleVertex>& vertices, uint32_t indexCount) {
         uiCircleVAO->bind();
         uiCircleVAO->getVertexBuffers()[0]->setData(vertices.data(), vertices.size() * sizeof(UiCircleVertex), VertexBufferUsage::Dynamic);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::renderUiRects(const std::vector<UiRectVertex>& vertices, uint32_t indexCount) {
+        uiRectVAO->bind();
+        uiRectVAO->getVertexBuffers()[0]->setData(vertices.data(), vertices.size() * sizeof(UiRectVertex), VertexBufferUsage::Dynamic);
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
     }
 

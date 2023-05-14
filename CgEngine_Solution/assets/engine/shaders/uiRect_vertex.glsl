@@ -5,7 +5,7 @@
 layout (location = 0) in vec4 a_PosUV;
 layout (location = 1) in vec4 a_LineColor;
 layout (location = 2) in vec4 a_FillColor;
-layout (location = 3) in float a_Width;
+layout (location = 3) in vec2 a_Size;
 layout (location = 4) in float a_LineWidth;
 layout (location = 5) in float a_TextureIndex;
 
@@ -13,8 +13,8 @@ out VS_OUT {
     vec2 TexCoord;
     vec4 LineColor;
     vec4 FillColor;
+    vec2 Size;
     float LineWidth;
-    float Width;
 } vs_out;
 
 out flat float TextureIndex;
@@ -24,7 +24,7 @@ void main() {
     vs_out.TexCoord = a_PosUV.zw;
     vs_out.LineColor = a_LineColor;
     vs_out.FillColor = a_FillColor;
+    vs_out.Size = a_Size;
     vs_out.LineWidth = a_LineWidth;
-    vs_out.Width = a_Width;
     TextureIndex = a_TextureIndex;
 }

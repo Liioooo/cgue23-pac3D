@@ -5,6 +5,7 @@ in VS_OUT {
     vec4 LineColor;
     vec4 FillColor;
     float LineWidth;
+    float Width;
 } fs_in;
 
 in flat float TextureIndex;
@@ -23,7 +24,7 @@ void main() {
 
     vec4 fillColor = TextureIndex < 0.0f ? fs_in.FillColor : texture(u_Textures[int(TextureIndex)], fs_in.TexCoord);
 
-    float lineAlpha = 1.0f - smoothstep(1.0f - fs_in.LineWidth, 1.02f - fs_in.LineWidth, dist);
+    float lineAlpha = 1.0f - smoothstep(1.0f - fs_in.LineWidth / (fs_in.Width * 0.5f), 1.02f - fs_in.LineWidth / (fs_in.Width * 0.5f), dist);
     float fillAlpha = 1.0f - smoothstep(0.95f, 1.0f, dist);
 
     o_FragColor = vec4(mix(fs_in.LineColor.rgb, fillColor.rgb, lineAlpha), mix(fs_in.LineColor.a, fillColor.a, lineAlpha) * fillAlpha);

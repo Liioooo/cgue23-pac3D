@@ -166,8 +166,7 @@ namespace CgEngine {
         updateTransforms();
 
         for (auto it = componentManager->begin<UiCanvasComponent>(); it != componentManager->end<UiCanvasComponent>(); it++) {
-            const auto& entityTransform = componentManager->getComponent<TransformComponent>(it->getEntity()).getModelMatrix();
-            it->update(entityTransform, viewportWidth, viewportHeight);
+            it->update(viewportWidth, viewportHeight);
         }
     }
 

@@ -3,7 +3,7 @@
 namespace CgEngine {
 
     enum class UIElementType {
-        Circle
+        Circle, Rect
     };
 
     enum class UIPosUnit {
@@ -38,12 +38,12 @@ namespace CgEngine {
         uint32_t getZIndex() const;
         void setZIndex(uint32_t zIndex);
 
-        void update(const glm::mat3& entityTransform, uint32_t viewportWidth, uint32_t viewportHeight, bool viewportDirty);
+        void update(uint32_t viewportWidth, uint32_t viewportHeight, bool viewportDirty);
 
         virtual const std::vector<glm::vec4>& getVertices() const = 0;
 
     protected:
-        virtual void updateVertices(const glm::mat3& entityTransform, bool absolutePosDirty) = 0;
+        virtual void updateElement(bool absolutePosDirty) = 0;
 
         UIXAlignment xAlignment;
         UIYAlignment yAlignment;

@@ -3,19 +3,20 @@
 #include "GlobalObjectManager.h"
 #include "Ui/UiCircle.h"
 #include "Asserts.h"
-#include "glm/gtx/matrix_transform_2d.hpp"
 
 namespace CgEngine {
-    void UiCanvasComponent::onAttach(CgEngine::Scene& scene, UiCanvasComponentParams& params) {
+    void UiCanvasComponent::onAttach(Scene& scene, UiCanvasComponentParams& params) {
         for (const auto& element: params.elements) {
             std::string name = element.name();
-            if (name == "CircleUi") {
+            if (name == "UiCircle") {
                 createElementCircle(element);
+            } else if (name == "UiRect") {
+                createElementRect(element);
             }
         }
     }
 
-    void UiCanvasComponent::update(const glm::mat4& entityTransform, uint32_t viewportWidth, uint32_t viewportHeight) {
+    void UiCanvasComponent::update(uint32_t viewportWidth, uint32_t viewportHeight) {
         if (viewportWidth == 0 && viewportHeight == 0) {
             return;
         }
@@ -24,22 +25,19 @@ namespace CgEngine {
         vWidth = viewportWidth;
         vHeight = viewportHeight;
 
-        auto transform = glm::mat3(1.0f);
-        transform *= glm::translate(transform, {viewportWidth / 2, viewportHeight / 2});
-        transform *= glm::mat3(
-                entityTransform[0][0], entityTransform[0][1], 0.0f,
-                entityTransform[1][0], entityTransform[1][1], 0.0f,
-                entityTransform[3][0], entityTransform[3][1], 1.0f
-        );;
-        transform *= glm::translate(transform, {-(static_cast<float>(viewportWidth) / 2), -(static_cast<float>(viewportHeight) / 2)});
-
         for (const auto& element: uiElements) {
-            element.second->update(transform, viewportWidth, viewportHeight, viewportDirty);
+            element.second->update(viewportWidth, viewportHeight, viewportDirty);
         }
     }
 
-    UiCircle* UiCanvasComponent::addCircleUi(const std::string& id) {
+    UiCircle* UiCanvasComponent::addUiCircle(const std::string& id) {
         auto* element = new UiCircle();
+        uiElements.insert({id, element});
+        return element;
+    }
+
+    UiRect* UiCanvasComponent::addUiRect(const std::string& id) {
+        auto* element = new UiRect();
         uiElements.insert({id, element});
         return element;
     }
@@ -57,12 +55,49 @@ namespace CgEngine {
     }
 
     void UiCanvasComponent::createElementCircle(const pugi::xml_node& elementNode) {
+        auto* element = createElement<UiCircle>(elementNode);
+
+        element->setLineWidth(elementNode.attribute("line-width").as_float(0.0f));
+        element->setLineColor(stringTupleToVec4(elementNode.attribute("line-color").as_string("0 0 0 1")));
+        element->setFillColor(stringTupleToVec4(elementNode.attribute("fill-color").as_string("0 0 0 1")));
+
+        std::string textureName = elementNode.attribute("texture").as_string("");
+        if (!textureName.empty()) {
+            std::string texturePath = FileSystem::getAsGamePath(textureName);
+            auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+            element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
+        }
+
+        element->setWidth(elementNode.attribute("width").as_float(100.0f));
+    }
+
+    void UiCanvasComponent::createElementRect(const pugi::xml_node& elementNode) {
+        auto* element = createElement<UiRect>(elementNode);
+
+        element->setLineWidth(elementNode.attribute("line-width").as_float(0.0f));
+        element->setLineColor(stringTupleToVec4(elementNode.attribute("line-color").as_string("0 0 0 1")));
+        element->setFillColor(stringTupleToVec4(elementNode.attribute("fill-color").as_string("0 0 0 1")));
+
+        std::string textureName = elementNode.attribute("texture").as_string("");
+        if (!textureName.empty()) {
+            std::string texturePath = FileSystem::getAsGamePath(textureName);
+            auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+            element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
+        }
+
+        element->setWidth(elementNode.attribute("width").as_float(100.0f));
+        element->setHeight(elementNode.attribute("height").as_float(100.0f));
+    }
+
+    template<typename E>
+    E* UiCanvasComponent::createElement(const pugi::xml_node& elementNode) {
         std::string id = elementNode.attribute("id").as_string("");
 
         CG_ASSERT(!id.empty(), "ID of UIElement must be set!")
         CG_ASSERT(uiElements.count(id) == 0, "ID of UIElement already used!")
 
-        auto* element = addCircleUi(id);
+        E* element = new E();
+        uiElements.insert({id, element});
 
         auto top = stringToPosAndUnit(elementNode.attribute("top").as_string("0px"));
         auto left = stringToPosAndUnit(elementNode.attribute("left").as_string("0px"));
@@ -79,19 +114,7 @@ namespace CgEngine {
 
         element->setZIndex(elementNode.attribute("z-index").as_int(0));
 
-        element->setLineWidth(elementNode.attribute("line-width").as_float(0.0f));
-        element->setLineColor(stringTupleToVec4(elementNode.attribute("line-color").as_string("0 0 0 1")));
-        element->setFillColor(stringTupleToVec4(elementNode.attribute("fill-color").as_string("0 0 0 1")));
-
-        std::string textureName = elementNode.attribute("texture").as_string("");
-        if (!textureName.empty()) {
-            std::string texturePath = FileSystem::getAsGamePath(textureName);
-            auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
-            element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
-        }
-
-        element->setWidth(elementNode.attribute("width").as_int(100));
-        element->setHeight(elementNode.attribute("height").as_int(100));
+        return element;
     }
 
     std::pair<float, UIPosUnit> UiCanvasComponent::stringToPosAndUnit(const std::string& s) {

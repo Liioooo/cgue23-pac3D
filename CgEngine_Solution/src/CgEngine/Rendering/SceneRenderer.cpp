@@ -212,6 +212,20 @@ namespace CgEngine {
 
             uiCirclePass = new RenderPass(uiCircleRenderPassSpec);
 
+            RenderPassSpecification uiRectRenderPassSpec;
+            uiRectRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("uiRect");
+            uiRectRenderPassSpec.clearColorBuffer = false;
+            uiRectRenderPassSpec.clearDepthBuffer = false;
+            uiRectRenderPassSpec.depthTest = false;
+            uiRectRenderPassSpec.depthWrite = false;
+            uiRectRenderPassSpec.useBlending = true;
+            uiRectRenderPassSpec.blendingEquation = BlendingEquation::Add;
+            uiRectRenderPassSpec.srcBlendingFunction = BlendingFunction::SrcAlpha;
+            uiRectRenderPassSpec.destBlendingFunction = BlendingFunction::OneMinusSrcAlpha;
+            uiRectRenderPassSpec.framebuffer = screenRenderPass->getSpecification().framebuffer;
+
+            uiRectPass = new RenderPass(uiRectRenderPassSpec);
+
             uiProjectionMatrix = glm::ortho(0.0f, static_cast<float>(viewportWidth), 0.0f, static_cast<float>(viewportHeight));
         }
 
@@ -228,6 +242,7 @@ namespace CgEngine {
         delete bloomDownSamplePass;
         delete bloomUpSamplePass;
         delete uiCirclePass;
+        delete uiRectPass;
         delete physicsCollidersRenderPass;
         delete normalsDebugRenderPass;
         delete debugLinesRenderPass;
@@ -425,39 +440,39 @@ namespace CgEngine {
             UiDrawInfo& drawInfo = uiDrawInfoQueue[element->getZIndex()];
 
             if (element->getType() == UIElementType::Circle) {
-
                 auto* circleElement = dynamic_cast<UiCircle*>(element);
-
                 const auto* texture = circleElement->getTexture();
-                float textureIndex = -1;
-                if (texture != nullptr) {
-                    for (uint32_t i = 0; i < drawInfo.filledTextureSlots; i++) {
-                        if (*drawInfo.textureSlots[i] == *texture) {
-                            textureIndex = static_cast<float>(i);
-                            break;
-                        }
-                    }
-                    if (textureIndex < 0.0f) {
-                        textureIndex = static_cast<float>(drawInfo.filledTextureSlots);
-                        drawInfo.textureSlots[drawInfo.filledTextureSlots] = texture;
-                        drawInfo.filledTextureSlots++;
-                    }
-                }
+                float textureIndex = findDrawInfoTextureIndex(drawInfo, texture);
 
                 for (const auto& v: element->getVertices()) {
                     UiCircleVertex& vertex = drawInfo.circleVertices.emplace_back();
                     vertex.posUV = v;
                     vertex.fillColor = circleElement->getFillColor();
+                    vertex.width = circleElement->getWidth();
                     vertex.lineColor = circleElement->getLineColor();
                     vertex.lineWidth = circleElement->getLineWidth();
                     vertex.textureIndex = textureIndex;
                 }
                 drawInfo.circleIndexCount += 6;
+            } else if (element->getType() == UIElementType::Rect) {
+                auto* rectElement = dynamic_cast<UiRect*>(element);
+                const auto* texture = rectElement->getTexture();
+                float textureIndex = findDrawInfoTextureIndex(drawInfo, texture);
 
-                CG_ASSERT(drawInfo.circleIndexCount <= Renderer::maxUiIndices, "Cannot render that many UICircles")
-                CG_ASSERT(drawInfo.filledTextureSlots < drawInfo.textureSlots.size(), "Cannot render that many different Textures on a single z-index")
-
+                for (const auto& v: element->getVertices()) {
+                    UiRectVertex& vertex = drawInfo.rectVertices.emplace_back();
+                    vertex.posUV = v;
+                    vertex.fillColor = rectElement->getFillColor();
+                    vertex.lineColor = rectElement->getLineColor();
+                    vertex.size = rectElement->getSize();
+                    vertex.lineWidth = rectElement->getLineWidth();
+                    vertex.textureIndex = textureIndex;
+                }
+                drawInfo.rectIndexCount += 6;
             }
+
+            CG_ASSERT(drawInfo.circleIndexCount <= Renderer::maxUiIndices, "Cannot render that many UICircles")
+            CG_ASSERT(drawInfo.filledTextureSlots < drawInfo.textureSlots.size(), "Cannot render that many different Textures on a single z-index")
         }
     }
 
@@ -613,6 +628,10 @@ namespace CgEngine {
             Renderer::beginRenderPass(*uiCirclePass);
             Renderer::renderUiCircles(drawInfo.circleVertices, drawInfo.circleIndexCount);
             Renderer::endRenderPass();
+
+            Renderer::beginRenderPass(*uiRectPass);
+            Renderer::renderUiRects(drawInfo.rectVertices, drawInfo.rectIndexCount);
+            Renderer::endRenderPass();
         }
     }
 
@@ -695,5 +714,23 @@ namespace CgEngine {
         }
 
         ubDirShadowData->setData(dirShadowData);
+    }
+
+    float SceneRenderer::findDrawInfoTextureIndex(UiDrawInfo& drawInfo, const Texture2D* texture) const {
+        float textureIndex = -1;
+        if (texture != nullptr) {
+            for (uint32_t i = 0; i < drawInfo.filledTextureSlots; i++) {
+                if (*drawInfo.textureSlots[i] == *texture) {
+                    textureIndex = static_cast<float>(i);
+                    break;
+                }
+            }
+            if (textureIndex < 0.0f) {
+                textureIndex = static_cast<float>(drawInfo.filledTextureSlots);
+                drawInfo.textureSlots[drawInfo.filledTextureSlots] = texture;
+                drawInfo.filledTextureSlots++;
+            }
+        }
+        return textureIndex;
     }
 }
