@@ -18,3 +18,7 @@
 	path = CgEngine_Solution/vendor/assimp
 	url = https://github.com/assimp/assimp.git
 	branch = master
+[submodule "CgEngine_Solution/vendor/freetype"]
+	path = CgEngine_Solution/vendor/freetype
+	url = https://gitlab.freedesktop.org/freetype/freetype.git
+	branch = master

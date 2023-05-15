@@ -175,6 +175,13 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         )
 ################################################################################
 
+# FREETYPE #####################################################################
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
+add_subdirectory(vendor/freetype)
+list(APPEND ADDITIONAL_LIBRARY_DEPENDENCIES freetype)
+list(APPEND ADDITIONAL_INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/vendor/freetype/include")
+################################################################################
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
