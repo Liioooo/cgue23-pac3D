@@ -181,6 +181,8 @@ namespace CgEngine {
 
     void Scene::onRender(SceneRenderer& renderer) {
         auto cameraComponent = std::find_if(componentManager->begin<CameraComponent>(), componentManager->end<CameraComponent>(), [](auto&& c) { return c.isPrimary();});
+        CG_ASSERT(cameraComponent != componentManager->end<CameraComponent>(), "Scene must have a Primary Camera")
+
         auto cameraTransform = componentManager->getComponent<TransformComponent>(cameraComponent->getEntity());
 
         SceneLightEnvironment lightEnvironment{};

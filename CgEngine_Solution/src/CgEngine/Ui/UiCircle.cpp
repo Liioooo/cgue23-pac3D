@@ -46,7 +46,7 @@ namespace CgEngine {
         return vertices;
     }
 
-    void UiCircle::updateElement(bool absolutePosDirty) {
+    void UiCircle::updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
         if (dirty || absolutePosDirty) {
             vertices.clear();
 

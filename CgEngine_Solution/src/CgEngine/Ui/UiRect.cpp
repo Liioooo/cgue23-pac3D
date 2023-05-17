@@ -51,7 +51,11 @@ namespace CgEngine {
         return vertices;
     }
 
-    void UiRect::updateElement(bool absolutePosDirty) {
+    bool UiRect::isPointInside(const glm::vec2& point) const {
+        return point.x >= collisionPoints[0] && point.x <= collisionPoints[2] && point.y >= collisionPoints[1] && point.y <= collisionPoints[3];
+    }
+
+    void UiRect::updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
         if (dirty || absolutePosDirty) {
             vertices.clear();
 
@@ -86,6 +90,12 @@ namespace CgEngine {
                 }
             }
         }
+
+        collisionPoints[0] = vertices[0].x;
+        collisionPoints[1] = viewportHeight - vertices[2].y;
+        collisionPoints[2] = vertices[2].x;
+        collisionPoints[3] = viewportHeight - vertices[0].y;
+
 
         dirty = false;
     }

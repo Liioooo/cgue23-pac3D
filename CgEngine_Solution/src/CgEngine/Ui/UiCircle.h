@@ -26,7 +26,7 @@ namespace CgEngine {
         const std::vector<glm::vec4>& getVertices() const override;
 
     protected:
-        void updateElement(bool absolutePosDirty) override;
+        void updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
 
     private:
         float width{};

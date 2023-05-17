@@ -3,6 +3,8 @@
 #include "Scene/Entity.h"
 #include "Scene/Scene.h"
 #include "Events/MouseScrolledEvent.h"
+#include "Events/MouseButtonPressedEvent.h"
+#include "Events/MouseMovedEvent.h"
 #include "Events/KeyPressedEvent.h"
 #include "Physics/PhysicsSystem.h"
 
@@ -33,6 +35,8 @@ namespace CgEngine {
         virtual void onTriggerExit(Entity other) {};
 
         virtual void onMouseScrolled(MouseScrolledEvent& event) {}
+        virtual void onMouseButtonPressed(MouseButtonPressedEvent& event) {}
+        virtual void onMouseMoved(MouseMovedEvent& event) {}
         virtual void onKeyPressed(KeyPressedEvent& event) {}
 
         Entity getOwingEntity();
@@ -46,6 +50,8 @@ namespace CgEngine {
         Entity createEntity(Entity parent);
         void setEntityTag(Entity entity, const std::string& tag);
         std::string getEntityTag(Entity entity);
+
+        void setActiveScene(const std::string& name);
 
         PhysicsRaycastHit physicsRaycast(const glm::vec3& origin, const glm::vec3& direction, float maxDistance, const std::unordered_set<Entity>& excludeEntities);
 

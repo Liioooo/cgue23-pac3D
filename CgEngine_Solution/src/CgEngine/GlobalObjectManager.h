@@ -1,10 +1,9 @@
 #pragma once
 
-#include <Scripting/ScriptManager.h>
+#include "Scripting/ScriptManager.h"
 #include "Scene/SceneManager.h"
 #include "Resources/ResourceManager.h"
 #include "Physics/PhysicsSystem.h"
-
 
 namespace CgEngine {
 

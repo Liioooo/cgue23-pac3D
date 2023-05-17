@@ -27,8 +27,10 @@ namespace CgEngine {
 
         const std::vector<glm::vec4>& getVertices() const override;
 
+        bool isPointInside(const glm::vec2& point) const;
+
     protected:
-        void updateElement(bool absolutePosDirty) override;
+        void updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
 
     private:
         glm::vec2 size;
@@ -42,6 +44,7 @@ namespace CgEngine {
         bool dirty = true;
 
         std::vector<glm::vec4> vertices;
+        glm::vec4 collisionPoints;
     };
 
 }

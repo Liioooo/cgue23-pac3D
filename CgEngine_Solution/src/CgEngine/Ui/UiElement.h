@@ -43,7 +43,7 @@ namespace CgEngine {
         virtual const std::vector<glm::vec4>& getVertices() const = 0;
 
     protected:
-        virtual void updateElement(bool absolutePosDirty) = 0;
+        virtual void updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) = 0;
 
         UIXAlignment xAlignment;
         UIYAlignment yAlignment;

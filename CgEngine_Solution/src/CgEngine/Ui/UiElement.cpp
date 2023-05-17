@@ -86,7 +86,7 @@ namespace CgEngine {
             }
         }
 
-        updateElement(dirty || viewportDirty);
+        updateElement(dirty || viewportDirty, viewportWidth, viewportHeight);
 
         dirty = false;
     }

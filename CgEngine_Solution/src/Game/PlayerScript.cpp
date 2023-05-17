@@ -115,8 +115,7 @@ namespace Game {
             gameCanvas.removeUIElement("live" + std::to_string(playerLives));
 
             if (playerLives == 0) {
-                CG_LOGGING_INFO("You lose!")
-                CgEngine::Application::get().shutdown();
+                setActiveScene("scenes/lost_scene.xml");
             }
 
             createStartText();

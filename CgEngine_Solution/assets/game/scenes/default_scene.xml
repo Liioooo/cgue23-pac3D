@@ -256,7 +256,7 @@
     <Entity id="inGameCanvas">
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
-            <UiCanvasComponent z-sorting="true">
+            <UiCanvasComponent>
                 <UiRect id="live0" left="10px" top="10px" width="100" height="100" texture="pacMan2D.png" line-width="0" y-align="top" x-align="left" />
                 <UiRect id="live1" left="120px" top="10px" width="100" height="100" texture="pacMan2D.png" line-width="0" y-align="top" x-align="left" />
                 <UiRect id="live2" left="230px" top="10px" width="100" height="100" texture="pacMan2D.png" line-width="0" y-align="top" x-align="left" />

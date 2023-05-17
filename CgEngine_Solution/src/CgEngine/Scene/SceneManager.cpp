@@ -2,6 +2,7 @@
 #include "GlobalObjectManager.h"
 #include "Resources/XMLFile.h"
 #include "SceneLoader.h"
+#include "FileSystem.h"
 
 namespace CgEngine {
 
@@ -22,7 +23,7 @@ namespace CgEngine {
     }
 
     void SceneManager::setActiveScene(const std::string &name) {
-        auto* xmlSceneFile = GlobalObjectManager::getInstance().getResourceManager().getResource<XMLFile>(name);
+        auto* xmlSceneFile = GlobalObjectManager::getInstance().getResourceManager().getResource<XMLFile>(FileSystem::getAsGamePath(name));
         nextScene = SceneLoader::loadScene(xmlSceneFile, viewportWidth, viewportHeight);
     }
 

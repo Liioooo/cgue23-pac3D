@@ -83,14 +83,18 @@ namespace CgEngine {
         });
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int button, int action, int mods) {
+            double x, y;
+
             switch (action) {
                 case GLFW_PRESS: {
-                    MouseButtonPressedEvent e(static_cast<MouseButton>(button));
+                    glfwGetCursorPos(w, &x, &y);
+                    MouseButtonPressedEvent e(static_cast<MouseButton>(button), static_cast<float>(x), static_cast<float>(y));
                     static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
                     break;
                 }
                 case GLFW_RELEASE: {
-                    MouseButtonReleasedEvent e(static_cast<MouseButton>(button));
+                    glfwGetCursorPos(w, &x, &y);
+                    MouseButtonReleasedEvent e(static_cast<MouseButton>(button), static_cast<float>(x), static_cast<float>(y));
                     static_cast<Window *>(glfwGetWindowUserPointer(w))->eventCallback(e);
                     break;
                 }

@@ -41,7 +41,7 @@ namespace CgEngine {
         return vertices;
     }
 
-    void UiText::updateElement(bool absolutePosDirty) {
+    void UiText::updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
         if (textDirty) {
             rawVertices.clear();
             numIndices = 0;
