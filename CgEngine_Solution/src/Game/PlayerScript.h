@@ -34,6 +34,8 @@ namespace Game {
 
         glm::vec3 cameraOffset = glm::vec3(0.0f, 1.5f, 0.0f);
         std::unordered_set<CgEngine::Entity> cameraRaycastExcluded;
+
+        void createStartText();
     };
 
 }

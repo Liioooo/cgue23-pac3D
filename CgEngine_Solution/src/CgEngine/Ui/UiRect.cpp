@@ -55,10 +55,10 @@ namespace CgEngine {
         if (dirty || absolutePosDirty) {
             vertices.clear();
 
-            vertices.emplace_back(0.0f, 0.0f, 0.0f, 0.0f);
-            vertices.emplace_back(size.x, 0.0f, 1.0f, 0.0f);
-            vertices.emplace_back(size.x, size.y, 1.0f, 1.0f);
-            vertices.emplace_back(0.0f, size.y, 0.0f, 1.0f);
+            vertices.emplace_back(0.0f, 0.0f, 0.0f, 1.0f);
+            vertices.emplace_back(size.x, 0.0f, 1.0f, 1.0f);
+            vertices.emplace_back(size.x, size.y, 1.0f, 0.0f);
+            vertices.emplace_back(0.0f, size.y, 0.0f, 0.0f);
 
             for (auto& vertex: vertices) {
                 switch (xAlignment) {

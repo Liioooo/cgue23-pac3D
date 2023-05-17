@@ -14,6 +14,7 @@ namespace CgEngine {
         void setSize(float s);
         void setText(const std::string& t);
         void setFont(const std::string& name);
+        void setUseKerning(bool use);
 
         const glm::vec4& getColor() const;
         const Texture2D* getFontAtlas() const;
@@ -31,6 +32,7 @@ namespace CgEngine {
 
         float size;
         Font* font;
+        bool useKerning = true;
 
         bool textDirty = true;
 

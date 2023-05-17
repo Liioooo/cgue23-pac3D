@@ -50,6 +50,10 @@ namespace CgEngine {
         return element;
     }
 
+    bool UiCanvasComponent::hasUiElement(const std::string& id) {
+        return uiElements.count(id) != 0;
+    }
+
     void UiCanvasComponent::removeUIElement(const std::string& id) {
         if (uiElements.count(id) != 0) {
             auto* element = uiElements.at(id);
@@ -88,9 +92,16 @@ namespace CgEngine {
 
         std::string textureName = elementNode.attribute("texture").as_string("");
         if (!textureName.empty()) {
-            std::string texturePath = FileSystem::getAsGamePath(textureName);
             auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
-            element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
+            std::string texturePath = FileSystem::getAsGamePath(textureName);
+
+            if (resourceManager.hasResource<Texture2D>(texturePath)) {
+                element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
+            } else {
+                auto* texture = new Texture2D(texturePath, false, TextureWrap::Repeat, MipMapFiltering::Bilinear);
+                resourceManager.insertResource(texturePath, texture);
+                element->setTexture(texture);
+            }
         }
 
         element->setWidth(elementNode.attribute("width").as_float(100.0f));
@@ -103,6 +114,7 @@ namespace CgEngine {
         element->setSize(elementNode.attribute("size").as_float(1.0f));
         element->setText(elementNode.attribute("text").as_string(""));
         element->setColor(stringTupleToVec4(elementNode.attribute("color").as_string("0 0 0 1")));
+        element->setUseKerning(elementNode.attribute("kerning").as_bool(true));
 
         std::string font = elementNode.attribute("font").as_string("");
         CG_ASSERT(!font.empty(), "UIText: Font must be set!")

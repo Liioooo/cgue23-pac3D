@@ -24,6 +24,7 @@ namespace CgEngine {
         UiRect* addUiRect(const std::string& id);
         UiText* addUiText(const std::string& id);
 
+        bool hasUiElement(const std::string& id);
         void removeUIElement(const std::string& id);
 
         template<typename U>

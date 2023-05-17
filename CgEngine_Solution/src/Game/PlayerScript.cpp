@@ -12,15 +12,23 @@ namespace Game {
         prevMousePos = CgEngine::Input::getMousePosition();
 
         cameraRaycastExcluded.insert(getOwingEntity());
+
+        createStartText();
     }
 
     void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
         if (respawnTimer > 0.0f) {
             respawnTimer -= ts.getSeconds();
-            CG_LOGGING_INFO("Respawn in: {0} Seconds", respawnTimer);
-            if (respawnTimer < 0.0f) {
-                CG_LOGGING_INFO("Remaining lives: {0}", playerLives);
+
+            auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("inGameCanvas"));
+            if (respawnTimer > 0) {
+                std::string timerStr = std::to_string(respawnTimer);
+                gameCanvas.getUIElement<CgEngine::UiText>("startTimer")->setText(timerStr.substr(0, timerStr.find('.') + 3));
+            } else {
+                gameCanvas.removeUIElement("startTimer");
+                gameCanvas.removeUIElement("start");
             }
+
             return;
         }
 
@@ -102,10 +110,16 @@ namespace Game {
             yaw = 0.0f;
             respawnTimer = 3.0f;
             playerLives--;
+
+            auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("inGameCanvas"));
+            gameCanvas.removeUIElement("live" + std::to_string(playerLives));
+
             if (playerLives == 0) {
                 CG_LOGGING_INFO("You lose!")
                 CgEngine::Application::get().shutdown();
             }
+
+            createStartText();
         }
     }
 
@@ -125,5 +139,32 @@ namespace Game {
                 comp.jump(0.5f);
             }
         }
+    }
+
+    void PlayerScript::createStartText() {
+        auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("inGameCanvas"));
+        auto* start = gameCanvas.addUiText("start");
+        auto* startTimer = gameCanvas.addUiText("startTimer");
+
+        start->setFont("SpaceMono-Bold.ttf");
+        start->setText("START IN");
+        start->setTop(0.3, CgEngine::UIPosUnit::Percent);
+        start->setLeft(0.5, CgEngine::UIPosUnit::Percent);
+        start->setSize(120);
+        start->setXAlignment(CgEngine::UIXAlignment::Center);
+        start->setYAlignment(CgEngine::UIYAlignment::Center);
+        start->setColor({0.8f, 0.0f, 0.0f, 1.0f});
+
+        std::string timerStr = std::to_string(respawnTimer);
+
+        startTimer->setFont("SpaceMono-Bold.ttf");
+        startTimer->setText(timerStr.substr(0, timerStr.find('.') + 3));
+        startTimer->setTop(0.42, CgEngine::UIPosUnit::Percent);
+        startTimer->setLeft(0.5, CgEngine::UIPosUnit::Percent);
+        startTimer->setSize(160);
+        startTimer->setXAlignment(CgEngine::UIXAlignment::Center);
+        startTimer->setYAlignment(CgEngine::UIYAlignment::Center);
+        startTimer->setColor({0.0f, 0.0f, 0.0f, 1.0f});
+        startTimer->setUseKerning(false);
     }
 }

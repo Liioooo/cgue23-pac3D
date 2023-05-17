@@ -21,6 +21,10 @@ namespace CgEngine {
         textDirty = true;
     }
 
+    void UiText::setUseKerning(bool use) {
+        useKerning = use;
+    }
+
     const glm::vec4& UiText::getColor() const {
         return color;
     }
@@ -40,6 +44,7 @@ namespace CgEngine {
     void UiText::updateElement(bool absolutePosDirty) {
         if (textDirty) {
             rawVertices.clear();
+            numIndices = 0;
             bounding = glm::vec2(0.0f);
 
             float penX = 0.0f;
@@ -57,7 +62,7 @@ namespace CgEngine {
 
                 float kerning = 0.0f;
 
-                if (lastGlyphIndex != 0) {
+                if (useKerning && lastGlyphIndex != 0) {
                     kerning = font->getKerning(lastGlyphIndex, cInfo.glyphIndex);
                 }
 
