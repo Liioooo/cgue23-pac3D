@@ -3,7 +3,7 @@
 namespace CgEngine {
 
     enum class UIElementType {
-        Circle, Rect
+        Circle, Rect, Text
     };
 
     enum class UIPosUnit {

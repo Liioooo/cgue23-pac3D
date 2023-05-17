@@ -9,6 +9,7 @@
 #include "Rendering/Material.h"
 #include "Rendering/Texture.h"
 #include "Physics/PhysicsMaterial.h"
+#include "Font.h"
 
 namespace CgEngine {
 
@@ -42,6 +43,7 @@ namespace CgEngine {
             registerResourceType<Texture2D>();
             registerResourceType<TextureCube>();
             registerResourceType<PhysicsMaterial>();
+            registerResourceType<Font>();
         }
 
         template<typename R>

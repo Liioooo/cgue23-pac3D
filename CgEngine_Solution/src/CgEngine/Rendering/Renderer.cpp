@@ -24,6 +24,7 @@ namespace CgEngine {
     VertexArrayObject* Renderer::linesVAO;
     VertexArrayObject* Renderer::uiCircleVAO;
     VertexArrayObject* Renderer::uiRectVAO;
+    VertexArrayObject* Renderer::uiTextVAO;
     ShaderStorageBuffer* Renderer::transformsBuffer;
 
 
@@ -115,6 +116,12 @@ namespace CgEngine {
         uiCircleVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float2, false}, {ShaderDataType::Float, false}, {ShaderDataType::Float, false}});
         uiRectVAO->addVertexBuffer(uiCircleVertexBuffer);
         uiRectVAO->setIndexBuffer(uiIndices, maxUiIndices);
+
+        uiTextVAO = new VertexArrayObject();
+        auto uiTextVertexBuffer = std::make_shared<VertexBuffer>(0, VertexBufferUsage::Dynamic);
+        uiTextVertexBuffer->setLayout({{ShaderDataType::Float4, false}, {ShaderDataType::Float4, false}, {ShaderDataType::Float, false}});
+        uiTextVAO->addVertexBuffer(uiTextVertexBuffer);
+        uiTextVAO->setIndexBuffer(uiIndices, maxUiIndices);
 
         isWireframe = false;
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -308,14 +315,26 @@ namespace CgEngine {
     }
 
     void Renderer::renderUiCircles(const std::vector<UiCircleVertex>& vertices, uint32_t indexCount) {
+        CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
+
         uiCircleVAO->bind();
         uiCircleVAO->getVertexBuffers()[0]->setData(vertices.data(), vertices.size() * sizeof(UiCircleVertex), VertexBufferUsage::Dynamic);
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
     }
 
     void Renderer::renderUiRects(const std::vector<UiRectVertex>& vertices, uint32_t indexCount) {
+        CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
+
         uiRectVAO->bind();
         uiRectVAO->getVertexBuffers()[0]->setData(vertices.data(), vertices.size() * sizeof(UiRectVertex), VertexBufferUsage::Dynamic);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+
+    void Renderer::renderUiText(const std::vector<UiTextVertex>& vertices, uint32_t indexCount) {
+        CG_ASSERT(currentRenderPass != nullptr, "There is no active RenderPass!")
+
+        uiTextVAO->bind();
+        uiTextVAO->getVertexBuffers()[0]->setData(vertices.data(), vertices.size() * sizeof(UiTextVertex), VertexBufferUsage::Dynamic);
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
     }
 

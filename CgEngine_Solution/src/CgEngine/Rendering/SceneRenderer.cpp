@@ -226,6 +226,20 @@ namespace CgEngine {
 
             uiRectPass = new RenderPass(uiRectRenderPassSpec);
 
+            RenderPassSpecification uiTextRenderPassSpec;
+            uiTextRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("uiText");
+            uiTextRenderPassSpec.clearColorBuffer = false;
+            uiTextRenderPassSpec.clearDepthBuffer = false;
+            uiTextRenderPassSpec.depthTest = false;
+            uiTextRenderPassSpec.depthWrite = false;
+            uiTextRenderPassSpec.useBlending = true;
+            uiTextRenderPassSpec.blendingEquation = BlendingEquation::Add;
+            uiTextRenderPassSpec.srcBlendingFunction = BlendingFunction::SrcAlpha;
+            uiTextRenderPassSpec.destBlendingFunction = BlendingFunction::OneMinusSrcAlpha;
+            uiTextRenderPassSpec.framebuffer = screenRenderPass->getSpecification().framebuffer;
+
+            uiTextPass = new RenderPass(uiTextRenderPassSpec);
+
             uiProjectionMatrix = glm::ortho(0.0f, static_cast<float>(viewportWidth), 0.0f, static_cast<float>(viewportHeight));
         }
 
@@ -243,6 +257,7 @@ namespace CgEngine {
         delete bloomUpSamplePass;
         delete uiCirclePass;
         delete uiRectPass;
+        delete uiTextPass;
         delete physicsCollidersRenderPass;
         delete normalsDebugRenderPass;
         delete debugLinesRenderPass;
@@ -469,10 +484,38 @@ namespace CgEngine {
                     vertex.textureIndex = textureIndex;
                 }
                 drawInfo.rectIndexCount += 6;
+            } else if (element->getType() == UIElementType::Text) {
+                auto* textElement = dynamic_cast<UiText*>(element);
+                const auto* fontAtlas = textElement->getFontAtlas();
+
+                float fontAtlasIndex = -1;
+                for (uint32_t i = 0; i < drawInfo.filledFontAtlases; i++) {
+                    if (*drawInfo.fontAtlases[i] == *fontAtlas) {
+                        fontAtlasIndex = static_cast<float>(i);
+                        break;
+                    }
+                }
+                if (fontAtlasIndex < 0.0f) {
+                    fontAtlasIndex = static_cast<float>(drawInfo.filledFontAtlases);
+                    drawInfo.fontAtlases[drawInfo.filledFontAtlases] = fontAtlas;
+                    drawInfo.filledFontAtlases++;
+                }
+
+                for (const auto& v: element->getVertices()) {
+                    UiTextVertex& vertex = drawInfo.textVertices.emplace_back();
+                    vertex.posUV = v;
+                    vertex.color = textElement->getColor();
+                    vertex.fontAtlasIndex = fontAtlasIndex;
+                }
+
+                drawInfo.textIndexCount += textElement->getNumIndices();
             }
 
             CG_ASSERT(drawInfo.circleIndexCount <= Renderer::maxUiIndices, "Cannot render that many UICircles")
+            CG_ASSERT(drawInfo.rectIndexCount <= Renderer::maxUiIndices, "Cannot render that many UIRects")
+            CG_ASSERT(drawInfo.textIndexCount <= Renderer::maxUiIndices, "Cannot render that many UIText")
             CG_ASSERT(drawInfo.filledTextureSlots < drawInfo.textureSlots.size(), "Cannot render that many different Textures on a single z-index")
+            CG_ASSERT(drawInfo.filledFontAtlases < drawInfo.fontAtlases.size(), "Cannot render that many different Fonts on a single z-index")
         }
     }
 
@@ -624,14 +667,32 @@ namespace CgEngine {
             for (uint32_t i = 0; i < drawInfo.filledTextureSlots; i++) {
                 drawInfo.textureSlots[i]->bind(i);
             }
+            for (uint32_t i = drawInfo.filledTextureSlots; i < drawInfo.textureSlots.size(); i++) {
+                Renderer::getWhiteTexture().bind(i);
+            }
+            if (drawInfo.circleIndexCount > 0) {
+                Renderer::beginRenderPass(*uiCirclePass);
+                Renderer::renderUiCircles(drawInfo.circleVertices, drawInfo.circleIndexCount);
+                Renderer::endRenderPass();
+            }
+            if (drawInfo.rectIndexCount > 0) {
+                Renderer::beginRenderPass(*uiRectPass);
+                Renderer::renderUiRects(drawInfo.rectVertices, drawInfo.rectIndexCount);
+                Renderer::endRenderPass();
+            }
 
-            Renderer::beginRenderPass(*uiCirclePass);
-            Renderer::renderUiCircles(drawInfo.circleVertices, drawInfo.circleIndexCount);
-            Renderer::endRenderPass();
 
-            Renderer::beginRenderPass(*uiRectPass);
-            Renderer::renderUiRects(drawInfo.rectVertices, drawInfo.rectIndexCount);
-            Renderer::endRenderPass();
+            for (uint32_t i = 0; i < drawInfo.filledFontAtlases; i++) {
+                drawInfo.fontAtlases[i]->bind(i);
+            }
+            for (uint32_t i = drawInfo.filledFontAtlases; i < drawInfo.fontAtlases.size(); i++) {
+                Renderer::getWhiteTexture().bind(i);
+            }
+            if (drawInfo.textIndexCount > 0) {
+                Renderer::beginRenderPass(*uiTextPass);
+                Renderer::renderUiText(drawInfo.textVertices, drawInfo.textIndexCount);
+                Renderer::endRenderPass();
+            }
         }
     }
 

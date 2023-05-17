@@ -42,6 +42,7 @@ namespace CgEngine {
         RenderPass* bloomUpSamplePass;
         RenderPass* uiCirclePass;
         RenderPass* uiRectPass;
+        RenderPass* uiTextPass;
         RenderPass* physicsCollidersRenderPass;
         RenderPass* normalsDebugRenderPass;
         RenderPass* debugLinesRenderPass;
@@ -166,6 +167,11 @@ namespace CgEngine {
             std::vector<UiRectVertex> rectVertices;
             std::array<const Texture2D*, 16> textureSlots{};
             uint32_t filledTextureSlots = 0;
+
+            std::vector<UiTextVertex> textVertices;
+            uint32_t textIndexCount = 0;
+            std::array<const Texture2D*, 4> fontAtlases;
+            uint32_t filledFontAtlases = 0;
         };
 
         std::map<uint32_t, UiDrawInfo> uiDrawInfoQueue;

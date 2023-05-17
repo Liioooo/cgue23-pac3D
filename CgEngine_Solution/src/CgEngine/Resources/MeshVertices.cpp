@@ -8,7 +8,7 @@
 #include "Application.h"
 
 namespace CgEngine {
-    MeshVertices *MeshVertices::createResource(const std::string &name) {
+    MeshVertices* MeshVertices::createResource(const std::string &name) {
         if (name == "CG_CubeMesh") {
             return createCubeMesh();
         } else if (name.rfind("CG_SphereMesh", 0) == 0) {

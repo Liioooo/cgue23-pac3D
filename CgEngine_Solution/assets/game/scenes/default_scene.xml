@@ -284,9 +284,10 @@
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
             <UiCanvasComponent z-sorting="true">
-                <UiCircle id="circle" left="0" top="0" width="100" fill-color="0.5 0.5 1 1.0" line-width="0" line-color="1 1 1 0.4" x-align="left" y-align="top" />
-                <UiCircle id="circle2" left="0.5" top="0.5" width="150" texture="textures/grass1-albedo3.png" line-width="10" z-index="1" />
+                <UiCircle id="circle" left="1" top="0" width="100" fill-color="0.5 0.5 1 1.0" line-width="0" line-color="1 1 1 0.4" x-align="right" y-align="top" />
+                <UiCircle id="circle2" left="0.5" top="0.8" width="150" texture="textures/grass1-albedo3.png" line-width="10" z-index="1" />
                 <UiRect id="rect1" left="0.5" top="0.1" width="150" height="150" texture="textures/grass1-albedo3.png" line-width="0" fill-color="0.5 0.5 1 0.3" y-align="top" />
+                <UiText id="text" left="0.5" top="0.5" text="Test g y AAV" font="arial.ttf" x-align="center" y-align="center" size="72" />
             </UiCanvasComponent>
         </Components>
     </Entity>

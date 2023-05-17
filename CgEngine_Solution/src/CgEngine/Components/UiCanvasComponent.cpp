@@ -12,6 +12,8 @@ namespace CgEngine {
                 createElementCircle(element);
             } else if (name == "UiRect") {
                 createElementRect(element);
+            } else if (name == "UiText") {
+                createElementText(element);
             }
         }
     }
@@ -38,6 +40,12 @@ namespace CgEngine {
 
     UiRect* UiCanvasComponent::addUiRect(const std::string& id) {
         auto* element = new UiRect();
+        uiElements.insert({id, element});
+        return element;
+    }
+
+    UiText* UiCanvasComponent::addUiText(const std::string& id) {
+        auto* element = new UiText();
         uiElements.insert({id, element});
         return element;
     }
@@ -87,6 +95,18 @@ namespace CgEngine {
 
         element->setWidth(elementNode.attribute("width").as_float(100.0f));
         element->setHeight(elementNode.attribute("height").as_float(100.0f));
+    }
+
+    void UiCanvasComponent::createElementText(const pugi::xml_node& elementNode) {
+        auto* element = createElement<UiText>(elementNode);
+
+        element->setSize(elementNode.attribute("size").as_float(1.0f));
+        element->setText(elementNode.attribute("text").as_string(""));
+        element->setColor(stringTupleToVec4(elementNode.attribute("color").as_string("0 0 0 1")));
+
+        std::string font = elementNode.attribute("font").as_string("");
+        CG_ASSERT(!font.empty(), "UIText: Font must be set!")
+        element->setFont(font);
     }
 
     template<typename E>

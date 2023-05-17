@@ -4,6 +4,7 @@
 #include "pugixml.hpp"
 #include "Ui/UiCircle.h"
 #include "Ui/UiRect.h"
+#include "Ui/UiText.h"
 
 namespace CgEngine {
 
@@ -21,6 +22,7 @@ namespace CgEngine {
 
         UiCircle* addUiCircle(const std::string& id);
         UiRect* addUiRect(const std::string& id);
+        UiText* addUiText(const std::string& id);
 
         void removeUIElement(const std::string& id);
 
@@ -38,6 +40,7 @@ namespace CgEngine {
 
         void createElementCircle(const pugi::xml_node& elementNode);
         void createElementRect(const pugi::xml_node& elementNode);
+        void createElementText(const pugi::xml_node& elementNode);
 
         template<typename E>
         E* createElement(const pugi::xml_node& elementNode);

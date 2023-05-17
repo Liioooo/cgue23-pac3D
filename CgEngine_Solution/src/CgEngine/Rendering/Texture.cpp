@@ -10,6 +10,7 @@ namespace CgEngine {
     namespace TextureUtils {
         int getOpenGLTextureInternalFormat(TextureFormat format) {
             switch (format) {
+                case TextureFormat::R:          return GL_RED;
                 case TextureFormat::RGB:        return GL_RGB;
                 case TextureFormat::RGBA:       return GL_RGBA;
                 case TextureFormat::Float16A:   return GL_RGBA16F;
@@ -32,7 +33,7 @@ namespace CgEngine {
         }
 
         int getOpenGLTextureType(TextureFormat format) {
-            if (format == TextureFormat::RGB || format == TextureFormat::RGBA) {
+            if (format == TextureFormat::RGB || format == TextureFormat::RGBA || format == TextureFormat::R) {
                 return GL_UNSIGNED_BYTE;
             }
             return GL_FLOAT;
@@ -43,6 +44,8 @@ namespace CgEngine {
                 return GL_RGBA;
             } else if (format == TextureFormat::Depth) {
                 return GL_DEPTH_COMPONENT;
+            } else if (format == TextureFormat::R) {
+                return GL_RED;
             }
             return GL_RGB;
         }
@@ -241,6 +244,17 @@ namespace CgEngine {
     void Texture2D::setClampBorderColor(const glm::vec4& color) {
         glBindTexture(GL_TEXTURE_2D, id);
         TextureUtils::setClampBorderColor(color, GL_TEXTURE_2D);
+    }
+
+    void Texture2D::bufferSubData(int x, int y, int w, int h, const void* data) {
+        GLint glFormat = TextureUtils::getOpenGLTextureFormat(format);
+        GLenum type = TextureUtils::getOpenGLTextureType(format);
+        glTextureSubImage2D(id, 0, x, y, w, h, glFormat, type, data);
+    }
+
+    void Texture2D::setUnpackAlignment(int alignment) {
+        glBindTexture(GL_TEXTURE_2D, id);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
     }
 
     bool Texture2D::isLoaded() const {

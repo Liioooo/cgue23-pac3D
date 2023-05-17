@@ -31,6 +31,12 @@ namespace CgEngine {
         float textureIndex;
     };
 
+    struct UiTextVertex {
+        glm::vec4 posUV;
+        glm::vec4 color;
+        float fontAtlasIndex;
+    };
+
     class Renderer {
     public:
         static void init();
@@ -43,6 +49,7 @@ namespace CgEngine {
         static void executeDrawCommand(const VertexArrayObject& vao, const Material& material, uint32_t indexCount, uint32_t baseIndex, uint32_t baseVertex, const std::vector<glm::mat4>& transforms, uint32_t instanceCount);
         static void renderUiCircles(const std::vector<UiCircleVertex>& vertices, uint32_t indexCount);
         static void renderUiRects(const std::vector<UiRectVertex>& vertices, uint32_t indexCount);
+        static void renderUiText(const std::vector<UiTextVertex>& vertices, uint32_t indexCount);
 
         static Texture2D& getWhiteTexture();
         static Texture2D& getBrdfLUTTexture();
@@ -76,6 +83,7 @@ namespace CgEngine {
 
         static VertexArrayObject* uiCircleVAO;
         static VertexArrayObject* uiRectVAO;
+        static VertexArrayObject* uiTextVAO;
 
         static ShaderStorageBuffer* transformsBuffer;
     };

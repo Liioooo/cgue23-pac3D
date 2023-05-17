@@ -3,7 +3,7 @@
 namespace CgEngine {
 
     enum class TextureFormat {
-        RGB, RGBA, Float16A, Float32A, Float16, Float32, Depth
+        R, RGB, RGBA, Float16A, Float32A, Float16, Float32, Depth
     };
 
     enum class TextureWrap {
@@ -47,6 +47,8 @@ namespace CgEngine {
         void bind(uint32_t slot) const;
         void generateMipMaps();
         void setClampBorderColor(const glm::vec4& color);
+        void bufferSubData(int x, int y, int w, int h, const void* data);
+        void setUnpackAlignment(int alignment);
         bool isLoaded() const;
 
     private:

@@ -33,7 +33,7 @@ namespace CgEngine {
         castShadows = params.castShadows;
     }
 
-    MeshVertices &MeshRendererComponent::getMeshVertices() {
+    MeshVertices& MeshRendererComponent::getMeshVertices() {
         return *mesh;
     }
 
