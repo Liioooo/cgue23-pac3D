@@ -10,8 +10,8 @@ namespace CgEngine {
         explicit UiRect() : UiElement(UIElementType::Rect) {};
         ~UiRect() override = default;
 
-        void setWidth(float width);
-        void setHeight(float height);
+        void setWidth(float width, UIPosUnit unit);
+        void setHeight(float height, UIPosUnit unit);
 
         void setLineWidth(float lineWidth);
         void setLineColor(const glm::vec4& lineColor);
@@ -30,9 +30,11 @@ namespace CgEngine {
         bool isPointInside(const glm::vec2& point) const;
 
     protected:
-        void updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
+        void updateElement(bool absolutePosDirty, bool viewportDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
 
     private:
+        std::pair<float, UIPosUnit> width;
+        std::pair<float, UIPosUnit> height;
         glm::vec2 size;
 
         float lineWidth{};

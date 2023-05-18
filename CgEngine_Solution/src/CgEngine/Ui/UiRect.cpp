@@ -1,13 +1,13 @@
 #include "UiRect.h"
 
 namespace CgEngine {
-    void UiRect::setWidth(float width) {
-        size.x = width;
+    void UiRect::setWidth(float width, UIPosUnit unit) {
+        this->width = {width, unit};
         dirty = true;
     }
 
-    void UiRect::setHeight(float height) {
-        size.y = height;
+    void UiRect::setHeight(float height, UIPosUnit unit) {
+        this->height = {height, unit};
         dirty = true;
     }
 
@@ -55,9 +55,33 @@ namespace CgEngine {
         return point.x >= collisionPoints[0] && point.x <= collisionPoints[2] && point.y >= collisionPoints[1] && point.y <= collisionPoints[3];
     }
 
-    void UiRect::updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
-        if (dirty || absolutePosDirty) {
+    void UiRect::updateElement(bool absolutePosDirty, bool viewportDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
+        if (dirty || absolutePosDirty || viewportDirty) {
             vertices.clear();
+
+            switch (width.second) {
+                case UIPosUnit::Pixel:
+                    size.x = width.first;
+                    break;
+                case UIPosUnit::VWPercent:
+                    size.x = width.first * static_cast<float>(viewportWidth);
+                    break;
+                case UIPosUnit::VHPercent:
+                    size.x = width.first * static_cast<float>(viewportHeight);
+                    break;
+            }
+
+            switch (height.second) {
+                case UIPosUnit::Pixel:
+                    size.y = height.first;
+                    break;
+                case UIPosUnit::VWPercent:
+                    size.y = height.first * static_cast<float>(viewportWidth);
+                    break;
+                case UIPosUnit::VHPercent:
+                    size.y = height.first * static_cast<float>(viewportHeight);
+                    break;
+            }
 
             vertices.emplace_back(0.0f, 0.0f, 0.0f, 1.0f);
             vertices.emplace_back(size.x, 0.0f, 1.0f, 1.0f);

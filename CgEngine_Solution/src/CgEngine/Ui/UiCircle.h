@@ -10,7 +10,7 @@ namespace CgEngine {
         explicit UiCircle() : UiElement(UIElementType::Circle) {};
         ~UiCircle() override = default;
 
-        void setWidth(float width);
+        void setWidth(float width, UIPosUnit unit);
         float getWidth() const;
 
         void setLineWidth(float lineWidth);
@@ -26,10 +26,11 @@ namespace CgEngine {
         const std::vector<glm::vec4>& getVertices() const override;
 
     protected:
-        void updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
+        void updateElement(bool absolutePosDirty, bool viewportDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
 
     private:
-        float width{};
+        std::pair<float, UIPosUnit> width;
+        float scaledWidth;
 
         float lineWidth{};
         glm::vec4 lineColor{};

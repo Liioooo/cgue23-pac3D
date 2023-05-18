@@ -6,8 +6,8 @@ namespace CgEngine {
         color = c;
     }
 
-    void UiText::setSize(float s) {
-        size = s;
+    void UiText::setSize(float s, UIPosUnit unit) {
+        size = {s, unit};
         textDirty = true;
     }
 
@@ -41,11 +41,23 @@ namespace CgEngine {
         return vertices;
     }
 
-    void UiText::updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
-        if (textDirty) {
+    void UiText::updateElement(bool absolutePosDirty, bool viewportDirty, uint32_t viewportWidth, uint32_t viewportHeight) {
+        if (textDirty || viewportDirty) {
             rawVertices.clear();
             numIndices = 0;
             bounding = glm::vec2(0.0f);
+
+            switch (size.second) {
+                case UIPosUnit::Pixel:
+                    scaledSize = size.first;
+                    break;
+                case UIPosUnit::VWPercent:
+                    scaledSize = size.first * static_cast<float>(viewportWidth);
+                    break;
+                case UIPosUnit::VHPercent:
+                    scaledSize = size.first * static_cast<float>(viewportHeight);
+                    break;
+            }
 
             float penX = 0.0f;
             float penY = 0.0f;
@@ -53,7 +65,7 @@ namespace CgEngine {
             float atlasWidth = static_cast<float>(font->getFontAtlas()->getWidth());
             float atlasHeight = static_cast<float>(font->getFontAtlas()->getHeight());
 
-            float scaledSize = size / Font::fontPixelSize;
+            float fontScaledSize = scaledSize / Font::fontPixelSize;
 
             uint32_t lastGlyphIndex = 0;
 
@@ -66,10 +78,10 @@ namespace CgEngine {
                     kerning = font->getKerning(lastGlyphIndex, cInfo.glyphIndex);
                 }
 
-                float x =  penX + (kerning + cInfo.bitmapLeft) * scaledSize;
-                float y =  penY - (cInfo.bitmapHeight - cInfo.bitmapTop) * scaledSize;
-                float w = cInfo.bitmapWidth * scaledSize;
-                float h = cInfo.bitmapHeight * scaledSize;
+                float x =  penX + (kerning + cInfo.bitmapLeft) * fontScaledSize;
+                float y =  penY - (cInfo.bitmapHeight - cInfo.bitmapTop) * fontScaledSize;
+                float w = cInfo.bitmapWidth * fontScaledSize;
+                float h = cInfo.bitmapHeight * fontScaledSize;
 
                 if (w > 0 && h > 0) {
                     rawVertices.emplace_back(x, y, cInfo.textureCoord, cInfo.bitmapHeight / atlasHeight);
@@ -83,14 +95,14 @@ namespace CgEngine {
                 bounding.y = glm::max(bounding.y, y + h);
                 bounding.x = glm::max(bounding.x, x + w);
 
-                penX += (cInfo.advanceX + kerning) * scaledSize;
-                penY += cInfo.advanceY * scaledSize;
+                penX += (cInfo.advanceX + kerning) * fontScaledSize;
+                penY += cInfo.advanceY * fontScaledSize;
 
                 lastGlyphIndex = cInfo.glyphIndex;
             }
         }
 
-        if (textDirty || absolutePosDirty) {
+        if (textDirty || absolutePosDirty || viewportDirty) {
             vertices.clear();
 
             auto alignmentOffset = glm::vec2(0.0f);

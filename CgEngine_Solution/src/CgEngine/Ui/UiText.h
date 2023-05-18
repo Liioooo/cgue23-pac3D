@@ -11,7 +11,7 @@ namespace CgEngine {
         ~UiText() override = default;
 
         void setColor(const glm::vec4& c);
-        void setSize(float s);
+        void setSize(float s, UIPosUnit unit);
         void setText(const std::string& t);
         void setFont(const std::string& name);
         void setUseKerning(bool use);
@@ -24,13 +24,15 @@ namespace CgEngine {
         const std::vector<glm::vec4>& getVertices() const override;
 
     protected:
-        void updateElement(bool absolutePosDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
+        void updateElement(bool absolutePosDirty, bool viewportDirty, uint32_t viewportWidth, uint32_t viewportHeight) override;
 
     private:
         glm::vec4 color;
         std::string text;
 
-        float size;
+        std::pair<float, UIPosUnit> size;
+        float scaledSize;
+
         Font* font;
         bool useKerning = true;
 

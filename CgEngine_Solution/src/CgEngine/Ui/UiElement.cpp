@@ -50,8 +50,11 @@ namespace CgEngine {
                     case UIPosUnit::Pixel:
                         absolutePos.x = left.first;
                         break;
-                    case UIPosUnit::Percent:
+                    case UIPosUnit::VWPercent:
                         absolutePos.x = static_cast<float>(viewportWidth) * left.first;
+                        break;
+                    case UIPosUnit::VHPercent:
+                        absolutePos.x = static_cast<float>(viewportHeight) * left.first;
                         break;
                 }
             } else if (right.first >= 0) {
@@ -59,8 +62,11 @@ namespace CgEngine {
                     case UIPosUnit::Pixel:
                         absolutePos.x = static_cast<float>(viewportWidth) - right.first;
                         break;
-                    case UIPosUnit::Percent:
+                    case UIPosUnit::VWPercent:
                         absolutePos.x = static_cast<float>(viewportWidth) - static_cast<float>(viewportWidth) * right.first;
+                        break;
+                    case UIPosUnit::VHPercent:
+                        absolutePos.x = static_cast<float>(viewportWidth) - static_cast<float>(viewportHeight) * right.first;
                         break;
                 }
             }
@@ -70,7 +76,10 @@ namespace CgEngine {
                     case UIPosUnit::Pixel:
                         absolutePos.y = static_cast<float>(viewportHeight) - top.first;
                         break;
-                    case UIPosUnit::Percent:
+                    case UIPosUnit::VWPercent:
+                        absolutePos.y = static_cast<float>(viewportHeight) - static_cast<float>(viewportWidth) * top.first;
+                        break;
+                    case UIPosUnit::VHPercent:
                         absolutePos.y = static_cast<float>(viewportHeight) - static_cast<float>(viewportHeight) * top.first;
                         break;
                 }
@@ -79,14 +88,17 @@ namespace CgEngine {
                     case UIPosUnit::Pixel:
                         absolutePos.y = bottom.first;
                         break;
-                    case UIPosUnit::Percent:
+                    case UIPosUnit::VWPercent:
+                        absolutePos.y = static_cast<float>(viewportWidth) * bottom.first;
+                        break;
+                    case UIPosUnit::VHPercent:
                         absolutePos.y = static_cast<float>(viewportHeight) * bottom.first;
                         break;
                 }
             }
         }
 
-        updateElement(dirty || viewportDirty, viewportWidth, viewportHeight);
+        updateElement(dirty, viewportDirty, viewportWidth, viewportHeight);
 
         dirty = false;
     }

@@ -146,9 +146,9 @@ namespace Game {
 
         start->setFont("SpaceMono-Bold.ttf");
         start->setText("START IN");
-        start->setTop(0.3, CgEngine::UIPosUnit::Percent);
-        start->setLeft(0.5, CgEngine::UIPosUnit::Percent);
-        start->setSize(120);
+        start->setTop(0.3, CgEngine::UIPosUnit::VHPercent);
+        start->setLeft(0.5, CgEngine::UIPosUnit::VWPercent);
+        start->setSize(0.12, CgEngine::UIPosUnit::VHPercent);
         start->setXAlignment(CgEngine::UIXAlignment::Center);
         start->setYAlignment(CgEngine::UIYAlignment::Center);
         start->setColor({0.8f, 0.0f, 0.0f, 1.0f});
@@ -157,9 +157,9 @@ namespace Game {
 
         startTimer->setFont("SpaceMono-Bold.ttf");
         startTimer->setText(timerStr.substr(0, timerStr.find('.') + 3));
-        startTimer->setTop(0.42, CgEngine::UIPosUnit::Percent);
-        startTimer->setLeft(0.5, CgEngine::UIPosUnit::Percent);
-        startTimer->setSize(160);
+        startTimer->setTop(0.44, CgEngine::UIPosUnit::VHPercent);
+        startTimer->setLeft(0.5, CgEngine::UIPosUnit::VWPercent);
+        startTimer->setSize(0.18, CgEngine::UIPosUnit::VHPercent);
         startTimer->setXAlignment(CgEngine::UIXAlignment::Center);
         startTimer->setYAlignment(CgEngine::UIYAlignment::Center);
         startTimer->setColor({0.0f, 0.0f, 0.0f, 1.0f});

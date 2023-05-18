@@ -20,6 +20,6 @@ void main() {
 
     vec4 fillColor = TextureIndex < 0.0f ? fs_in.FillColor : texture(u_Textures[int(TextureIndex)], fs_in.TexCoord);
 
-    float line = min(step(fs_in.Size.x - adjustedLineWidth, fs_in.Size.x * abs(localPos.x)) + step(fs_in.Size.y - adjustedLineWidth, fs_in.Size.y * abs(localPos.y)), 1.0f);
+    float line = fs_in.LineWidth > 0.0f ? min(step(fs_in.Size.x - adjustedLineWidth, fs_in.Size.x * abs(localPos.x)) + step(fs_in.Size.y - adjustedLineWidth, fs_in.Size.y * abs(localPos.y)), 1.0f) : 0.0f;
     o_FragColor = mix(fillColor, fs_in.LineColor, line);
 }

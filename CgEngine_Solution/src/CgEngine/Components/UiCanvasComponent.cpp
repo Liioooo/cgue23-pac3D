@@ -80,7 +80,8 @@ namespace CgEngine {
             element->setTexture(resourceManager.getResource<Texture2D>(texturePath));
         }
 
-        element->setWidth(elementNode.attribute("width").as_float(100.0f));
+        auto width = stringToPosAndUnit(elementNode.attribute("width").as_string("0"));
+        element->setWidth(width.first, width.second);
     }
 
     void UiCanvasComponent::createElementRect(const pugi::xml_node& elementNode) {
@@ -104,14 +105,19 @@ namespace CgEngine {
             }
         }
 
-        element->setWidth(elementNode.attribute("width").as_float(100.0f));
-        element->setHeight(elementNode.attribute("height").as_float(100.0f));
+        auto width = stringToPosAndUnit(elementNode.attribute("width").as_string("0"));
+        auto height = stringToPosAndUnit(elementNode.attribute("height").as_string("0"));
+
+        element->setWidth(width.first, width.second);
+        element->setHeight(height.first, height.second);
     }
 
     void UiCanvasComponent::createElementText(const pugi::xml_node& elementNode) {
         auto* element = createElement<UiText>(elementNode);
 
-        element->setSize(elementNode.attribute("size").as_float(1.0f));
+        auto size = stringToPosAndUnit(elementNode.attribute("size").as_string("0"));
+        element->setSize(size.first, size.second);
+
         element->setText(elementNode.attribute("text").as_string(""));
         element->setColor(stringTupleToVec4(elementNode.attribute("color").as_string("0 0 0 1")));
         element->setUseKerning(elementNode.attribute("kerning").as_bool(true));
@@ -131,10 +137,10 @@ namespace CgEngine {
         E* element = new E();
         uiElements.insert({id, element});
 
-        auto top = stringToPosAndUnit(elementNode.attribute("top").as_string("0px"));
-        auto left = stringToPosAndUnit(elementNode.attribute("left").as_string("0px"));
-        auto bottom = stringToPosAndUnit(elementNode.attribute("bottom").as_string("-1px"));
-        auto right = stringToPosAndUnit(elementNode.attribute("right").as_string("-1px"));
+        auto top = stringToPosAndUnit(elementNode.attribute("top").as_string("0"));
+        auto left = stringToPosAndUnit(elementNode.attribute("left").as_string("0"));
+        auto bottom = stringToPosAndUnit(elementNode.attribute("bottom").as_string("-1"));
+        auto right = stringToPosAndUnit(elementNode.attribute("right").as_string("-1"));
 
         element->setTop(top.first, top.second);
         element->setLeft(left.first, left.second);
@@ -150,10 +156,17 @@ namespace CgEngine {
     }
 
     std::pair<float, UIPosUnit> UiCanvasComponent::stringToPosAndUnit(const std::string& s) {
-        if (s.length() > 2 && s.compare(s.length() - 2, 2, "px") == 0) {
-            return {std::stof(s.substr(0, s.length() - 2)), UIPosUnit::Pixel};
+        if (s.length() > 2 && s.compare(s.length() - 2, 2, "vw") == 0) {
+            float pos = 0.01f * std::stof(s.substr(0, s.length() - 2));
+            return {pos, UIPosUnit::VWPercent};
+        } else if (s.compare(s.length() - 2, 2, "vh") == 0) {
+            float pos = 0.01f * std::stof(s.substr(0, s.length() - 2));
+            return {pos, UIPosUnit::VHPercent};
+        } else {
+            float pos = std::stof(s);
+            return {pos, UIPosUnit::Pixel};
         }
-        return {std::stof(s), UIPosUnit::Percent};
+
     }
 
     UIXAlignment UiCanvasComponent::stringToXAlignment(const std::string& s) {
