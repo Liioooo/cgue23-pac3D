@@ -29,6 +29,7 @@ namespace Game {
             } else {
                 gameCanvas.removeUIElement("startTimer");
                 gameCanvas.removeUIElement("start");
+                gameCanvas.getUIElement<CgEngine::UiCircle>("cross")->setFillColor({0.0f, 0.0f, 0.0f, 0.8f});
             }
 
             return;
@@ -167,5 +168,7 @@ namespace Game {
         startTimer->setYAlignment(CgEngine::UIYAlignment::Center);
         startTimer->setColor({0.0f, 0.0f, 0.0f, 1.0f});
         startTimer->setUseKerning(false);
+
+        gameCanvas.getUIElement<CgEngine::UiCircle>("cross")->setFillColor({0.0f, 0.0f, 0.0f, 0.0f});
     }
 }

@@ -11,7 +11,7 @@ namespace CgEngine {
         std::string mesh;
         std::string material;
         bool castShadows;
-        std::vector<uint32_t> meshNodes;
+        std::vector<std::string> meshNodes;
     };
 
     class MeshRendererComponent : public Component {

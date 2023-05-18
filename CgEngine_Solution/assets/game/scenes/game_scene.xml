@@ -261,6 +261,8 @@
                 <UiRect id="live1" left="5vw" top="0.5vw" width="4vw" height="4vw" texture="pacMan2D.png" line-width="0" y-align="top" x-align="left" />
                 <UiRect id="live2" left="9.5vw" top="0.5vw" width="4vw" height="4vw" texture="pacMan2D.png" line-width="0" y-align="top" x-align="left" />
                 <UiRect id="live3" left="14vw" top="0.5vw" width="4vw" height="4vw" texture="pacMan2D.png" line-width="0" y-align="top" x-align="left" />
+
+                <UiCircle id="cross" left="50vw" top="50vh" width="15" height="15" fill-color="0 0 0 0.8" line-width="0" y-align="top" x-align="center" />
             </UiCanvasComponent>
         </Components>
     </Entity>
@@ -285,7 +287,7 @@
         </Entity>
         <Entity id="playerMesh">
             <Components>
-                <TransformComponent position="0 -0.25 0" rotation="0 0 0" scale="1 1 1" />
+                <TransformComponent position="0 -0.26 0" rotation="0 0 0" scale="1 1 1" />
                 <MeshRendererComponent asset-file="pacman.fbx" />
                 <PointLightComponent color="#e9f022" intensity="1" radius="4" falloff="0.6" />
             </Components>

@@ -176,6 +176,11 @@ namespace Game {
 
                 glm::vec3 direction = glm::normalize(mapNodes[g.nextMapNode].pos - rigid.getGlobalPosePosition());
                 rigid.setKinematicTarget(rigid.getGlobalPosePosition() + direction * ts.getSeconds() * 6.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+
+                auto rot = glm::atan(direction.x, direction.z) - glm::pi<float>();
+
+                auto& meshTransform = getComponent<CgEngine::TransformComponent>(*getChildEntities(g.entity).cbegin());
+                meshTransform.setLocalRotationVec({0.0f, rot, 0.0f});
             }
         }
     }
@@ -246,15 +251,37 @@ namespace Game {
         rigidBodyParams.isDynamic = true;
         rigidBodyParams.isKinematic = true;
 
-        for (auto& g : ghosts) {
+        for (uint32_t i = 0; i < ghosts.size(); i++) {
+            uint32_t ghostModel = i % 3;
+            std::string ghostModelStr = std::to_string(ghostModel);
+
+            auto& g = ghosts[i];
             g.entity = createEntity(ghostContainer);
             setEntityTag(g.entity, "ghost");
             attachComponent<CgEngine::TransformComponent>(g.entity, CgEngine::TransformComponentParams{g.homePos, glm::vec3(0.0f), glm::vec3(1.0f, 0.8f, 1.0f)});
-            attachComponent<CgEngine::MeshRendererComponent>(g.entity, CgEngine::MeshRendererComponentParams{"", "CG_CapsuleMesh_0.8_1", "Red", true});
             attachComponent<CgEngine::CapsuleColliderComponent>(g.entity, CgEngine::CapsuleColliderComponentParams{0.8f, 0.4f, glm::vec3(0.0f), false, "default-physics-material"});
             attachComponent<CgEngine::ScriptComponent>(g.entity, CgEngine::ScriptComponentParams{"singleGhostScript"});
             attachComponent<CgEngine::RigidBodyComponent>(g.entity, rigidBodyParams);
-            attachComponent<CgEngine::PointLightComponent>(g.entity, CgEngine::PointLightComponentParams{glm::vec3(1.0f, 0.0f, 0.0f), 1.0f, 4.0f, 0.8f});
+
+            glm::vec3 lightColor;
+
+            switch (ghostModel) {
+                case 0:
+                    lightColor = {1.0f, 0.05f, 0.05f};
+                    break;
+                case 1:
+                    lightColor = {0.2f, 1.0f, 0.1f};
+                    break;
+                case 2:
+                    lightColor = {0.05f, 0.05f, 1.0f};
+                    break;
+            }
+
+            attachComponent<CgEngine::PointLightComponent>(g.entity, CgEngine::PointLightComponentParams{lightColor, 1.0f, 4.0f, 0.8f});
+
+            auto meshEntity = createEntity(g.entity);
+            attachComponent<CgEngine::TransformComponent>(meshEntity, CgEngine::TransformComponentParams{glm::vec3(0.0f), glm::vec3(0.0f, glm::pi<float>(), 0.0f), glm::vec3(1.0f)});
+            attachComponent<CgEngine::MeshRendererComponent>(meshEntity, CgEngine::MeshRendererComponentParams{"ghosts.fbx", "", "", true, {"Ghost" + ghostModelStr, "Eye1_g" + ghostModelStr, "Eye2_g" + ghostModelStr}});
         }
     }
 

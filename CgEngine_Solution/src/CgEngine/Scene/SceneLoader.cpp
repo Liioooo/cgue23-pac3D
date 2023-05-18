@@ -233,13 +233,13 @@ namespace CgEngine {
         return {r, g, b};
     }
 
-    std::vector<uint32_t> SceneLoader::getListFromString(const std::string& s) {
-        std::vector<uint32_t> result{};
+    std::vector<std::string> SceneLoader::getListFromString(const std::string& s) {
+        std::vector<std::string> result{};
         std::stringstream ss(s);
         std::string item;
 
         while (std::getline(ss, item, ',')) {
-            result.emplace_back(std::stoi(item));
+            result.emplace_back(item);
         }
 
         return result;

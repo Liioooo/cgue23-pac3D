@@ -68,6 +68,10 @@ namespace CgEngine {
         return meshNodes;
     }
 
+    uint32_t MeshVertices::getMeshNodeIndex(const std::string& nodeName) const {
+        return nodeNameToNode.at(nodeName);
+    }
+
     const Material* MeshVertices::getMaterial(size_t index) const {
         return materials.at(index).get();
     }
@@ -734,6 +738,8 @@ namespace CgEngine {
         meshNode.aiNode = node;
         meshNode.localTransform = localTransform;
         meshNode.transform = transform;
+
+        nodeNameToNode.insert({node->mName.C_Str(), meshNodes.size() - 1});
 
         for (uint32_t i = 0; i < node->mNumMeshes; i++) {
             uint32_t submeshIndex = node->mMeshes[i];

@@ -15,7 +15,8 @@ namespace CgEngine {
                     }
                 }
             } else {
-                for (const auto& i: params.meshNodes) {
+                for (const auto& nodeName: params.meshNodes) {
+                    uint32_t i = mesh->getMeshNodeIndex(nodeName);
                     auto& mN = mesh->getMeshNodes().at(i);
                     if (!mN.submeshIndices.empty()) {
                         meshNodes.push_back(i);

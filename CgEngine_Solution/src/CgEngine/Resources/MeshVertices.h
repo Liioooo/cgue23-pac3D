@@ -50,6 +50,7 @@ namespace CgEngine {
         const std::vector<uint32_t>& getIndexBuffer() const;
         const std::vector<Submesh>& getSubmeshes() const;
         std::vector<MeshNode>& getMeshNodes();
+        uint32_t getMeshNodeIndex(const std::string& nodeName) const;
         const Material* getMaterial(size_t index) const;
 
 
@@ -71,6 +72,7 @@ namespace CgEngine {
         std::vector<Submesh> submeshes;
         std::vector<std::unique_ptr<Material>> materials;
         std::vector<MeshNode> meshNodes{};
+        std::unordered_map<std::string, uint32_t> nodeNameToNode{};
     };
 
 }
