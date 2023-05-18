@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "Asserts.h"
-#include <glm/gtc/type_ptr.hpp>
 #include "glad/glad.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stbi_image.h"

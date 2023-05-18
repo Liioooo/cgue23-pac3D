@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Resources/MeshVertices.h>
-#include <Rendering/Material.h>
+#include "Resources/MeshVertices.h"
+#include "Rendering/Material.h"
 #include "Component.h"
 
 namespace CgEngine {

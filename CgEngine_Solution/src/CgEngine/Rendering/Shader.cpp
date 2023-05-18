@@ -3,9 +3,7 @@
 #include "FileSystem.h"
 #include "Logging.h"
 #include "Asserts.h"
-#include <glm/gtc/type_ptr.hpp>
 #include "glad/glad.h"
-#include <regex>
 
 namespace CgEngine {
 

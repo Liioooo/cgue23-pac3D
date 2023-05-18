@@ -1,5 +1,4 @@
 #include "TransformComponent.h"
-#include <glm/ext/matrix_transform.hpp>
 #include "Scene/Scene.h"
 
 namespace CgEngine {

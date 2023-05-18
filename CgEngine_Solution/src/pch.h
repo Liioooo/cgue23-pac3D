@@ -1,5 +1,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/common.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 
 #include <array>
 #include <algorithm>
@@ -14,3 +18,5 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <regex>
+#include <random>

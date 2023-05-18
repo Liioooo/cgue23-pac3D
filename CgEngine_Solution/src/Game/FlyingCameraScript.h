@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Scripting/NativeScript.h>
-#include <Logging.h>
+#include "Scripting/NativeScript.h"
+#include "Logging.h"
 
 namespace Game {
 

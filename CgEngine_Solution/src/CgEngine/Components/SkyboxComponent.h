@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Rendering/Texture.h>
+#include "Rendering/Texture.h"
 #include "Component.h"
 
 namespace CgEngine {

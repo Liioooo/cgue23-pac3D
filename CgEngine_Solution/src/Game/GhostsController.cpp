@@ -1,5 +1,4 @@
 #include "GhostsController.h"
-#include <random>
 #include "glm/gtx/vector_angle.hpp"
 
 namespace Game {

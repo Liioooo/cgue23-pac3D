@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Rendering/VertexArrayObject.h>
-#include <Rendering/Material.h>
+#include "Rendering/VertexArrayObject.h"
+#include "Rendering/Material.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

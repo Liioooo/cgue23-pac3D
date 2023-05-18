@@ -1,9 +1,8 @@
 #pragma once
 
 #include <INIReader.h>
-#include <Rendering/SceneRenderer.h>
+#include "Rendering/SceneRenderer.h"
 #include "Window.h"
-#include "Events/Event.h"
 #include "Events/WindowCloseEvent.h"
 #include "Events/WindowResizeEvent.h"
 #include "Events/KeyPressedEvent.h"

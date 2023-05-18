@@ -2,7 +2,6 @@
 
 #include "Shader.h"
 #include "Framebuffer.h"
-#include "glad/glad.h"
 
 namespace CgEngine {
 

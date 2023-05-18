@@ -1,8 +1,8 @@
 #include "Scene.h"
 #include "Asserts.h"
 #include "Rendering/SceneRenderer.h"
-#include "Rendering/Renderer.h"
 #include "Application.h"
+#include "GlobalObjectManager.h"
 
 namespace CgEngine {
     Scene::Scene(int viewportWidth, int viewportHeight) : viewportWidth(viewportWidth), viewportHeight(viewportHeight) {

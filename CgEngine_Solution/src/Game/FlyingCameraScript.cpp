@@ -1,7 +1,6 @@
 #include "FlyingCameraScript.h"
 #include "Events/Input.h"
 #include "Events/KeyCodes.h"
-#include "glm/gtx/common.hpp"
 
 namespace Game {
     void FlyingCameraScript::update(CgEngine::TimeStep ts) {

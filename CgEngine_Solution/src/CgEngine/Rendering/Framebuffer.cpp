@@ -1,7 +1,5 @@
-#include <Asserts.h>
-
-#include <utility>
 #include "Framebuffer.h"
+#include "Asserts.h"
 #include "glad/glad.h"
 
 namespace CgEngine {

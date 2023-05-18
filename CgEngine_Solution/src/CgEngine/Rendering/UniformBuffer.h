@@ -15,6 +15,7 @@ namespace CgEngine {
 
             glGenBuffers(1, &bufferId);
             glBindBufferBase(GL_UNIFORM_BUFFER, binding, bufferId);
+            glNamedBufferData(bufferId, bufferSize, nullptr, GL_DYNAMIC_DRAW);
         }
 
         ~UniformBuffer() {
@@ -24,8 +25,7 @@ namespace CgEngine {
         void setData(const D& data) {
             CG_ASSERT(sizeof(data) == bufferSize, "Buffer size mismatch!")
 
-            glBindBuffer(GL_UNIFORM_BUFFER, bufferId);
-            glBufferData(GL_UNIFORM_BUFFER, bufferSize, &data, GL_DYNAMIC_DRAW);
+            glNamedBufferSubData(bufferId, 0, bufferSize, &data);
         }
 
     private:

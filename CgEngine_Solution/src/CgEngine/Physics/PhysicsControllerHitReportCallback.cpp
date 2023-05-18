@@ -1,4 +1,4 @@
-#include <Components/ScriptComponent.h>
+#include "Components/ScriptComponent.h"
 #include "PhysicsControllerHitReportCallback.h"
 #include "AbstractPhysicsActor.h"
 #include "Scene/Scene.h"

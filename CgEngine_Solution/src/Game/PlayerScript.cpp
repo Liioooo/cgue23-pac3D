@@ -1,7 +1,6 @@
 #include "PlayerScript.h"
 #include "Events/Input.h"
 #include "Events/KeyCodes.h"
-#include "glm/gtx/common.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 #include "Application.h"
 #include "GhostsController.h"

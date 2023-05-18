@@ -2,10 +2,10 @@
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/Renderer.h"
 #include "Asserts.h"
-#include <filesystem>
 #include "FileSystem.h"
-#include <GlobalObjectManager.h>
+#include "GlobalObjectManager.h"
 #include "Application.h"
+#include <filesystem>
 
 namespace CgEngine {
     MeshVertices* MeshVertices::createResource(const std::string &name) {

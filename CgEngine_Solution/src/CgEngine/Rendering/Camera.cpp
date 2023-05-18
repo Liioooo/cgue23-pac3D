@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include "glm/ext/matrix_clip_space.hpp"
 
 namespace CgEngine {
     CameraProjectionType Camera::getProjectionType() const {

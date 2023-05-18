@@ -1,6 +1,6 @@
-#include <Rendering/Renderer.h>
 #include "Application.h"
 #include "Logging.h"
+#include "GlobalObjectManager.h"
 
 namespace CgEngine {
     Application* Application::instance = nullptr;

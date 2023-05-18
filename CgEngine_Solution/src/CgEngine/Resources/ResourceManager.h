@@ -1,11 +1,8 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <memory>
-#include <Resources/XMLFile.h>
-#include <Resources/MeshVertices.h>
-#include <Rendering/Shader.h>
+#include "Resources/XMLFile.h"
+#include "Resources/MeshVertices.h"
+#include "Rendering/Shader.h"
 #include "Rendering/Material.h"
 #include "Rendering/Texture.h"
 #include "Physics/PhysicsMaterial.h"

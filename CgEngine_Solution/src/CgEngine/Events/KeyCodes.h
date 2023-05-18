@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 namespace CgEngine {
 
     enum class KeyCode : uint16_t {
