@@ -23,6 +23,7 @@ namespace CgEngine {
     }
 
     void SceneManager::setActiveScene(const std::string &name) {
+        switchedScenes = true;
         auto* xmlSceneFile = GlobalObjectManager::getInstance().getResourceManager().getResource<XMLFile>(FileSystem::getAsGamePath(name));
         nextScene = SceneLoader::loadScene(xmlSceneFile, viewportWidth, viewportHeight);
     }
@@ -36,5 +37,11 @@ namespace CgEngine {
         if (nextScene != nullptr) {
             nextScene->onViewportResize(width, height);
         }
+    }
+
+    bool SceneManager::hadSceneSwitch() {
+        bool out = switchedScenes;
+        switchedScenes = false;
+        return out;
     }
 }

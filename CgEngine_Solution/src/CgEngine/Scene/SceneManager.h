@@ -13,12 +13,16 @@ namespace CgEngine {
         void setActiveScene(const std::string& name);
         void setViewportSize(uint32_t width, uint32_t height);
 
+        bool hadSceneSwitch();
+
     private:
         Scene* activeScene = nullptr;
         Scene* nextScene = nullptr;
 
         uint32_t viewportWidth;
         uint32_t viewportHeight;
+
+        bool switchedScenes = false;
     };
 
 }

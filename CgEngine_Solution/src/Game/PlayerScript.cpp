@@ -16,6 +16,9 @@ namespace Game {
     }
 
     void PlayerScript::fixedUpdate(CgEngine::TimeStep ts) {
+        auto& playerMeshTransform = getComponent<CgEngine::TransformComponent>(findEntityById("playerMesh"));
+        playerMeshTransform.setLocalRotationVec({0.0f, yaw, 0.0f});
+
         if (respawnTimer > 0.0f) {
             respawnTimer -= ts.getSeconds();
 

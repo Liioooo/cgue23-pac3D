@@ -6,6 +6,7 @@
 #include "Game/SingleGhostScript.h"
 #include "Game/PlayerScript.h"
 #include "Game/LostScript.h"
+#include "Game/StartScript.h"
 
 int main(int argc, char **argv) {
     CgEngine::Logging::init();
@@ -18,6 +19,7 @@ int main(int argc, char **argv) {
     application->registerNativeScript<Game::SingleGhostScript>("singleGhostScript");
     application->registerNativeScript<Game::PlayerScript>("player");
     application->registerNativeScript<Game::LostScript>("lostScript");
+    application->registerNativeScript<Game::StartScript>("startScript");
 
     application->init();
     application->run();

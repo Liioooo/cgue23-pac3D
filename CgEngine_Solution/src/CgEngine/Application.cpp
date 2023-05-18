@@ -63,6 +63,10 @@ namespace CgEngine {
             float time = getTime();
             timeStep = time - lastFrameTime;
             lastFrameTime = time;
+
+            if (sceneManager->hadSceneSwitch()) {
+                timeStep = 0.0f;
+            }
         }
     }
 
