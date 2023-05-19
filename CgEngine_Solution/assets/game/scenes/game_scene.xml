@@ -24,6 +24,12 @@
             <MeshRendererComponent asset-file="city_map.fbx" />
         </Components>
     </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="0 0 -1" rotation="0 0 0" scale="1 1 1" />
+            <MeshRendererComponent asset-file="garage.fbx" />
+        </Components>
+    </Entity>
     <Entity id="worldColliders">
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />
