@@ -22,6 +22,8 @@ namespace CgEngine {
 
         Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ)
                 : position{pX, pY, pZ}, normal{nX, nY, nZ} {};
+
+        Vertex(float pX, float pY, float pZ) : position{pX, pY, pZ} {};
     };
 
     struct Submesh {
@@ -43,6 +45,7 @@ namespace CgEngine {
     class MeshVertices {
     public:
         static MeshVertices* createResource(const std::string& name);
+        static MeshVertices* createFromPhysx(const glm::vec3* vertices, uint32_t numVertices, const uint32_t* indices, uint32_t numIndices);
 
         MeshVertices() = default;
         ~MeshVertices();

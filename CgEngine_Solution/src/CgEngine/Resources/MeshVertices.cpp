@@ -44,6 +44,44 @@ namespace CgEngine {
         }
     }
 
+    MeshVertices* MeshVertices::createFromPhysx(const glm::vec3* vertices, uint32_t numVertices, const uint32_t* indices, uint32_t numIndices) {
+        auto *mesh = new MeshVertices();
+
+        for (uint32_t i = 0; i < numVertices; i++) {
+            mesh->vertices.emplace_back(vertices[i].x, vertices[i].y, vertices[i].z);
+        }
+
+        mesh->vao = new VertexArrayObject();
+
+        auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(),
+                                                           mesh->vertices.size() * sizeof(Vertex));
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float2, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true),
+                                 VertexBufferElement(ShaderDataType::Float3, true)});
+
+        mesh->vao->addVertexBuffer(vertexBuffer);
+        mesh->vao->setIndexBuffer(indices, numIndices);
+
+        Submesh& submesh = mesh->submeshes.emplace_back();
+        submesh.baseVertex = 0;
+        submesh.baseIndex = 0;
+        submesh.vertexCount = numVertices;
+        submesh.indexCount = numIndices;
+        submesh.materialIndex = 0;
+
+        mesh->materials.emplace_back(Renderer::getDefaultPBRMaterial());
+
+        MeshNode& meshNode = mesh->meshNodes.emplace_back();
+        meshNode.aiNode = nullptr;
+        meshNode.submeshIndices.push_back(0);
+        meshNode.transform = glm::mat4(1.0f);
+        meshNode.localTransform = glm::mat4(1.0f);
+
+        return mesh;
+    }
+
     MeshVertices::~MeshVertices() {
         delete vao;
     }
@@ -86,22 +124,26 @@ namespace CgEngine {
             return *meshNode.physicsTriangleMesh;
         }
 
-        auto& submesh = submeshes.at(meshNode.submeshIndices[0]);
-
+        uint32_t vertexOffset = 0;
         std::vector<glm::vec3> physicsVertices;
-        physicsVertices.reserve(submesh.vertexCount);
-        for (uint32_t i = submesh.baseVertex; i < submesh.baseVertex + submesh.vertexCount; i++) {
-            physicsVertices.emplace_back(meshNode.transform * glm::vec4(vertices.at(i).position, 1.0f));
-        }
-
         std::vector<uint32_t> physicsIndices;
-        physicsIndices.reserve(submesh.indexCount);
-        for (uint32_t i = submesh.baseIndex; i < submesh.baseIndex + submesh.indexCount; i++) {
-            physicsIndices.emplace_back(indexBuffer.at(i));
+
+        for (const auto& smi: meshNode.submeshIndices) {
+            auto& submesh = submeshes.at(smi);
+
+            for (uint32_t i = submesh.baseVertex; i < submesh.baseVertex + submesh.vertexCount; i++) {
+                physicsVertices.emplace_back(meshNode.transform * glm::vec4(vertices.at(i).position, 1.0f));
+            }
+
+            for (uint32_t i = submesh.baseIndex; i < submesh.baseIndex + submesh.indexCount; i++) {
+                physicsIndices.emplace_back(indexBuffer.at(i) + vertexOffset);
+            }
+
+            vertexOffset += submesh.vertexCount;
         }
 
         auto& physicsCooking = GlobalObjectManager::getInstance().getPhysicsSystem().getPhysicsCooking();
-        auto* physicsMesh = physicsCooking.cookTriangleMesh(physicsVertices.data(), submesh.vertexCount, physicsIndices.data(), submesh.indexCount);
+        auto* physicsMesh = physicsCooking.cookTriangleMesh(physicsVertices.data(), physicsVertices.size(), physicsIndices.data(), physicsIndices.size());
         meshNode.physicsTriangleMesh = physicsMesh;
         return *physicsMesh;
     }

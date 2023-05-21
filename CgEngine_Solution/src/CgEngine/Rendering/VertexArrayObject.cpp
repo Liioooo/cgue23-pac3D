@@ -77,7 +77,7 @@ namespace CgEngine {
 
     }
 
-    void VertexArrayObject::setIndexBuffer(uint32_t* buffer, size_t count) {
+    void VertexArrayObject::setIndexBuffer(const uint32_t* buffer, size_t count) {
         bind();
         glGenBuffers(1, &ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

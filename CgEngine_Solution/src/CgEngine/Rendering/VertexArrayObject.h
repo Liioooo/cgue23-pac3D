@@ -13,7 +13,7 @@ namespace CgEngine {
         void unbind() const;
 
         void addVertexBuffer(std::shared_ptr<VertexBuffer> buffer);
-        void setIndexBuffer(uint32_t* buffer, size_t count);
+        void setIndexBuffer(const uint32_t* buffer, size_t count);
 
         std::vector<std::shared_ptr<VertexBuffer>>& getVertexBuffers();
         size_t getIndexCount() const;

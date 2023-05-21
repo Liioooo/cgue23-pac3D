@@ -5,6 +5,9 @@
 namespace CgEngine {
     PhysicsCooking::PhysicsCooking(physx::PxFoundation* pxFoundation, const physx::PxTolerancesScale& tolerancesScale) {
         auto params = physx::PxCookingParams(tolerancesScale);
+        params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eWELD_VERTICES;
+        params.meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eFORCE_32BIT_INDICES;
+        params.meshWeldTolerance = 0.05f;
         physxCooking = PxCreateCooking(PX_PHYSICS_VERSION, *pxFoundation, params);
         CG_ASSERT(physxCooking, "Error while creating PhysXCooking")
     }

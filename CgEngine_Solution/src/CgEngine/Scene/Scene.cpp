@@ -271,6 +271,11 @@ namespace CgEngine {
                 glm::mat4 colliderTransform = glm::translate(glm::mat4(1.0), transform.getGlobalPosition() + it->getOffset());
                 renderer.submitPhysicsColliderMesh(capsuleMesh, colliderTransform);
             }
+
+            for (auto it = componentManager->begin<TriangleColliderComponent>(); it != componentManager->end<TriangleColliderComponent>(); it++) {
+                auto& transform = componentManager->getComponent<TransformComponent>(it->getEntity());
+                renderer.submitPhysicsColliderMesh(it->getPhysicsMesh().getVisualizationMesh(), glm::translate(glm::mat4(1.0), transform.getGlobalPosition()));
+            }
         }
 
         renderer.endScene();
