@@ -76,6 +76,36 @@ namespace CgEngine {
         return materials.at(index).get();
     }
 
+    PhysicsTriangleMesh& MeshVertices::getPhysicsTriangleMeshForNode(const std::string& nodeName) {
+        uint32_t nodeIndex = nodeNameToNode.at(nodeName);
+        auto& meshNode = meshNodes.at(nodeIndex);
+
+        CG_ASSERT(meshNode.submeshIndices.size() > 0, "Cannot create PhysicsTriangleMesh from empty node")
+
+        if (meshNode.physicsTriangleMesh != nullptr) {
+            return *meshNode.physicsTriangleMesh;
+        }
+
+        auto& submesh = submeshes.at(meshNode.submeshIndices[0]);
+
+        std::vector<glm::vec3> physicsVertices;
+        physicsVertices.reserve(submesh.vertexCount);
+        for (uint32_t i = submesh.baseVertex; i < submesh.baseVertex + submesh.vertexCount; i++) {
+            physicsVertices.emplace_back(meshNode.transform * glm::vec4(vertices.at(i).position, 1.0f));
+        }
+
+        std::vector<uint32_t> physicsIndices;
+        physicsIndices.reserve(submesh.indexCount);
+        for (uint32_t i = submesh.baseIndex; i < submesh.baseIndex + submesh.indexCount; i++) {
+            physicsIndices.emplace_back(indexBuffer.at(i));
+        }
+
+        auto& physicsCooking = GlobalObjectManager::getInstance().getPhysicsSystem().getPhysicsCooking();
+        auto* physicsMesh = physicsCooking.cookTriangleMesh(physicsVertices.data(), submesh.vertexCount, physicsIndices.data(), submesh.indexCount);
+        meshNode.physicsTriangleMesh = physicsMesh;
+        return *physicsMesh;
+    }
+
     MeshVertices *MeshVertices::createCubeMesh() {
         auto *mesh = new MeshVertices();
 

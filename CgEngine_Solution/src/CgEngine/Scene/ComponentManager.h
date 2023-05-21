@@ -11,7 +11,8 @@
 #include "Components/SkyboxComponent.h"
 #include "Components/BoxColliderComponent.h"
 #include "Components/SphereColliderComponent.h"
-#include "Components/CApsuleColliderComponent.h"
+#include "Components/CapsuleColliderComponent.h"
+#include "Components/TriangleColliderComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/CharacterControllerComponent.h"
 #include "Components/UiCanvasComponent.h"
@@ -33,6 +34,7 @@ namespace CgEngine {
             registerComponentType<BoxColliderComponent>();
             registerComponentType<SphereColliderComponent>();
             registerComponentType<CapsuleColliderComponent>();
+            registerComponentType<TriangleColliderComponent>();
             registerComponentType<RigidBodyComponent>();
             registerComponentType<CharacterControllerComponent>();
             registerComponentType<CharacterControllerComponent>();

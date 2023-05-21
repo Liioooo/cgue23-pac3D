@@ -2,6 +2,7 @@
 
 #include "Rendering/VertexArrayObject.h"
 #include "Rendering/Material.h"
+#include "Physics/PhysicsTriangleMesh.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -33,6 +34,7 @@ namespace CgEngine {
 
     struct MeshNode {
         aiNode* aiNode;
+        PhysicsTriangleMesh* physicsTriangleMesh = nullptr;
         std::vector<uint32_t> submeshIndices;
         glm::mat4 localTransform{1.0f};
         glm::mat4 transform{1.0f};
@@ -52,6 +54,8 @@ namespace CgEngine {
         std::vector<MeshNode>& getMeshNodes();
         uint32_t getMeshNodeIndex(const std::string& nodeName) const;
         const Material* getMaterial(size_t index) const;
+
+        PhysicsTriangleMesh& getPhysicsTriangleMeshForNode(const std::string& nodeName);
 
 
     private:

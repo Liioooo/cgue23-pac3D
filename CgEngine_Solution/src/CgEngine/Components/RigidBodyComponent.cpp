@@ -33,6 +33,12 @@ namespace CgEngine {
             colliderComp.colliderUuid = colliderUuid;
         }
 
+        if (scene.hasComponent<TriangleColliderComponent>(entity)) {
+            auto& colliderComp = scene.getComponent<TriangleColliderComponent>(entity);
+            uint32_t colliderUuid = addTriangleCollider(colliderComp.getPhysicsMaterial(), colliderComp.getPhysicsMesh(), colliderComp.getIsTrigger());
+            colliderComp.colliderUuid = colliderUuid;
+        }
+
         scene.getPhysicsScene().addActor(actor);
     }
 
@@ -103,6 +109,10 @@ namespace CgEngine {
 
     uint32_t RigidBodyComponent::addCapsuleCollider(PhysicsMaterial& material, float radius, float halfHeight, glm::vec3 offset, bool isTrigger) {
         return actor->addCapsuleCollider(material, radius, halfHeight, offset, isTrigger);
+    }
+
+    uint32_t RigidBodyComponent::addTriangleCollider(CgEngine::PhysicsMaterial& material, PhysicsTriangleMesh& physicsMesh, bool isTrigger) {
+        return actor->addTriangleCollider(material, physicsMesh, isTrigger);
     }
 
     void RigidBodyComponent::removeCollider(uint32_t colliderUuid) {

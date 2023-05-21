@@ -4,6 +4,7 @@
 #include "PxPhysicsAPI.h"
 #include "PhysicsSimulationEventCallbacks.h"
 #include "PhysicsControllerHitReportCallback.h"
+#include "PhysicsCooking.h"
 
 namespace CgEngine {
 
@@ -60,6 +61,7 @@ namespace CgEngine {
         physx::PxDefaultAllocator& getPhysxAllocator();
         PhysicsSimulationEventCallbacks& getSimulationEventCallbacks();
         PhysicsControllerHitReportCallback& getControllerHitReportCallback();
+        PhysicsCooking& getPhysicsCooking();
         const PhysXSettings& getPhysxSettings() const;
 
         static physx::PxFilterFlags filterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0, physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1, physx::PxPairFlags& pairFlags, const void* constantBlock,physx::PxU32 constantBlockSize);
@@ -72,6 +74,7 @@ namespace CgEngine {
         PhysXErrorCallback physxErrorCallback;
         PhysicsSimulationEventCallbacks simulationEventCallbacks;
         PhysicsControllerHitReportCallback controllerHitReportCallback;
+        PhysicsCooking* physicsCooking;
 
         const PhysXSettings physxSettings;
     };

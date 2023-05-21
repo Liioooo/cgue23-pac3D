@@ -63,6 +63,8 @@ namespace CgEngine {
             createSphereColliderComponent(scene, entity, node);
         } else if (name == "CapsuleColliderComponent") {
             createCapsuleColliderComponent(scene, entity, node);
+        } else if (name == "TriangleColliderComponent") {
+            createTriangleColliderComponent(scene, entity, node);
         } else if (name == "CharacterControllerComponent") {
             createCharacterControllerComponent(scene, entity, node);
         } else if (name == "UiCanvasComponent") {
@@ -194,6 +196,16 @@ namespace CgEngine {
             node.attribute("material").as_string("default-physics-material"),
         };
         scene->attachComponent<CapsuleColliderComponent>(entity, params);
+    }
+
+    void SceneLoader::createTriangleColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node) {
+        TriangleColliderComponentParams params{
+                node.attribute("asset-file").as_string(""),
+                node.attribute("mesh-node").as_string(""),
+                node.attribute("trigger").as_bool(false),
+                node.attribute("material").as_string("default-physics-material"),
+        };
+        scene->attachComponent<TriangleColliderComponent>(entity, params);
     }
 
     void SceneLoader::createCharacterControllerComponent(CgEngine::Scene* scene, CgEngine::Entity entity, const pugi::xml_node& node) {

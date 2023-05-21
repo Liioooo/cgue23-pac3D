@@ -84,12 +84,17 @@ namespace CgEngine {
         tolerancesScale.speed = 100.0f;
 
         physx::PxPvd* pvd = nullptr;
-        //pvd = physx::PxCreatePvd(*physxFoundation);
-        //physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 1000);
-        //pvd->connect(*transport,physx::PxPvdInstrumentationFlag::eALL);
+
+#ifdef _DEBUG
+        pvd = physx::PxCreatePvd(*physxFoundation);
+        physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 1000);
+        pvd->connect(*transport,physx::PxPvdInstrumentationFlag::eALL);
+#endif
 
         physxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *physxFoundation, tolerancesScale, false, pvd);
         CG_ASSERT(physxPhysics, "Error while creating PhysXPhysics")
+
+        physicsCooking = new PhysicsCooking(physxFoundation, tolerancesScale);
 
         physxCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(1);
     }
@@ -100,6 +105,8 @@ namespace CgEngine {
 
         physxPhysics->release();
         physxPhysics = nullptr;
+
+        delete physicsCooking;
 
         physxFoundation->release();
         physxFoundation = nullptr;
@@ -127,6 +134,10 @@ namespace CgEngine {
 
     PhysicsControllerHitReportCallback& PhysicsSystem::getControllerHitReportCallback() {
         return controllerHitReportCallback;
+    }
+
+    PhysicsCooking& PhysicsSystem::getPhysicsCooking() {
+        return *physicsCooking;
     }
 
     const PhysXSettings &PhysicsSystem::getPhysxSettings() const {
