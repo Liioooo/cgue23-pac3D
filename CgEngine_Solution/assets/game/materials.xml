@@ -1,16 +1,16 @@
 <Materials>
-    <Material name="Red">
+    <Material name="Coins">
         <Albedo>#ffffff</Albedo>
         <Roughness>1.0</Roughness>
         <Metalness>0</Metalness>
         <Emission>1.0</Emission>
         <EmissionColor>#ff0000</EmissionColor>
     </Material>
-    <Material name="Player">
-        <Albedo>#e9f022</Albedo>
-        <Roughness>0.6</Roughness>
+    <Material name="Projectiles">
+        <Albedo>#153aeb</Albedo>
+        <Roughness>0.8</Roughness>
         <Metalness>0</Metalness>
-        <Emission>0.2</Emission>
-        <EmissionColor>#e9f022</EmissionColor>
+        <Emission>1.0</Emission>
+        <EmissionColor>#153aeb</EmissionColor>
     </Material>
 </Materials>

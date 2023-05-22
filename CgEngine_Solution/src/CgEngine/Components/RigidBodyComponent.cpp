@@ -87,6 +87,10 @@ namespace CgEngine {
         actor->setKinematicTarget(target, rotation);
     }
 
+    void RigidBodyComponent::setGlobalPose(glm::vec3 target, glm::quat rotation) {
+        actor->setGlobalPose(target, rotation);
+    }
+
     glm::vec3 RigidBodyComponent::getGlobalPosePosition() {
         return actor->getGlobalPosePosition();
     }

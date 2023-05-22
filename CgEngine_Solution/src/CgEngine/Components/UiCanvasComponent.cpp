@@ -137,8 +137,8 @@ namespace CgEngine {
         E* element = new E();
         uiElements.insert({id, element});
 
-        auto top = stringToPosAndUnit(elementNode.attribute("top").as_string("0"));
-        auto left = stringToPosAndUnit(elementNode.attribute("left").as_string("0"));
+        auto top = stringToPosAndUnit(elementNode.attribute("top").as_string("-1"));
+        auto left = stringToPosAndUnit(elementNode.attribute("left").as_string("-1"));
         auto bottom = stringToPosAndUnit(elementNode.attribute("bottom").as_string("-1"));
         auto right = stringToPosAndUnit(elementNode.attribute("right").as_string("-1"));
 
@@ -159,7 +159,7 @@ namespace CgEngine {
         if (s.length() > 2 && s.compare(s.length() - 2, 2, "vw") == 0) {
             float pos = 0.01f * std::stof(s.substr(0, s.length() - 2));
             return {pos, UIPosUnit::VWPercent};
-        } else if (s.compare(s.length() - 2, 2, "vh") == 0) {
+        } else if (s.length() > 2 && s.compare(s.length() - 2, 2, "vh") == 0) {
             float pos = 0.01f * std::stof(s.substr(0, s.length() - 2));
             return {pos, UIPosUnit::VHPercent};
         } else {

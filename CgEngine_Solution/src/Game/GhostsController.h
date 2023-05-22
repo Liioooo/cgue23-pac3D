@@ -13,7 +13,7 @@ namespace Game {
     };
 
     enum class GhostState {
-        Home, LeavingHome, Moving
+        Dead, Home, LeavingHome, Moving
     };
 
     struct Ghost {
@@ -21,6 +21,7 @@ namespace Game {
         GhostState state = GhostState::Home;
         int nextMapNode = -1;
         int lastMapNode = -1;
+        int lives = 5;
         CgEngine::Entity entity;
     };
 
@@ -31,6 +32,7 @@ namespace Game {
         }
 
         uint32_t getTotalCoinAmount();
+        void notifyGhostHitByProjectile(CgEngine::Entity ghostEntity);
 
     protected:
         void onAttach() override;

@@ -114,6 +114,15 @@ namespace Game {
         glm::vec3 playerPos = getComponent<CgEngine::TransformComponent>(playerEntity).getGlobalPosition();
 
         for (auto& g: ghosts) {
+            if (g.state == GhostState::Dead) {
+                getComponent<CgEngine::RigidBodyComponent>(g.entity).setGlobalPose(g.homePos, glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+                auto& meshTransform = getComponent<CgEngine::TransformComponent>(*getChildEntities(g.entity).cbegin());
+                meshTransform.setLocalRotationVec({0.0f, glm::pi<float>(), 0.0f});
+                g.state = GhostState::Home;
+                timeSinceGhostLeavingHome = 0.0f;
+                continue;
+            }
+
             if (g.state == GhostState::LeavingHome) {
                 getComponent<CgEngine::RigidBodyComponent>(g.entity).setKinematicTarget(g.homePos + glm::vec3(0.0f, 0.0f, 2.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
                 g.state = GhostState::Moving;
@@ -124,7 +133,7 @@ namespace Game {
                     g.lastMapNode = 4;
                     g.nextMapNode = 3;
                 }
-                break;
+                continue;
             }
 
             if (g.state == GhostState::Moving) {
@@ -189,6 +198,18 @@ namespace Game {
         return totalCoinAmount;
     }
 
+    void GhostsController::notifyGhostHitByProjectile(CgEngine::Entity ghostEntity) {
+        for (auto& g: ghosts) {
+            if (g.entity == ghostEntity ) {
+                g.lives--;
+                if (g.lives == 0) {
+                    g.state = GhostState::Dead;
+                    g.lives = 5;
+                }
+            }
+        }
+    }
+
     void GhostsController::setMapNeighbors(size_t node, std::initializer_list<int> neighbors) {
         for (const auto& n: neighbors) {
             mapNodes[node].neighbors.push_back(n);
@@ -230,7 +251,7 @@ namespace Game {
         rigidBodyParams.isDynamic = false;
 
         attachComponent<CgEngine::TransformComponent>(e, CgEngine::TransformComponentParams{pos, glm::vec3(0.0f), glm::vec3(0.1f)});
-        attachComponent<CgEngine::MeshRendererComponent>(e, CgEngine::MeshRendererComponentParams{"", "CG_SphereMesh", "Red", true});
+        attachComponent<CgEngine::MeshRendererComponent>(e, CgEngine::MeshRendererComponentParams{"", "CG_SphereMesh", "Coins", true});
         attachComponent<CgEngine::SphereColliderComponent>(e, CgEngine::SphereColliderComponentParams{1.4f, glm::vec3(0.0f), true, "default-physics-material"});
         attachComponent<CgEngine::RigidBodyComponent>(e, rigidBodyParams);
 
@@ -260,7 +281,6 @@ namespace Game {
             setEntityTag(g.entity, "ghost");
             attachComponent<CgEngine::TransformComponent>(g.entity, CgEngine::TransformComponentParams{g.homePos, glm::vec3(0.0f), glm::vec3(1.0f, 0.8f, 1.0f)});
             attachComponent<CgEngine::CapsuleColliderComponent>(g.entity, CgEngine::CapsuleColliderComponentParams{0.8f, 0.4f, glm::vec3(0.0f), false, "default-physics-material"});
-            attachComponent<CgEngine::ScriptComponent>(g.entity, CgEngine::ScriptComponentParams{"singleGhostScript"});
             attachComponent<CgEngine::RigidBodyComponent>(g.entity, rigidBodyParams);
 
             glm::vec3 lightColor;

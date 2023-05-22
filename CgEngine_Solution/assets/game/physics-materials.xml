@@ -1,7 +1,7 @@
 <Materials>
-    <Material name="bounce">
-        <StaticFriction>0.6</StaticFriction>
-        <DynamicFricion>0.6</DynamicFricion>
-        <Restitution>0.5</Restitution>
+    <Material name="projectiles">
+        <StaticFriction>0.5</StaticFriction>
+        <DynamicFricion>0.5</DynamicFricion>
+        <Restitution>0.85</Restitution>
     </Material>
 </Materials>

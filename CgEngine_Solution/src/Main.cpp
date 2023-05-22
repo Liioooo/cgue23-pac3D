@@ -3,8 +3,8 @@
 
 #include "Game/FlyingCameraScript.h"
 #include "Game/GhostsController.h"
-#include "Game/SingleGhostScript.h"
 #include "Game/PlayerScript.h"
+#include "Game/ProjectileScript.h"
 #include "Game/LostScript.h"
 #include "Game/StartScript.h"
 
@@ -16,8 +16,8 @@ int main(int argc, char **argv) {
 
     application->registerNativeScript<Game::FlyingCameraScript>("flyingCameraScript");
     application->registerNativeScript<Game::GhostsController>("ghostsController");
-    application->registerNativeScript<Game::SingleGhostScript>("singleGhostScript");
     application->registerNativeScript<Game::PlayerScript>("player");
+    application->registerNativeScript<Game::ProjectileScript>("projectileScript");
     application->registerNativeScript<Game::LostScript>("lostScript");
     application->registerNativeScript<Game::StartScript>("startScript");
 

@@ -22,6 +22,7 @@ namespace Game {
 
         void onMouseScrolled(CgEngine::MouseScrolledEvent& event) override;
         void onKeyPressed(CgEngine::KeyPressedEvent& event) override;
+        void onMouseButtonPressed(CgEngine::MouseButtonPressedEvent& event) override;
 
     private:
         std::pair<float, float> prevMousePos;
@@ -31,11 +32,19 @@ namespace Game {
 
         float respawnTimer = 3.0f;
         uint32_t playerLives = 4;
+        const uint32_t maxProjectiles = 6;
+        uint32_t projectiles = maxProjectiles;
+
+        uint32_t totalCoins = 1;
+        uint32_t leftCoins = 1;
+
+        float timeSinceNewProjectile = 0.0f;
 
         glm::vec3 cameraOffset = glm::vec3(0.0f, 1.5f, 0.0f);
         std::unordered_set<CgEngine::Entity> cameraRaycastExcluded;
 
         void createStartText();
+        void updateGuiStats();
     };
 
 }

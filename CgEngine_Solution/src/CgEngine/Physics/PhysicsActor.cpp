@@ -134,6 +134,14 @@ namespace CgEngine {
         physxActor->is<physx::PxRigidDynamic>()->setKinematicTarget(physx::PxTransform(PhysXUtils::glmToPhysXVec(target), PhysXUtils::glmToPhysXQuat(rotation)));
     }
 
+    void PhysicsActor::setGlobalPose(glm::vec3 target, glm::quat rotation) {
+        if (!dynamic) {
+            return;
+        }
+
+        physxActor->is<physx::PxRigidDynamic>()->setGlobalPose(physx::PxTransform(PhysXUtils::glmToPhysXVec(target), PhysXUtils::glmToPhysXQuat(rotation)));
+    }
+
     glm::vec3 PhysicsActor::getGlobalPosePosition() {
         return PhysXUtils::phsXToGlmVec(physxActor->getGlobalPose().p);
     }

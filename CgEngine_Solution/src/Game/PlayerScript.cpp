@@ -60,7 +60,16 @@ namespace Game {
     }
 
 
-    void PlayerScript::update(CgEngine::TimeStep ts) {}
+    void PlayerScript::update(CgEngine::TimeStep ts) {
+        timeSinceNewProjectile += ts.getSeconds();
+        if (timeSinceNewProjectile >= 5.0f) {
+            timeSinceNewProjectile = 0.0f;
+            if (projectiles < maxProjectiles) {
+                projectiles++;
+            }
+        }
+        updateGuiStats();
+    }
 
     void PlayerScript::lateUpdate(CgEngine::TimeStep ts) {
         auto mousePos = CgEngine::Input::getMousePosition();
@@ -102,7 +111,8 @@ namespace Game {
             CgEngine::Entity coinContainer = getParentEntity(other);
             auto& ghostsController = getComponent<CgEngine::ScriptComponent>(getParentEntity(coinContainer)).getNativeScript<GhostsController>();
             destroyEntity(other);
-            CG_LOGGING_INFO("Left Coins: {0}/{1}", getChildEntities(coinContainer).size(), ghostsController.getTotalCoinAmount());
+            totalCoins = ghostsController.getTotalCoinAmount();
+            leftCoins = getChildEntities(coinContainer).size();
         }
     }
 
@@ -143,6 +153,39 @@ namespace Game {
         }
     }
 
+    void PlayerScript::onMouseButtonPressed(CgEngine::MouseButtonPressedEvent& event) {
+        if (respawnTimer > 0 || projectiles <= 0) {
+            return;
+        }
+
+        projectiles--;
+
+        auto& playerTransform = getComponent<CgEngine::TransformComponent>();
+
+        CgEngine::Entity e = createEntity(findEntityById("projectiles"));
+        setEntityTag(e, "projectile");
+
+        CgEngine::RigidBodyComponentParams rigidBodyParams{};
+        rigidBodyParams.isDynamic = true;
+        rigidBodyParams.mass = 5;
+        rigidBodyParams.angularDrag = 0.5f;
+        rigidBodyParams.linearDrag = 0.25f;
+        rigidBodyParams.collisionDetection = CgEngine::PhysicsCollisionDetection::Continuous;
+
+        attachComponent<CgEngine::TransformComponent>(e, CgEngine::TransformComponentParams{playerTransform.getGlobalPosition() + glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.15f)});
+        attachComponent<CgEngine::MeshRendererComponent>(e, CgEngine::MeshRendererComponentParams{"", "CG_SphereMesh", "Projectiles", true});
+        attachComponent<CgEngine::PointLightComponent>(e, CgEngine::PointLightComponentParams{{10.0f/255, 23.0f/255, 87.0f/255}, 1.5f, 4.0f, 0.8f});
+        attachComponent<CgEngine::SphereColliderComponent>(e, CgEngine::SphereColliderComponentParams{1.0f, glm::vec3(0.0f), false, "projectiles"});
+        attachComponent<CgEngine::ScriptComponent>(e, CgEngine::ScriptComponentParams{"projectileScript"});
+        auto& rigidBody = attachComponent<CgEngine::RigidBodyComponent>(e, rigidBodyParams);
+
+        glm::vec3 direction = glm::normalize(glm::quat({glm::max(0.0f, pitch + 0.25f), yaw, 0}) * glm::vec3(0, 0, -1));
+
+        rigidBody.addForce(direction * 8000.0f);
+
+        event.stopPropagation();
+    }
+
     void PlayerScript::createStartText() {
         auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("inGameCanvas"));
         auto* start = gameCanvas.addUiText("start");
@@ -150,9 +193,9 @@ namespace Game {
 
         start->setFont("SpaceMono-Bold.ttf");
         start->setText("START IN");
-        start->setTop(0.3, CgEngine::UIPosUnit::VHPercent);
-        start->setLeft(0.5, CgEngine::UIPosUnit::VWPercent);
-        start->setSize(0.12, CgEngine::UIPosUnit::VHPercent);
+        start->setTop(0.3f, CgEngine::UIPosUnit::VHPercent);
+        start->setLeft(0.5f, CgEngine::UIPosUnit::VWPercent);
+        start->setSize(0.12f, CgEngine::UIPosUnit::VHPercent);
         start->setXAlignment(CgEngine::UIXAlignment::Center);
         start->setYAlignment(CgEngine::UIYAlignment::Center);
         start->setColor({0.8f, 0.0f, 0.0f, 1.0f});
@@ -161,14 +204,27 @@ namespace Game {
 
         startTimer->setFont("SpaceMono-Bold.ttf");
         startTimer->setText(timerStr.substr(0, timerStr.find('.') + 3));
-        startTimer->setTop(0.44, CgEngine::UIPosUnit::VHPercent);
-        startTimer->setLeft(0.5, CgEngine::UIPosUnit::VWPercent);
-        startTimer->setSize(0.18, CgEngine::UIPosUnit::VHPercent);
+        startTimer->setTop(0.44f, CgEngine::UIPosUnit::VHPercent);
+        startTimer->setLeft(0.5f, CgEngine::UIPosUnit::VWPercent);
+        startTimer->setSize(0.18f, CgEngine::UIPosUnit::VHPercent);
         startTimer->setXAlignment(CgEngine::UIXAlignment::Center);
         startTimer->setYAlignment(CgEngine::UIYAlignment::Center);
         startTimer->setColor({0.0f, 0.0f, 0.0f, 1.0f});
         startTimer->setUseKerning(false);
 
         gameCanvas.getUIElement<CgEngine::UiCircle>("cross")->setFillColor({0.0f, 0.0f, 0.0f, 0.0f});
+    }
+
+    void PlayerScript::updateGuiStats() {
+        auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("inGameCanvas"));
+        auto* projectilesAmount = gameCanvas.getUIElement<CgEngine::UiRect>("projectilesAmount");
+
+        float projectileWidth = (static_cast<float>(projectiles) / static_cast<float>(maxProjectiles)) * 0.15f;
+        projectilesAmount->setWidth(projectileWidth, CgEngine::UIPosUnit::VWPercent);
+
+        auto* coinsAmount = gameCanvas.getUIElement<CgEngine::UiRect>("coinsAmount");
+        float coinWidth = (1.0f - (static_cast<float>(leftCoins) / static_cast<float>(totalCoins))) * 0.15f;
+        coinsAmount->setWidth(coinWidth, CgEngine::UIPosUnit::VWPercent);
+
     }
 }
