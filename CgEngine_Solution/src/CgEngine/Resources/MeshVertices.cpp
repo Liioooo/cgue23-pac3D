@@ -148,6 +148,32 @@ namespace CgEngine {
         return *physicsMesh;
     }
 
+    PhysicsConvexMesh& MeshVertices::getPhysicsConvexMeshForNode(const std::string& nodeName) {
+        uint32_t nodeIndex = nodeNameToNode.at(nodeName);
+        auto& meshNode = meshNodes.at(nodeIndex);
+
+        CG_ASSERT(meshNode.submeshIndices.size() > 0, "Cannot create PhysicsConvexMesh from empty node")
+
+        if (meshNode.physicsConvexMesh != nullptr) {
+            return *meshNode.physicsConvexMesh;
+        }
+
+        std::vector<glm::vec3> physicsVertices;
+
+        for (const auto& smi: meshNode.submeshIndices) {
+            auto& submesh = submeshes.at(smi);
+
+            for (uint32_t i = submesh.baseVertex; i < submesh.baseVertex + submesh.vertexCount; i++) {
+                physicsVertices.emplace_back(meshNode.transform * glm::vec4(vertices.at(i).position, 1.0f));
+            }
+        }
+
+        auto& physicsCooking = GlobalObjectManager::getInstance().getPhysicsSystem().getPhysicsCooking();
+        auto* physicsMesh = physicsCooking.cookConvexMesh(physicsVertices.data(), physicsVertices.size());
+        meshNode.physicsConvexMesh = physicsMesh;
+        return *physicsMesh;
+    }
+
     MeshVertices *MeshVertices::createCubeMesh() {
         auto *mesh = new MeshVertices();
 

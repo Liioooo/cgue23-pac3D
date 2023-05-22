@@ -2,6 +2,7 @@
 
 #include "PxPhysicsAPI.h"
 #include "PhysicsTriangleMesh.h"
+#include "PhysicsConvexMesh.h"
 
 namespace CgEngine {
 
@@ -11,6 +12,7 @@ namespace CgEngine {
         ~PhysicsCooking();
 
         PhysicsTriangleMesh* cookTriangleMesh(glm::vec3* vertices, uint32_t numVertices, uint32_t* indices, uint32_t indexCount);
+        PhysicsConvexMesh* cookConvexMesh(glm::vec3* vertices, uint32_t numVertices);
 
     private:
         physx::PxCooking* physxCooking;

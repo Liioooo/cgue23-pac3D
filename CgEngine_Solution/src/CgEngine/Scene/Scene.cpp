@@ -276,6 +276,11 @@ namespace CgEngine {
                 auto& transform = componentManager->getComponent<TransformComponent>(it->getEntity());
                 renderer.submitPhysicsColliderMesh(it->getPhysicsMesh().getVisualizationMesh(), glm::translate(glm::mat4(1.0), transform.getGlobalPosition()));
             }
+
+            for (auto it = componentManager->begin<ConvexColliderComponent>(); it != componentManager->end<ConvexColliderComponent>(); it++) {
+                auto& transform = componentManager->getComponent<TransformComponent>(it->getEntity());
+                renderer.submitPhysicsColliderMesh(it->getPhysicsMesh().getVisualizationMesh(), glm::translate(glm::mat4(1.0), transform.getGlobalPosition()));
+            }
         }
 
         renderer.endScene();

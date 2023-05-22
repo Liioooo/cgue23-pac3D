@@ -13,6 +13,7 @@
 #include "Components/SphereColliderComponent.h"
 #include "Components/CapsuleColliderComponent.h"
 #include "Components/TriangleColliderComponent.h"
+#include "Components/ConvexColliderComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/CharacterControllerComponent.h"
 #include "Components/UiCanvasComponent.h"
@@ -35,6 +36,7 @@ namespace CgEngine {
             registerComponentType<SphereColliderComponent>();
             registerComponentType<CapsuleColliderComponent>();
             registerComponentType<TriangleColliderComponent>();
+            registerComponentType<ConvexColliderComponent>();
             registerComponentType<RigidBodyComponent>();
             registerComponentType<CharacterControllerComponent>();
             registerComponentType<CharacterControllerComponent>();

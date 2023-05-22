@@ -4,6 +4,7 @@
 #include "PhysicsShapeSphere.h"
 #include "PhysicsShapeCapsule.h"
 #include "PhysicsShapeTriangleMesh.h"
+#include "PhysicsShapeConvexMesh.h"
 #include "Uuid.h"
 
 namespace CgEngine {
@@ -183,8 +184,15 @@ namespace CgEngine {
         return uuid;
     }
 
-    uint32_t PhysicsActor::addTriangleCollider(CgEngine::PhysicsMaterial& material, PhysicsTriangleMesh& physicsMesh, bool isTrigger) {
+    uint32_t PhysicsActor::addTriangleCollider(PhysicsMaterial& material, PhysicsTriangleMesh& physicsMesh, bool isTrigger) {
         auto* collider = new PhysicsShapeTriangleMesh(*this, material, physicsMesh, isTrigger);
+        uint32_t uuid = Uuid().getUuid();
+        colliders.insert({uuid, collider});
+        return uuid;
+    }
+
+    uint32_t PhysicsActor::addConvexCollider(PhysicsMaterial& material, PhysicsConvexMesh& physicsMesh, bool isTrigger) {
+        auto* collider = new PhysicsShapeConvexMesh(*this, material, physicsMesh, isTrigger);
         uint32_t uuid = Uuid().getUuid();
         colliders.insert({uuid, collider});
         return uuid;

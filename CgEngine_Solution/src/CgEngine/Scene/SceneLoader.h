@@ -25,6 +25,7 @@ namespace CgEngine {
         static void createSphereColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createCapsuleColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createTriangleColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
+        static void createConvexColliderComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createCharacterControllerComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createUiCanvasComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
 

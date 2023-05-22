@@ -39,4 +39,24 @@ namespace CgEngine {
 
         return new PhysicsTriangleMesh(physxPhysics.createTriangleMesh(readBuffer));
     }
+
+    PhysicsConvexMesh* PhysicsCooking::cookConvexMesh(glm::vec3* vertices, uint32_t numVertices) {
+        physx::PxConvexMeshDesc meshDesc;
+        meshDesc.points.count = numVertices;
+        meshDesc.points.stride = sizeof(glm::vec3);
+        meshDesc.points.data = vertices;
+        meshDesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
+
+        physx::PxDefaultMemoryOutputStream writeBuffer;
+        physx::PxConvexMeshCookingResult::Enum result;
+        bool status = physxCooking->cookConvexMesh(meshDesc, writeBuffer, &result);
+
+        CG_ASSERT(status, "Failed to cook ConvexMesh")
+
+        auto& physxPhysics = GlobalObjectManager::getInstance().getPhysicsSystem().getPhysxPhysics();
+
+        physx::PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+
+        return new PhysicsConvexMesh(physxPhysics.createConvexMesh(readBuffer));
+    }
 }

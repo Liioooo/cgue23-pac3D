@@ -280,7 +280,7 @@ namespace Game {
             g.entity = createEntity(ghostContainer);
             setEntityTag(g.entity, "ghost");
             attachComponent<CgEngine::TransformComponent>(g.entity, CgEngine::TransformComponentParams{g.homePos, glm::vec3(0.0f), glm::vec3(1.0f, 0.8f, 1.0f)});
-            attachComponent<CgEngine::CapsuleColliderComponent>(g.entity, CgEngine::CapsuleColliderComponentParams{0.8f, 0.4f, glm::vec3(0.0f), false, "default-physics-material"});
+            attachComponent<CgEngine::ConvexColliderComponent>(g.entity, CgEngine::ConvexColliderComponentParams{"ghosts.fbx", "Ghost" + ghostModelStr, false, "default-physics-material"});
             attachComponent<CgEngine::RigidBodyComponent>(g.entity, rigidBodyParams);
 
             glm::vec3 lightColor;
