@@ -5,7 +5,7 @@
 #include "Application.h"
 
 namespace CgEngine {
-    Material *Material::createResource(const std::string &name) {
+    Material *Material::createResource(const std::string& name) {
         auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
 
         const pugi::xml_document& materialsXML = resourceManager.getResource<XMLFile>(FileSystem::getAsGamePath("materials.xml"))->getXMLDocument();
@@ -119,71 +119,71 @@ namespace CgEngine {
         floatValues[name] = value;
     }
 
-    void Material::set(const std::string &name, glm::vec2 value) {
+    void Material::set(const std::string& name, glm::vec2 value) {
         vec2Values[name] = value;
     }
 
-    void Material::set(const std::string &name, glm::vec3 value) {
+    void Material::set(const std::string& name, glm::vec3 value) {
         vec3Values[name] = value;
     }
 
-    void Material::set(const std::string &name, glm::vec4 value) {
+    void Material::set(const std::string& name, glm::vec4 value) {
         vec4Values[name] = value;
     }
 
-    void Material::set(const std::string &name, glm::mat3 value) {
+    void Material::set(const std::string& name, glm::mat3 value) {
         mat3Values[name] = value;
     }
 
-    void Material::set(const std::string &name, glm::mat4 value) {
+    void Material::set(const std::string& name, glm::mat4 value) {
         mat4Values[name] = value;
     }
 
-    void Material::setTexture2D(const std::string &name, const Texture2D& texture, uint32_t textureSlot) {
+    void Material::setTexture2D(const std::string& name, const Texture2D& texture, uint32_t textureSlot) {
         texValues[name] = {texture.getRendererId(), textureSlot};
     }
 
-    void Material::setTextureCube(const std::string &name, const TextureCube& texture, uint32_t textureSlot) {
+    void Material::setTextureCube(const std::string& name, const TextureCube& texture, uint32_t textureSlot) {
         texValues[name] = {texture.getRendererId(), textureSlot};
     }
 
-    void Material::setTexture(const std::string &name, uint32_t textureRenderId, uint32_t textureSlot) {
+    void Material::setTexture(const std::string& name, uint32_t textureRenderId, uint32_t textureSlot) {
         texValues[name] = {textureRenderId, textureSlot};
     }
 
-    bool Material::getBool(const std::string &name) const {
+    bool Material::getBool(const std::string& name) const {
         return boolValues.at(name);
     }
 
-    int Material::getInt(const std::string &name) const {
+    int Material::getInt(const std::string& name) const {
         return intValues.at(name);
     }
 
-    float Material::getFloat(const std::string &name) const {
+    float Material::getFloat(const std::string& name) const {
         return floatValues.at(name);
     }
 
-    const glm::vec2 &Material::getVec2(const std::string &name) const {
+    const glm::vec2 &Material::getVec2(const std::string& name) const {
         return vec2Values.at(name);
     }
 
-    const glm::vec3 &Material::getVec3(const std::string &name) const {
+    const glm::vec3 &Material::getVec3(const std::string& name) const {
         return vec3Values.at(name);
     }
 
-    const glm::vec4 &Material::getVec4(const std::string &name) const {
+    const glm::vec4 &Material::getVec4(const std::string& name) const {
         return vec4Values.at(name);
     }
 
-    const glm::mat3 &Material::getMat3(const std::string &name) const {
+    const glm::mat3 &Material::getMat3(const std::string& name) const {
         return mat3Values.at(name);
     }
 
-    const glm::mat4 &Material::getMat4(const std::string &name) const {
+    const glm::mat4 &Material::getMat4(const std::string& name) const {
         return mat4Values.at(name);
     }
 
-    const MaterialTextureData &Material::getTexture(const std::string &name) const {
+    const MaterialTextureData &Material::getTexture(const std::string& name) const {
         return texValues.at(name);
     }
 

@@ -21,8 +21,8 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_C_FLAGS_INIT": "/Od /W3 /sdl /ZI",
-                "CMAKE_CXX_FLAGS_INIT": "/Od /std:c++17 /W3 /sdl /ZI"
+                "CMAKE_C_FLAGS_INIT": "/Od /W3 /sdl /Zi",
+                "CMAKE_CXX_FLAGS_INIT": "/Od /std:c++17 /W3 /sdl /Zi"
             }
         },
         {
@@ -40,7 +40,7 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_C_FLAGS_INIT": "/GL /O2 /W3 /sdl",
+                "CMAKE_C_FLAGS_INIT": "/GL /O2 /W3",
                 "CMAKE_CXX_FLAGS_INIT": "/GL /O2 /std:c++17 /W3 /sdl"
             }
         },
@@ -59,7 +59,7 @@
                 "CMAKE_BUILD_TYPE": "Dist",
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe",
-                "CMAKE_C_FLAGS_INIT": "/GL /O2 /W3 /sdl",
+                "CMAKE_C_FLAGS_INIT": "/GL /O2 /W3",
                 "CMAKE_CXX_FLAGS_INIT": "/GL /O2 /std:c++17 /W3 /sdl"
             }
         }

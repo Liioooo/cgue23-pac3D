@@ -4,6 +4,9 @@
 #include "Rendering/Material.h"
 #include "Physics/PhysicsTriangleMesh.h"
 #include "Physics/PhysicsConvexMesh.h"
+#include "Animation/Skeleton.h"
+#include "Animation/BoneInfluence.h"
+#include "Animation/BoneInfo.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -42,6 +45,7 @@ namespace CgEngine {
         std::vector<uint32_t> submeshIndices;
         glm::mat4 localTransform{1.0f};
         glm::mat4 transform{1.0f};
+        glm::mat4 invTransform{1.0f};
     };
 
     class MeshVertices {
@@ -63,6 +67,8 @@ namespace CgEngine {
         PhysicsTriangleMesh& getPhysicsTriangleMeshForNode(const std::string& nodeName);
         PhysicsConvexMesh& getPhysicsConvexMeshForNode(const std::string& nodeName);
 
+        bool hasSkeleton() const;
+
 
     private:
         static MeshVertices* createCubeMesh();
@@ -74,6 +80,10 @@ namespace CgEngine {
         static glm::mat4 getTransformFromAssimpTransform(const aiMatrix4x4& transform);
         static TextureWrap getTextureWrapFromAssimp(aiTextureMapMode mapMode);
 
+        static Skeleton* importSkeleton(const aiScene* scene);
+        static void traverseNodesBone(const aiNode* node, Skeleton* skeleton, const std::unordered_set<std::string_view>& bones);
+        static void traverseBone(const aiNode* node, Skeleton* skeleton, uint32_t parentBone);
+
         void traverseNodes(aiNode* node, const glm::mat4& parentTransform);
 
         VertexArrayObject* vao;
@@ -83,6 +93,9 @@ namespace CgEngine {
         std::vector<std::unique_ptr<Material>> materials;
         std::vector<MeshNode> meshNodes{};
         std::unordered_map<std::string, uint32_t> nodeNameToNode{};
+        Skeleton* skeleton = nullptr;
+        std::vector<BoneInfluence> boneInfluences{};
+        std::vector<BoneInfo> boneInfos{};
     };
 
 }

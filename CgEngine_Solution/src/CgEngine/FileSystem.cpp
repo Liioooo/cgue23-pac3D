@@ -3,7 +3,7 @@
 #include "Logging.h"
 
 namespace CgEngine {
-    std::string FileSystem::readFileToString(const std::string &path) {
+    std::string FileSystem::readFileToString(const std::string& path) {
         std::ifstream file(path);
 
         if (file.is_open()) {
@@ -18,7 +18,7 @@ namespace CgEngine {
         return std::string{};
     }
 
-    bool FileSystem::checkFileExists(const std::string &path) {
+    bool FileSystem::checkFileExists(const std::string& path) {
         std::ifstream file(path);
         if (file.is_open()) {
             file.close();
@@ -27,7 +27,7 @@ namespace CgEngine {
         return false;
     }
 
-    std::string FileSystem::getAsGamePath(const std::string &path) {
+    std::string FileSystem::getAsGamePath(const std::string& path) {
         if (path.rfind("assets/game/", 0) == 0) {
             return path;
         }
@@ -35,7 +35,7 @@ namespace CgEngine {
         return "assets/game/" + path;
     }
 
-    std::string FileSystem::getAsEnginePath(const std::string &path) {
+    std::string FileSystem::getAsEnginePath(const std::string& path) {
         if (path.rfind("assets/engine/", 0) == 0) {
             return path;
         }

@@ -26,7 +26,7 @@ namespace CgEngine {
         Font(const std::string& name);
         ~Font();
 
-        float getKerning(unsigned int leftGlyph, unsigned int rightGlyph) const;
+        float getKerning(uint32_t leftGlyph, uint32_t rightGlyph) const;
         const FontCharacterInfo& getCharacterInfo(char c) const;
         const Texture2D* getFontAtlas() const;
 

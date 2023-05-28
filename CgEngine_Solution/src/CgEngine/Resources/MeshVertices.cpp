@@ -174,6 +174,10 @@ namespace CgEngine {
         return *physicsMesh;
     }
 
+    bool MeshVertices::hasSkeleton() const {
+        return skeleton != nullptr;
+    }
+
     MeshVertices *MeshVertices::createCubeMesh() {
         auto *mesh = new MeshVertices();
 
@@ -561,7 +565,7 @@ namespace CgEngine {
 
         const aiScene *scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_SortByPType |
                                                             aiProcess_GenNormals | aiProcess_FlipUVs |
-                                                            aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices);
+                                                            aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_LimitBoneWeights);
 
         CG_ASSERT(scene && scene->HasMeshes() && scene->mRootNode, "3D-Asset could not be loaded: " + path + ", " + importer.GetErrorString());
 
@@ -605,6 +609,8 @@ namespace CgEngine {
             }
         }
 
+        mesh->skeleton = importSkeleton(scene);
+
         mesh->traverseNodes(scene->mRootNode, glm::mat4(1.0f));
 
         mesh->vao = new VertexArrayObject();
@@ -618,6 +624,48 @@ namespace CgEngine {
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
+
+        if (mesh->hasSkeleton()) {
+            mesh->boneInfluences.resize(mesh->vertices.size());
+
+            for (uint32_t mI = 0; mI < scene->mNumMeshes; mI++) {
+                const aiMesh* aiMesh = scene->mMeshes[mI];
+                if (aiMesh->mNumBones == 0) {
+                    continue;
+                }
+
+                Submesh& submesh = mesh->submeshes.at(mI);
+
+                for (uint32_t bI = 0; bI < aiMesh->mNumBones; bI++) {
+                    const aiBone* bone = aiMesh->mBones[bI];
+                    uint32_t boneIndex = mesh->skeleton->findBoneIndex(bone->mName.C_Str());
+                    CG_ASSERT(boneIndex != Skeleton::NoBone, "Cannot find Bone in Skeleton")
+
+                    uint32_t boneInfoIndex = ~0;
+                    for (uint32_t j = 0; j < mesh->boneInfos.size(); j++) {
+                        const auto& boneInfo = mesh->boneInfos.at(j);
+                        if (boneInfo.boneIndex == boneIndex && boneInfo.submeshIndex == mI) {
+                            boneInfoIndex = j;
+                            break;
+                        }
+                    }
+                    if (boneInfoIndex == ~0) {
+                        boneInfoIndex = mesh->boneInfos.size();
+                        mesh->boneInfos.emplace_back(getTransformFromAssimpTransform(bone->mOffsetMatrix), boneIndex, mI);
+                    }
+
+                    for (uint32_t j = 0; j < bone->mNumWeights; j++) {
+                        uint32_t vertexId = submesh.baseVertex + bone->mWeights[j].mVertexId;
+                        float weight = bone->mWeights[j].mWeight;
+                        mesh->boneInfluences[vertexId].addBoneData(boneInfoIndex, weight);
+                    }
+                }
+            }
+
+            for (auto& item: mesh->boneInfluences) {
+                item.normalizeWeights();
+            }
+        }
 
         auto resourceManager = GlobalObjectManager::getInstance().getResourceManager();
 
@@ -828,6 +876,42 @@ namespace CgEngine {
         return TextureWrap::Repeat;
     }
 
+    Skeleton* MeshVertices::importSkeleton(const aiScene* scene) {
+        std::unordered_set<std::string_view> bones;
+
+        for (uint32_t mI = 0; mI < scene->mNumMeshes; mI++) {
+            const aiMesh* mesh = scene->mMeshes[mI];
+            for (uint32_t bI = 0; bI < mesh->mNumBones; bI++) {
+                bones.emplace(mesh->mBones[bI]->mName.C_Str());
+            }
+        }
+
+        if (bones.empty()) {
+            return nullptr;
+        }
+
+        auto* skeleton = new Skeleton(bones.size());
+        traverseNodesBone(scene->mRootNode, skeleton, bones);
+        return skeleton;
+    }
+
+    void MeshVertices::traverseNodesBone(const aiNode* node, CgEngine::Skeleton* skeleton, const std::unordered_set<std::string_view>& bones) {
+        if (bones.count(node->mName.C_Str()) != 0) {
+            traverseBone(node, skeleton, Skeleton::NoBone);
+        } else {
+            for (uint32_t i = 0; i < node->mNumChildren; i++) {
+                traverseNodesBone(node->mChildren[i], skeleton, bones);
+            }
+        }
+    }
+
+    void MeshVertices::traverseBone(const aiNode* node, CgEngine::Skeleton* skeleton, uint32_t parentBone) {
+        uint32_t boneIndex = skeleton->addBone(node->mName.C_Str(), parentBone, getTransformFromAssimpTransform(node->mTransformation));
+        for (uint32_t i = 0; i < node->mNumChildren; i++) {
+            traverseBone(node->mChildren[i], skeleton, boneIndex);
+        }
+    }
+
     void MeshVertices::traverseNodes(aiNode *node, const glm::mat4 &parentTransform) {
         glm::mat4 localTransform = getTransformFromAssimpTransform(node->mTransformation);
         glm::mat4 transform = parentTransform * localTransform;
@@ -836,6 +920,7 @@ namespace CgEngine {
         meshNode.aiNode = node;
         meshNode.localTransform = localTransform;
         meshNode.transform = transform;
+        meshNode.invTransform = glm::inverse(transform);
 
         nodeNameToNode.insert({node->mName.C_Str(), meshNodes.size() - 1});
 

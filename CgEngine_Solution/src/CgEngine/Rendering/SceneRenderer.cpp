@@ -92,7 +92,7 @@ namespace CgEngine {
         {
             float bloomWidth = static_cast<float>(viewportWidth) / 2.0f;
             float bloomHeight = static_cast<float>(viewportHeight) / 2.0f;
-            for (auto & bloomTexture : bloomTextures) {
+            for (auto& bloomTexture : bloomTextures) {
                 bloomTexture = new Texture2D(TextureFormat::Float32, static_cast<uint32_t>(bloomWidth), static_cast<uint32_t>(bloomHeight), TextureWrap::Clamp, MipMapFiltering::Bilinear);
                 bloomWidth /= 2.0f;
                 bloomHeight /= 2.0f;

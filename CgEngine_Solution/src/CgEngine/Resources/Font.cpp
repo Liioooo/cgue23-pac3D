@@ -62,7 +62,7 @@ namespace CgEngine {
         delete fontAtlas;
     }
 
-    float Font::getKerning(unsigned int leftGlyph, unsigned int rightGlyph) const {
+    float Font::getKerning(uint32_t leftGlyph, uint32_t rightGlyph) const {
         FT_Vector delta;
         FT_Get_Kerning(ftFace, leftGlyph, rightGlyph, FT_KERNING_DEFAULT, &delta);
         return static_cast<float>(delta.x >> 6);
