@@ -7,6 +7,7 @@
 #include "Animation/Skeleton.h"
 #include "Animation/BoneInfluence.h"
 #include "Animation/BoneInfo.h"
+#include "Animation/Animation.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -78,11 +79,16 @@ namespace CgEngine {
 
         static std::string getTexturePath(const std::string& modelPath, const std::string& texturePath);
         static glm::mat4 getTransformFromAssimpTransform(const aiMatrix4x4& transform);
+        static glm::vec3 getVec3FromAssimpVec(const aiVector3D& vec);
+        static glm::quat getQuatFromAssimpQuat(const aiQuaternion& quat);
         static TextureWrap getTextureWrapFromAssimp(aiTextureMapMode mapMode);
 
         static Skeleton* importSkeleton(const aiScene* scene);
         static void traverseNodesBone(const aiNode* node, Skeleton* skeleton, const std::unordered_set<std::string_view>& bones);
         static void traverseBone(const aiNode* node, Skeleton* skeleton, uint32_t parentBone);
+
+        static void importAnimations(const aiScene* scene, const Skeleton* skeleton, std::unordered_map<std::string, Animation>& animations);
+        static Animation importAnimation(const aiAnimation* aiAnimation, const Skeleton* skeleton);
 
         void traverseNodes(aiNode* node, const glm::mat4& parentTransform);
 
@@ -96,6 +102,7 @@ namespace CgEngine {
         Skeleton* skeleton = nullptr;
         std::vector<BoneInfluence> boneInfluences{};
         std::vector<BoneInfo> boneInfos{};
+        std::unordered_map<std::string, Animation> animations;
     };
 
 }

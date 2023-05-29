@@ -626,6 +626,8 @@ namespace CgEngine {
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
 
         if (mesh->hasSkeleton()) {
+            importAnimations(scene, mesh->skeleton, mesh->animations);
+
             mesh->boneInfluences.resize(mesh->vertices.size());
 
             for (uint32_t mI = 0; mI < scene->mNumMeshes; mI++) {
@@ -865,6 +867,14 @@ namespace CgEngine {
         return result;
     }
 
+    glm::vec3 MeshVertices::getVec3FromAssimpVec(const aiVector3D& vec) {
+        return {vec.x, vec.y, vec.z};
+    }
+
+    glm::quat MeshVertices::getQuatFromAssimpQuat(const aiQuaternion& quat) {
+        return {quat.w, quat.x, quat.y, quat.z};
+    }
+
     TextureWrap MeshVertices::getTextureWrapFromAssimp(aiTextureMapMode mapMode) {
         switch (mapMode) {
             case aiTextureMapMode_Clamp:
@@ -910,6 +920,97 @@ namespace CgEngine {
         for (uint32_t i = 0; i < node->mNumChildren; i++) {
             traverseBone(node->mChildren[i], skeleton, boneIndex);
         }
+    }
+
+    void MeshVertices::importAnimations(const aiScene* scene, const CgEngine::Skeleton* skeleton, std::unordered_map<std::string, Animation>& animations) {
+        if (!scene->HasAnimations()) {
+            return;
+        }
+
+        for (uint32_t i = 0; i < scene->mNumAnimations; i++) {
+            const aiAnimation* animation = scene->mAnimations[i];
+            if (animation->mDuration <= 0.0f) {
+                break;
+            }
+            animations.insert({animation->mName.C_Str(), std::move(importAnimation(animation, skeleton))});
+        }
+    }
+
+    Animation MeshVertices::importAnimation(const aiAnimation* aiAnimation, const CgEngine::Skeleton* skeleton) {
+        std::vector<AnimationChannel> channels;
+        channels.resize(skeleton->getNumBones());
+
+        std::unordered_map<uint32_t, const aiNodeAnim*> boneToNodeAnimation;
+
+        for (uint32_t i = 0 ; i < aiAnimation->mNumChannels; i++) {
+            const aiNodeAnim* nodeAnimation = aiAnimation->mChannels[i];
+            uint32_t bI = skeleton->findBoneIndex(nodeAnimation->mNodeName.C_Str());
+            if (bI != Skeleton::NoBone) {
+                boneToNodeAnimation.insert({bI, nodeAnimation});
+            }
+        }
+
+        for (uint32_t bI = 0; bI < skeleton->getNumBones(); bI++) {
+            channels[bI].boneIndex = bI;
+            if (auto channel = boneToNodeAnimation.find(bI); channel != boneToNodeAnimation.end()) {
+                auto nodeAnimation = channel->second;
+
+                channels[bI].translations.reserve(nodeAnimation->mNumPositionKeys + 2);
+                channels[bI].scales.reserve(nodeAnimation->mNumScalingKeys + 2);
+                channels[bI].rotations.reserve(nodeAnimation->mNumRotationKeys + 2);
+
+                for (uint32_t i = 0; i < nodeAnimation->mNumPositionKeys; i++) {
+                    auto key = nodeAnimation->mPositionKeys[i];
+                    float timeStamp = glm::clamp(static_cast<float>(key.mTime / aiAnimation->mDuration), 0.0f, 1.0f);
+                    if (i == 0 && timeStamp > 0.0f) {
+                        channels[bI].translations.emplace_back(0.0f, getVec3FromAssimpVec(key.mValue));
+                    }
+                    channels[bI].translations.emplace_back(timeStamp, getVec3FromAssimpVec(key.mValue));
+                }
+                if (channels[bI].translations.empty()) {
+                    channels[bI].translations.emplace_back(0.0f, glm::vec3(0.0f));
+                } else if (channels[bI].translations.back().timeStamp < 1.0f) {
+                    channels[bI].translations.emplace_back(1.0f, channels[bI].translations.back().value);
+                }
+
+                for (uint32_t i = 0; i < nodeAnimation->mNumScalingKeys; i++) {
+                    auto key = nodeAnimation->mScalingKeys[i];
+                    float timeStamp = glm::clamp(static_cast<float>(key.mTime / aiAnimation->mDuration), 0.0f, 1.0f);
+                    if (i == 0 && timeStamp > 0.0f) {
+                        channels[bI].scales.emplace_back(0.0f, getVec3FromAssimpVec(key.mValue));
+                    }
+                    channels[bI].scales.emplace_back(timeStamp, getVec3FromAssimpVec(key.mValue));
+                }
+                if (channels[bI].scales.empty()) {
+                    channels[bI].scales.emplace_back(0.0f, glm::vec3(0.0f));
+                } else if (channels[bI].scales.back().timeStamp < 1.0f) {
+                    channels[bI].scales.emplace_back(1.0f, channels[bI].scales.back().value);
+                }
+
+                for (uint32_t i = 0; i < nodeAnimation->mNumRotationKeys; i++) {
+                    auto key = nodeAnimation->mRotationKeys[i];
+                    float timeStamp = glm::clamp(static_cast<float>(key.mTime / aiAnimation->mDuration), 0.0f, 1.0f);
+                    if (i == 0 && timeStamp > 0.0f) {
+                        channels[bI].rotations.emplace_back(0.0f, getQuatFromAssimpQuat(key.mValue));
+                    }
+                    channels[bI].rotations.emplace_back(timeStamp, getQuatFromAssimpQuat(key.mValue));
+                }
+                if (channels[bI].rotations.empty()) {
+                    channels[bI].rotations.emplace_back(0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+                } else if (channels[bI].rotations.back().timeStamp < 1.0f) {
+                    channels[bI].rotations.emplace_back(1.0f, channels[bI].rotations.back().value);
+                }
+            }
+        }
+
+        double ticksPerSecond = aiAnimation->mTicksPerSecond;
+        if (ticksPerSecond < 0.0001) {
+            ticksPerSecond = 1.0;
+        }
+
+        const auto animationDuration = static_cast<float>(aiAnimation->mDuration / ticksPerSecond);
+
+        return Animation(std::move(channels), animationDuration);
     }
 
     void MeshVertices::traverseNodes(aiNode *node, const glm::mat4 &parentTransform) {

@@ -35,4 +35,8 @@ namespace CgEngine {
     const glm::mat4& Skeleton::getBoneTransform(uint32_t index) const {
         return boneTransforms.at(index);
     }
+
+    uint32_t Skeleton::getNumBones() const {
+        return boneNames.size();
+    }
 }

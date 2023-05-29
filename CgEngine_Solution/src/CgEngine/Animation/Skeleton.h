@@ -14,6 +14,8 @@ namespace CgEngine {
         const std::string& getBoneName(uint32_t index) const;
         const glm::mat4& getBoneTransform(uint32_t index) const;
 
+        uint32_t getNumBones() const;
+
     private:
         std::vector<std::string> boneNames;
         std::vector<uint32_t> parentBoneIndices;
