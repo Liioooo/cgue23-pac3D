@@ -43,6 +43,8 @@ namespace CgEngine {
             createTransformComponent(scene, entity, node);
         } else if (name == "MeshRendererComponent") {
             createMeshRendererComponent(scene, entity, node);
+        } else if (name == "AnimatedMeshRendererComponent") {
+            createAnimatedMeshRendererComponent(scene, entity, node);
         } else if (name == "CameraComponent") {
             createCameraComponent(scene, entity, node);
         } else if (name == "ScriptComponent") {
@@ -91,6 +93,20 @@ namespace CgEngine {
             getListFromString(node.attribute("mesh-nodes").as_string())
         };
         scene->attachComponent<MeshRendererComponent>(entity, params);
+    }
+
+    void SceneLoader::createAnimatedMeshRendererComponent(CgEngine::Scene* scene, CgEngine::Entity entity, const pugi::xml_node& node) {
+        AnimatedMeshRendererComponentParams params{
+                node.attribute("asset-file").as_string(),
+                node.attribute("material").as_string(),
+                node.attribute("cast-shadows").as_bool(true),
+                getListFromString(node.attribute("mesh-nodes").as_string()),
+                node.attribute("animation").as_string(""),
+                node.attribute("animation-speed").as_float(1.0f),
+                node.attribute("auto-play").as_bool(true),
+                node.attribute("loop").as_bool(true)
+        };
+        scene->attachComponent<AnimatedMeshRendererComponent>(entity, params);
     }
 
     void SceneLoader::createCameraComponent(Scene *scene, Entity entity, const pugi::xml_node &node) {

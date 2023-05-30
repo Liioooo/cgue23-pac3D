@@ -9,7 +9,9 @@ namespace CgEngine {
 
     VertexArrayObject::~VertexArrayObject() {
         glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &ebo);
+        if (!usingExistingIndexBuffer) {
+            glDeleteBuffers(1, &ebo);
+        }
     }
 
     void VertexArrayObject::bind() const {
@@ -85,6 +87,14 @@ namespace CgEngine {
         indexCount = count;
     }
 
+    void VertexArrayObject::useExistingIndexBuffer(uint32_t rendererId, size_t count) {
+        bind();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rendererId);
+        ebo = rendererId;
+        indexCount = count;
+        usingExistingIndexBuffer = true;
+    }
+
     std::vector<std::shared_ptr<VertexBuffer>> &VertexArrayObject::getVertexBuffers() {
         return vertexBuffers;
     }
@@ -95,5 +105,9 @@ namespace CgEngine {
 
     uint32_t VertexArrayObject::getRendererId() const {
         return vao;
+    }
+
+    uint32_t VertexArrayObject::getIndexBufferRendererId() const {
+        return ebo;
     }
 }

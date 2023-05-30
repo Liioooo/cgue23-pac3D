@@ -2,6 +2,7 @@
 
 #include "Rendering/VertexArrayObject.h"
 #include "Rendering/Material.h"
+#include "Rendering/ShaderStorageBuffer.h"
 #include "Physics/PhysicsTriangleMesh.h"
 #include "Physics/PhysicsConvexMesh.h"
 #include "Animation/Skeleton.h"
@@ -15,20 +16,16 @@
 namespace CgEngine {
 
     struct Vertex {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 uv;
-        glm::vec3 tangent;
-        glm::vec3 bitangent;
+        glm::vec4 position;
+        glm::vec4 normal;
+        glm::vec4 tangent;
+        glm::vec4 bitangent;
+        glm::vec4 uv;
 
         Vertex() {};
-        Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ, float tU, float tV)
-        : position{pX, pY, pZ}, normal{nX, nY, nZ}, uv{tU, tV} {};
-
-        Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ)
-                : position{pX, pY, pZ}, normal{nX, nY, nZ} {};
-
-        Vertex(float pX, float pY, float pZ) : position{pX, pY, pZ} {};
+        Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ, float tU, float tV) : position{pX, pY, pZ, 1.0f}, normal{nX, nY, nZ, 0.0f}, uv{tU, tV, 0.0f, 0.0f} {};
+        Vertex(float pX, float pY, float pZ, float nX, float nY, float nZ) : position{pX, pY, pZ, 1.0f}, normal{nX, nY, nZ, 0.0f} {};
+        Vertex(float pX, float pY, float pZ) : position{pX, pY, pZ, 1.0f} {};
     };
 
     struct Submesh {
@@ -43,10 +40,10 @@ namespace CgEngine {
         aiNode* aiNode;
         PhysicsTriangleMesh* physicsTriangleMesh = nullptr;
         PhysicsConvexMesh* physicsConvexMesh = nullptr;
+        int parentNode;
         std::vector<uint32_t> submeshIndices;
         glm::mat4 localTransform{1.0f};
         glm::mat4 transform{1.0f};
-        glm::mat4 invTransform{1.0f};
     };
 
     class MeshVertices {
@@ -69,6 +66,10 @@ namespace CgEngine {
         PhysicsConvexMesh& getPhysicsConvexMeshForNode(const std::string& nodeName);
 
         bool hasSkeleton() const;
+        const Skeleton* getSkeleton() const;
+        const std::vector<BoneInfo>& getBoneInfos() const;
+        const std::unordered_map<std::string, Animation>& getAnimations() const;
+        const ShaderStorageBuffer* getBoneInfluencesBuffer() const;
 
 
     private:
@@ -83,14 +84,15 @@ namespace CgEngine {
         static glm::quat getQuatFromAssimpQuat(const aiQuaternion& quat);
         static TextureWrap getTextureWrapFromAssimp(aiTextureMapMode mapMode);
 
-        static Skeleton* importSkeleton(const aiScene* scene);
+        static Skeleton* importSkeleton(const aiScene* scene, MeshVertices* mesh);
         static void traverseNodesBone(const aiNode* node, Skeleton* skeleton, const std::unordered_set<std::string_view>& bones);
         static void traverseBone(const aiNode* node, Skeleton* skeleton, uint32_t parentBone);
 
         static void importAnimations(const aiScene* scene, const Skeleton* skeleton, std::unordered_map<std::string, Animation>& animations);
         static Animation importAnimation(const aiAnimation* aiAnimation, const Skeleton* skeleton);
 
-        void traverseNodes(aiNode* node, const glm::mat4& parentTransform);
+        void traverseNodes(aiNode* node, const glm::mat4& parentTransform, int parentNode);
+        const MeshNode* findNodeUsingSubmesh(uint32_t submeshIndex) const;
 
         VertexArrayObject* vao;
         std::vector<Vertex> vertices;
@@ -101,6 +103,7 @@ namespace CgEngine {
         std::unordered_map<std::string, uint32_t> nodeNameToNode{};
         Skeleton* skeleton = nullptr;
         std::vector<BoneInfluence> boneInfluences{};
+        ShaderStorageBuffer* boneInfluencesBuffer = nullptr;
         std::vector<BoneInfo> boneInfos{};
         std::unordered_map<std::string, Animation> animations;
     };

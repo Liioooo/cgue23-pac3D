@@ -25,7 +25,7 @@ namespace CgEngine {
         }
         if (sum > 0.0f) {
             for (int i = 0; i < 4; ++i) {
-                weights[i] /= sum;
+                weights[i] = weights[i] > 0.0f ? weights[i] / sum : 0.0f;
             }
         }
     }

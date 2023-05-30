@@ -28,6 +28,9 @@ namespace CgEngine {
         Animation(std::vector<AnimationChannel> channels, float duration) : channels(std::move(channels)), duration(duration) {};
         Animation(Animation&& other) : duration(other.duration), channels(std::move(other.channels)) {};
 
+        float getDuration() const;
+        const std::vector<AnimationChannel>& getChannels() const;
+
     private:
         std::vector<AnimationChannel> channels;
         float duration;

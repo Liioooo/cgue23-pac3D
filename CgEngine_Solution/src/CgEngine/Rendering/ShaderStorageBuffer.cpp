@@ -2,9 +2,8 @@
 #include "glad/glad.h"
 
 namespace CgEngine {
-    ShaderStorageBuffer::ShaderStorageBuffer(uint32_t binding) {
-        glGenBuffers(1, &bufferId);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, bufferId);
+    ShaderStorageBuffer::ShaderStorageBuffer() {
+        glCreateBuffers(1, &bufferId);
     }
 
     ShaderStorageBuffer::~ShaderStorageBuffer() {
@@ -13,6 +12,10 @@ namespace CgEngine {
 
     void ShaderStorageBuffer::setData(const void* data, size_t size) {
         glNamedBufferData(bufferId, size, data, GL_DYNAMIC_DRAW);
+    }
+
+    void ShaderStorageBuffer::bind(uint32_t binding) const {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, bufferId);
     }
 
 }

@@ -30,6 +30,10 @@ namespace CgEngine {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
     }
 
+    void VertexBuffer::bindAsSSBO(uint32_t binding) {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, vbo);
+    }
+
     void VertexBuffer::unbind() const {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -39,7 +43,7 @@ namespace CgEngine {
         glBufferData(GL_ARRAY_BUFFER, size, data, openGLUsage(usage));
     }
 
-    void VertexBuffer::setLayout(std::initializer_list<VertexBufferElement> elements) {
+    void VertexBuffer::setLayout(std::vector<VertexBufferElement> elements) {
         bufferElements = elements;
 
         size_t offset = 0;

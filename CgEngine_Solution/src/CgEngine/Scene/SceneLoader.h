@@ -14,6 +14,7 @@ namespace CgEngine {
         static void createComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createTransformComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createMeshRendererComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
+        static void createAnimatedMeshRendererComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createCameraComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createScriptComponent(Scene* scene, Entity entity, const pugi::xml_node& node);
         static void createDirectionalLightComponent(Scene* scene, Entity entity, const pugi::xml_node& node);

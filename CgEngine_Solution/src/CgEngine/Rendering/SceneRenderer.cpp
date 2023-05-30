@@ -246,6 +246,8 @@ namespace CgEngine {
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
         ubLightData = new UniformBuffer<UBLightData>("LightData", 1, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
         ubDirShadowData = new UniformBuffer<UBDirShadowData>("DirShadowData", 2, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("dirShadowMap"));
+
+        boneTransformsBuffer = new ShaderStorageBuffer();
     }
 
     SceneRenderer::~SceneRenderer() {
@@ -278,6 +280,8 @@ namespace CgEngine {
         delete ubCameraData;
         delete ubLightData;
         delete ubDirShadowData;
+
+        delete boneTransformsBuffer;
     }
 
     void SceneRenderer::setActiveScene(Scene* scene) {
@@ -440,6 +444,53 @@ namespace CgEngine {
                 if (castShadows) {
                     DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
                     shadowMapDrawCommand.vao = mesh.getVAO();
+                    shadowMapDrawCommand.material = material;
+                    shadowMapDrawCommand.baseIndex = submesh.baseIndex;
+                    shadowMapDrawCommand.baseVertex = submesh.baseVertex;
+                    shadowMapDrawCommand.indexCount = submesh.indexCount;
+                    shadowMapDrawCommand.instanceCount++;
+                }
+            }
+        }
+    }
+
+    void SceneRenderer::submitAnimatedMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform, const std::vector<glm::mat4>& boneTransforms, VertexArrayObject* skinnedVAO) {
+        auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+        auto& skinning = *resourceManager.getResource<ComputeShader>("skinning");
+
+        boneTransformsBuffer->setData(boneTransforms.data(), boneTransforms.size() * sizeof(glm::mat4));
+        boneTransformsBuffer->bind(2);
+        mesh.getVAO()->getVertexBuffers()[0]->bindAsSSBO(3);
+        skinnedVAO->getVertexBuffers()[0]->bindAsSSBO(4);
+        mesh.getBoneInfluencesBuffer()->bind(1);
+
+        skinning.bind();
+        skinning.dispatch((mesh.getVertices().size() + (mesh.getVertices().size() % 32)) / 32, 1, 1);
+        skinning.waitForMemoryBarrier();
+
+        auto& submeshes = mesh.getSubmeshes();
+
+        for (const auto& meshNodeIndex: meshNodes) {
+            const auto& meshNode = mesh.getMeshNodes().at(meshNodeIndex);
+
+            for (const auto& submeshIndex: meshNode.submeshIndices) {
+                const Submesh& submesh = submeshes.at(submeshIndex);
+                const Material* material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
+                MeshKey mk = {skinnedVAO->getRendererId(), submeshIndex, material->getUuid().getUuid()};
+
+                meshTransforms[mk].emplace_back(transform);
+
+                DrawCommand& drawCommand = drawCommandQueue[mk];
+                drawCommand.vao = skinnedVAO;
+                drawCommand.material = material;
+                drawCommand.baseIndex = submesh.baseIndex;
+                drawCommand.baseVertex = submesh.baseVertex;
+                drawCommand.indexCount = submesh.indexCount;
+                drawCommand.instanceCount++;
+
+                if (castShadows) {
+                    DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
+                    shadowMapDrawCommand.vao = skinnedVAO;
                     shadowMapDrawCommand.material = material;
                     shadowMapDrawCommand.baseIndex = submesh.baseIndex;
                     shadowMapDrawCommand.baseVertex = submesh.baseVertex;

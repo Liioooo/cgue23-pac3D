@@ -274,13 +274,13 @@ namespace Game {
 
         for (uint32_t i = 0; i < ghosts.size(); i++) {
             uint32_t ghostModel = i % 3;
-            std::string ghostModelStr = std::to_string(ghostModel);
+            std::string ghostModelStr = std::to_string(ghostModel + 1);
 
             auto& g = ghosts[i];
             g.entity = createEntity(ghostContainer);
             setEntityTag(g.entity, "ghost");
             attachComponent<CgEngine::TransformComponent>(g.entity, CgEngine::TransformComponentParams{g.homePos, glm::vec3(0.0f), glm::vec3(1.0f, 0.8f, 1.0f)});
-            attachComponent<CgEngine::ConvexColliderComponent>(g.entity, CgEngine::ConvexColliderComponentParams{"ghosts.fbx", "Ghost" + ghostModelStr, false, "default-physics-material"});
+            attachComponent<CgEngine::ConvexColliderComponent>(g.entity, CgEngine::ConvexColliderComponentParams{"models.fbx", "Ghost" + ghostModelStr, false, "default-physics-material"});
             attachComponent<CgEngine::RigidBodyComponent>(g.entity, rigidBodyParams);
 
             glm::vec3 lightColor;
@@ -301,7 +301,7 @@ namespace Game {
 
             auto meshEntity = createEntity(g.entity);
             attachComponent<CgEngine::TransformComponent>(meshEntity, CgEngine::TransformComponentParams{glm::vec3(0.0f), glm::vec3(0.0f, glm::pi<float>(), 0.0f), glm::vec3(1.0f)});
-            attachComponent<CgEngine::MeshRendererComponent>(meshEntity, CgEngine::MeshRendererComponentParams{"ghosts.fbx", "", "", true, {"Ghost" + ghostModelStr, "Eye1_g" + ghostModelStr, "Eye2_g" + ghostModelStr}});
+            attachComponent<CgEngine::AnimatedMeshRendererComponent>(meshEntity, CgEngine::AnimatedMeshRendererComponentParams{"models.fbx", "", true, {"Ghost" + ghostModelStr}, "ArmatureGhost" + ghostModelStr + "|" + "Ghost" + ghostModelStr + "Anim", 2.0f, true, true});
         }
     }
 

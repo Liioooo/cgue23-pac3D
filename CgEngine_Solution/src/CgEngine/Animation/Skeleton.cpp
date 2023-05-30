@@ -15,6 +15,10 @@ namespace CgEngine {
         return boneIndex;
     }
 
+    void Skeleton::setArmatureTransform(uint32_t index, const glm::mat4& transform) {
+        armatureTransforms[index] = transform;
+    }
+
     uint32_t Skeleton::findBoneIndex(const std::string_view name) const {
         for (uint32_t i = 0; i < boneNames.size(); i++) {
             if (boneNames[i] == name) {
@@ -32,8 +36,22 @@ namespace CgEngine {
         return boneNames.at(index);
     }
 
-    const glm::mat4& Skeleton::getBoneTransform(uint32_t index) const {
-        return boneTransforms.at(index);
+    const std::vector<glm::mat4>& Skeleton::getBoneTransforms() const {
+        return boneTransforms;
+    }
+
+    const glm::mat4& Skeleton::getArmatureTransform(uint32_t index) const {
+        return armatureTransforms.at(index);
+    }
+
+    void Skeleton::calculateMissingArmatureTransforms() {
+        for (uint32_t i = 0; i < boneNames.size(); i++) {
+            uint32_t parentIndex = i;
+            while (getParentBoneIndex(parentIndex) != Skeleton::NoBone) {
+                parentIndex = getParentBoneIndex(parentIndex);
+            }
+            armatureTransforms[i] = armatureTransforms[parentIndex];
+        }
     }
 
     uint32_t Skeleton::getNumBones() const {

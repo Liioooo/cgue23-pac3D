@@ -55,11 +55,11 @@ namespace CgEngine {
 
         auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(),
                                                            mesh->vertices.size() * sizeof(Vertex));
-        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float2, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true)});
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true)});
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(indices, numIndices);
@@ -84,6 +84,9 @@ namespace CgEngine {
 
     MeshVertices::~MeshVertices() {
         delete vao;
+        delete skeleton;
+        delete boneInfluencesBuffer;
+
     }
 
     VertexArrayObject* MeshVertices::getVAO() {
@@ -132,7 +135,7 @@ namespace CgEngine {
             auto& submesh = submeshes.at(smi);
 
             for (uint32_t i = submesh.baseVertex; i < submesh.baseVertex + submesh.vertexCount; i++) {
-                physicsVertices.emplace_back(meshNode.transform * glm::vec4(vertices.at(i).position, 1.0f));
+                physicsVertices.emplace_back(meshNode.transform * vertices.at(i).position);
             }
 
             for (uint32_t i = submesh.baseIndex; i < submesh.baseIndex + submesh.indexCount; i++) {
@@ -164,7 +167,7 @@ namespace CgEngine {
             auto& submesh = submeshes.at(smi);
 
             for (uint32_t i = submesh.baseVertex; i < submesh.baseVertex + submesh.vertexCount; i++) {
-                physicsVertices.emplace_back(meshNode.transform * glm::vec4(vertices.at(i).position, 1.0f));
+                physicsVertices.emplace_back(meshNode.transform * vertices.at(i).position);
             }
         }
 
@@ -176,6 +179,22 @@ namespace CgEngine {
 
     bool MeshVertices::hasSkeleton() const {
         return skeleton != nullptr;
+    }
+
+    const Skeleton* MeshVertices::getSkeleton() const {
+        return skeleton;
+    }
+
+    const std::vector<BoneInfo>& MeshVertices::getBoneInfos() const {
+        return boneInfos;
+    }
+
+    const std::unordered_map<std::string, Animation>& MeshVertices::getAnimations() const {
+        return animations;
+    }
+
+    const ShaderStorageBuffer* MeshVertices::getBoneInfluencesBuffer() const {
+        return boneInfluencesBuffer;
     }
 
     MeshVertices *MeshVertices::createCubeMesh() {
@@ -269,11 +288,11 @@ namespace CgEngine {
 
         auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(),
                                                            mesh->vertices.size() * sizeof(Vertex));
-        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float2, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true)});
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true)});
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
@@ -366,11 +385,11 @@ namespace CgEngine {
 
         auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(),
                                                            mesh->vertices.size() * sizeof(Vertex));
-        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float2, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true)});
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true)});
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
@@ -531,11 +550,11 @@ namespace CgEngine {
 
         auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(),
                                                            mesh->vertices.size() * sizeof(Vertex));
-        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float2, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true),
-                                 VertexBufferElement(ShaderDataType::Float3, true)});
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true),
+                                 VertexBufferElement(ShaderDataType::Float4, true)});
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
@@ -589,16 +608,16 @@ namespace CgEngine {
 
             for (size_t v = 0; v < aiMesh->mNumVertices; v++) {
                 Vertex& vertex = mesh->vertices.emplace_back();
-                vertex.position = {aiMesh->mVertices[v].x, aiMesh->mVertices[v].y, aiMesh->mVertices[v].z};
-                vertex.normal = {aiMesh->mNormals[v].x, aiMesh->mNormals[v].y, aiMesh->mNormals[v].z};
+                vertex.position = {aiMesh->mVertices[v].x, aiMesh->mVertices[v].y, aiMesh->mVertices[v].z, 1.0f};
+                vertex.normal = {aiMesh->mNormals[v].x, aiMesh->mNormals[v].y, aiMesh->mNormals[v].z, 0.0f};
 
                 if (aiMesh->HasTextureCoords(0)) {
-                    vertex.uv = {aiMesh->mTextureCoords[0][v].x, aiMesh->mTextureCoords[0][v].y};
+                    vertex.uv = {aiMesh->mTextureCoords[0][v].x, aiMesh->mTextureCoords[0][v].y, 0.0f, 0.0f};
                 }
 
                 if (aiMesh->HasTangentsAndBitangents()) {
-                    vertex.tangent = {aiMesh->mTangents[v].x, aiMesh->mTangents[v].y, aiMesh->mTangents[v].z};
-                    vertex.bitangent = {aiMesh->mBitangents[v].x, aiMesh->mBitangents[v].y, aiMesh->mBitangents[v].z};
+                    vertex.tangent = {aiMesh->mTangents[v].x, aiMesh->mTangents[v].y, aiMesh->mTangents[v].z, 0.0f};
+                    vertex.bitangent = {aiMesh->mBitangents[v].x, aiMesh->mBitangents[v].y, aiMesh->mBitangents[v].z, 0.0f};
                 }
             }
 
@@ -609,18 +628,18 @@ namespace CgEngine {
             }
         }
 
-        mesh->skeleton = importSkeleton(scene);
+        mesh->traverseNodes(scene->mRootNode, glm::mat4(1.0f), -1);
 
-        mesh->traverseNodes(scene->mRootNode, glm::mat4(1.0f));
+        mesh->skeleton = importSkeleton(scene, mesh);
 
         mesh->vao = new VertexArrayObject();
 
         auto vertexBuffer = std::make_shared<VertexBuffer>(mesh->vertices.data(), mesh->vertices.size() * sizeof(Vertex));
-        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float3, false),
-                                 VertexBufferElement(ShaderDataType::Float3, false),
-                                 VertexBufferElement(ShaderDataType::Float2, false),
-                                 VertexBufferElement(ShaderDataType::Float3, false),
-                                 VertexBufferElement(ShaderDataType::Float3, false)});
+        vertexBuffer->setLayout({VertexBufferElement(ShaderDataType::Float4, false),
+                                 VertexBufferElement(ShaderDataType::Float4, false),
+                                 VertexBufferElement(ShaderDataType::Float4, false),
+                                 VertexBufferElement(ShaderDataType::Float4, false),
+                                 VertexBufferElement(ShaderDataType::Float4, false)});
 
         mesh->vao->addVertexBuffer(vertexBuffer);
         mesh->vao->setIndexBuffer(mesh->indexBuffer.data(), mesh->indexBuffer.size());
@@ -653,6 +672,9 @@ namespace CgEngine {
                     }
                     if (boneInfoIndex == ~0) {
                         boneInfoIndex = mesh->boneInfos.size();
+
+                        const MeshNode* meshNode = mesh->findNodeUsingSubmesh(mI);
+                        CG_ASSERT(meshNode != nullptr, "Mesh is not used in any Node")
                         mesh->boneInfos.emplace_back(getTransformFromAssimpTransform(bone->mOffsetMatrix), boneIndex, mI);
                     }
 
@@ -667,6 +689,9 @@ namespace CgEngine {
             for (auto& item: mesh->boneInfluences) {
                 item.normalizeWeights();
             }
+
+            mesh->boneInfluencesBuffer = new ShaderStorageBuffer();
+            mesh->boneInfluencesBuffer->setData(mesh->boneInfluences.data(), mesh->boneInfluences.size() * sizeof(BoneInfluence));
         }
 
         auto resourceManager = GlobalObjectManager::getInstance().getResourceManager();
@@ -886,7 +911,7 @@ namespace CgEngine {
         return TextureWrap::Repeat;
     }
 
-    Skeleton* MeshVertices::importSkeleton(const aiScene* scene) {
+    Skeleton* MeshVertices::importSkeleton(const aiScene* scene, MeshVertices* mesh) {
         std::unordered_set<std::string_view> bones;
 
         for (uint32_t mI = 0; mI < scene->mNumMeshes; mI++) {
@@ -902,6 +927,16 @@ namespace CgEngine {
 
         auto* skeleton = new Skeleton(bones.size());
         traverseNodesBone(scene->mRootNode, skeleton, bones);
+
+
+        for (uint32_t i = 0; i < skeleton->getNumBones(); i++) {
+            if (skeleton->getParentBoneIndex(i) == Skeleton::NoBone) {
+                int armatureNode = mesh->meshNodes.at(mesh->getMeshNodeIndex(skeleton->getBoneName(i))).parentNode;
+                skeleton->setArmatureTransform(i, armatureNode != -1 ? mesh->meshNodes.at(armatureNode).transform : glm::mat4(1.0f));
+            }
+        }
+        skeleton->calculateMissingArmatureTransforms();
+
         return skeleton;
     }
 
@@ -1013,7 +1048,7 @@ namespace CgEngine {
         return Animation(std::move(channels), animationDuration);
     }
 
-    void MeshVertices::traverseNodes(aiNode *node, const glm::mat4 &parentTransform) {
+    void MeshVertices::traverseNodes(aiNode *node, const glm::mat4 &parentTransform, int parentNode) {
         glm::mat4 localTransform = getTransformFromAssimpTransform(node->mTransformation);
         glm::mat4 transform = parentTransform * localTransform;
 
@@ -1021,7 +1056,7 @@ namespace CgEngine {
         meshNode.aiNode = node;
         meshNode.localTransform = localTransform;
         meshNode.transform = transform;
-        meshNode.invTransform = glm::inverse(transform);
+        meshNode.parentNode = parentNode;
 
         nodeNameToNode.insert({node->mName.C_Str(), meshNodes.size() - 1});
 
@@ -1031,7 +1066,18 @@ namespace CgEngine {
         }
 
         for (uint32_t i = 0; i < node->mNumChildren; i++) {
-            traverseNodes(node->mChildren[i], transform);
+            traverseNodes(node->mChildren[i], transform, meshNodes.size() - 1);
         }
+    }
+
+    const MeshNode* MeshVertices::findNodeUsingSubmesh(uint32_t submeshIndex) const {
+        for (const auto& node: meshNodes) {
+            for (const auto& i: node.submeshIndices) {
+                if (submeshIndex == i) {
+                    return &node;
+                }
+            }
+        }
+        return nullptr;
     }
 }

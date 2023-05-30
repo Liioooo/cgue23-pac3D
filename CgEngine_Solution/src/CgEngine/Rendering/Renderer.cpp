@@ -154,7 +154,8 @@ namespace CgEngine {
 
         brdfLUT = new Texture2D(FileSystem::getAsEnginePath("ibl_brdf_lut.png"), false, TextureWrap::Clamp, MipMapFiltering::Bilinear);
 
-        transformsBuffer = new ShaderStorageBuffer(0);
+        transformsBuffer = new ShaderStorageBuffer();
+        transformsBuffer->bind(0);
     }
 
     void Renderer::shutdown() {

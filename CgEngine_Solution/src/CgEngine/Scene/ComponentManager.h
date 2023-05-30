@@ -4,6 +4,7 @@
 #include "Components/TransformComponent.h"
 #include "Components/ScriptComponent.h"
 #include "Components/MeshRendererComponent.h"
+#include "Components/AnimatedMeshRendererComponent.h"
 #include "Components/CameraComponent.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/PointLightComponent.h"
@@ -27,6 +28,7 @@ namespace CgEngine {
             registerComponentType<TransformComponent>();
             registerComponentType<ScriptComponent>();
             registerComponentType<MeshRendererComponent>();
+            registerComponentType<AnimatedMeshRendererComponent>();
             registerComponentType<CameraComponent>();
             registerComponentType<DirectionalLightComponent>();
             registerComponentType<PointLightComponent>();
