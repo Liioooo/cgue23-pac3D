@@ -16,7 +16,7 @@
 | `mesh`         | Built in mesh                                                   | `CG_SphereMesh_16_16` | -           |
 | `material`     | Material for this mesh. Overrides materials from asset files.   | `MyMaterial`          | -           |
 | `cast-shadows` | Defines if this object casts shadows.                           | `true`                | `true`      |
-| `mesh-nodes`   | List of Nodes to render. Nothing means: everything is rendered. | `0,1,2`               | -           |
+| `mesh-nodes`   | List of Nodes to render. Nothing means: everything is rendered. | `RootNode, Node1`     | -           |
 
 **Built in Meshes:**
 
@@ -29,6 +29,19 @@
   - `CG_Capsule_R_H`: <br>
     `R`: Radius <br>
     `H`: Height
+
+## AnimatedMeshRendererComponent
+
+| **Property**      | **Description**                                                 | **Example**           | **Default** |
+|-------------------|-----------------------------------------------------------------|-----------------------|-------------|
+| `asset-file`      | File to load 3D-Asset                                           | `model.fbx`           | -           |
+| `material`        | Material for this mesh. Overrides materials from asset files.   | `MyMaterial`          | -           |
+| `cast-shadows`    | Defines if this object casts shadows.                           | `true`                | `true`      |
+| `mesh-nodes`      | List of Nodes to render. Nothing means: everything is rendered. | `RootNode, Node1`     | -           |
+| `animation`       | Animation to use. (Must be included in the Asset-File)          | `Armature\|Animation` | -           |
+| `animation-speed` | Animation speed. (Can also be negative)                         | `1.0`                 | `1.0`       |
+| `auto-play`       | Auto play the animation.                                        | `true`                | `true`      |
+| `loop`            | Should the animation loop?                                      | `true`                | `true`      |
 
 ## CameraComponent
 
@@ -136,6 +149,30 @@ application->registerNativeScript<Game::CameraScript>("cameraScript");
 
 [PhysX Docs](https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/docs/Geometry.html#capsules)
 
+## TriangleColliderComponent
+
+| **Property** | **Description**               | **Example**   | **Default**                |
+|--------------|-------------------------------|---------------|----------------------------|
+| `asset-file` | File to load 3D-Asset         | `model.fbx`   | -                          |
+| `mesh-node`  | Node of the asset-file to use | `0.5`         | -                          |
+| `trigger`    | Is trigger                    | `false`       | `false`                    |
+| `material`   | Physics material to use       | `phyMaterial` | `default-physics-material` |
+
+[PhysX Docs](https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/docs/Geometry.html#triangle-meshes)
+
+
+## ConvexColliderComponent
+
+| **Property** | **Description**               | **Example**   | **Default**                |
+|--------------|-------------------------------|---------------|----------------------------|
+| `asset-file` | File to load 3D-Asset         | `model.fbx`   | -                          |
+| `mesh-node`  | Node of the asset-file to use | `0.5`         | -                          |
+| `trigger`    | Is trigger                    | `false`       | `false`                    |
+| `material`   | Physics material to use       | `phyMaterial` | `default-physics-material` |
+
+[PhysX Docs](https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/docs/Geometry.html#convex-meshes)
+
+
 ## CharacterControllerComponent
 
 | **Property**  | **Description**                | **Example** | **Default** |
@@ -145,3 +182,54 @@ application->registerNativeScript<Game::CameraScript>("cameraScript");
 | `slope-limit` | Slope limit for the Controller | `30`        | `0.0`       |
 
 [PhysX CharacterController Docs](https://nvidia-omniverse.github.io/PhysX/physx/5.1.3/docs/CharacterControllers.html)
+
+## UiCanvasComponent
+
+This component doesn't have direct properties. One can specify which UI Elements it should contain by adding XML child nodes.
+
+All elements have the following properties:
+
+| **Property** | **Description**                        | **Example**  | **Default** |
+|--------------|----------------------------------------|--------------|-------------|
+| `id`         | ID to find the Element. (required)     | `element-id` | -           |
+| `top`        | Distance to top off the window         | `0`          | `0.0`       |
+| `bottom`     | Distance bottom top off the window     | `0`          | -           |
+| `left`       | Distance left top off the window       | `0`          | -           |
+| `right`      | Distance right top off the window      | `0`          | -           |
+| `x-align`    | Possible values: `left, center, right` | `left`       | `center`    |
+| `y-align`    | Possible values: `top, center, bottom` | `top`        | `center`    |
+| `z-index`    | Used for depth sorting                 | `1`          | `0`         |
+
+For lengths and sizes following units can be used:
+
+- Pixel: Just write the number - `10`
+- ViewportWidthPercent: `10vw`
+- ViewportHeightPercent: `10vh`
+
+### UICircle
+
+| **Property** | **Description**        | **Example** | **Default** |
+|--------------|------------------------|-------------|-------------|
+| `line-width` | Outline width          | `1`         | `0`         |
+| `line-color` | Color of the outline   | `1 0 0 1`   | `0 0 0 1`   |
+| `texture`    | Texture to use         | `image.png` | -           |
+| `width`      | Diameter of the circle | `30`        | `0`         |
+
+### UiRect
+
+| **Property** | **Description**      | **Example** | **Default** |
+|--------------|----------------------|-------------|-------------|
+| `line-width` | Outline width        | `1`         | `0`         |
+| `line-color` | Color of the outline | `1 0 0 1`   | `0 0 0 1`   |
+| `texture`    | Texture to use       | `image.png` | -           |
+| `width`      | Width of the rect    | `30`        | `0`         |
+| `height`     | Height of the rect   | `30`        | `0`         |
+
+### UIText
+
+| **Property** | **Description** | **Example**  | **Default** |
+|--------------|-----------------|--------------|-------------|
+| `size`       | Font size       | `10`         | `0`         |
+| `text`       | Text            | `Some Text`  | `""`        |
+| `color`      | Text color      | `1 0 0 1`    | `0 0 0 1`   |
+| `font`       | Font to use     | `roboto.ttf` | -           |

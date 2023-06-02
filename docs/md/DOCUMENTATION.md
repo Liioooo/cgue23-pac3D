@@ -17,3 +17,4 @@
 | stb_image | https://github.com/nothings/stb           | Loading textures from files                |
 | assimp    | https://github.com/assimp/assimp          | 3D Model loading                           |
 | PhysX     | https://github.com/NVIDIA-Omniverse/PhysX | 3D Physics                                 |
+| FreeType  | https://freetype.org/index.html           | Font loading                               |
