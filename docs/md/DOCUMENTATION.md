@@ -1,9 +1,5 @@
 # Documentation
 
-## Implementation
-
-## Features
-
 ## Libraries
 
 | Name      | Link                                      | Usage                                      |
@@ -18,3 +14,7 @@
 | assimp    | https://github.com/assimp/assimp          | 3D Model loading                           |
 | PhysX     | https://github.com/NVIDIA-Omniverse/PhysX | 3D Physics                                 |
 | FreeType  | https://freetype.org/index.html           | Font loading                               |
+
+## Available Components
+
+[List of Components](COMPONENTS_DOCS.md)
