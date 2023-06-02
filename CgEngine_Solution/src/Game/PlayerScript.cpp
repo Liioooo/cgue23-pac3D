@@ -23,15 +23,16 @@ namespace Game {
             respawnTimer -= ts.getSeconds();
 
             auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("inGameCanvas"));
-            if (respawnTimer > 0) {
+            if (respawnTimer > 0.0f) {
                 std::string timerStr = std::to_string(respawnTimer);
                 gameCanvas.getUIElement<CgEngine::UiText>("startTimer")->setText(timerStr.substr(0, timerStr.find('.') + 3));
+                getComponent<CgEngine::AnimatedMeshRendererComponent>(findEntityById("playerMesh")).setAnimationPlaying(false);
             } else {
                 gameCanvas.removeUIElement("startTimer");
                 gameCanvas.removeUIElement("start");
                 gameCanvas.getUIElement<CgEngine::UiCircle>("cross")->setFillColor({0.0f, 0.0f, 0.0f, 0.8f});
+                getComponent<CgEngine::AnimatedMeshRendererComponent>(findEntityById("playerMesh")).reset();
             }
-
             return;
         }
 
@@ -55,6 +56,8 @@ namespace Game {
         } else {
             movement = (glm::length(movement) == 0.0f ? movement : normalize(movement)) * ts.getSeconds() * 7.0f;
         }
+
+        getComponent<CgEngine::AnimatedMeshRendererComponent>(findEntityById("playerMesh")).setAnimationPlaying(glm::length(movement) > 0.0f);
 
         comp.move(movement);
     }

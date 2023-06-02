@@ -37,6 +37,7 @@ namespace CgEngine {
         void setAnimationPlaying(bool playing);
         void setAnimationSpeed(float speed);
         void setLoopAnimation(bool loop);
+        void reset();
 
         void update(TimeStep ts);
 

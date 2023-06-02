@@ -103,6 +103,11 @@ namespace CgEngine {
         loopAnimation = loop;
     }
 
+    void AnimatedMeshRendererComponent::reset() {
+        animationTime = 0.0f;
+        calculateBoneTransforms(mesh->getSkeleton()->getBoneTransforms());
+    }
+
     void AnimatedMeshRendererComponent::update(TimeStep ts) {
         if (!isAnimationPlaying || animationSpeed == 0) {
             return;

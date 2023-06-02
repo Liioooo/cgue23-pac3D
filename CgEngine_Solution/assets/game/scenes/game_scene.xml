@@ -302,7 +302,7 @@
         <Entity id="playerMesh">
             <Components>
                 <TransformComponent position="0 -0.26 0" rotation="0 0 0" scale="1 1 1" />
-                <MeshRendererComponent asset-file="models.fbx" mesh-nodes="PacMan" />
+                <AnimatedMeshRendererComponent asset-file="models.fbx" mesh-nodes="PacMan" animation="ArmaturePacMan|WalkingPacMan" animation-speed="2.5" auto-play="false" />
                 <PointLightComponent color="#e9f022" intensity="1" radius="4" falloff="0.6" />
             </Components>
         </Entity>
