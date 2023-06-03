@@ -166,7 +166,7 @@ namespace CgEngine {
             std::vector<UiCircleVertex> circleVertices;
             uint32_t rectIndexCount = 0;
             std::vector<UiRectVertex> rectVertices;
-            std::array<const Texture2D*, 16> textureSlots{};
+            std::array<const Texture2D*, Renderer::maxTextureSlots> textureSlots{};
             uint32_t filledTextureSlots = 0;
 
             std::vector<UiTextVertex> textVertices;

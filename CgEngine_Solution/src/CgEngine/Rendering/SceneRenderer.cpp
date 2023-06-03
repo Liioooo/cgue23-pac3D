@@ -243,6 +243,10 @@ namespace CgEngine {
             uiProjectionMatrix = glm::ortho(0.0f, static_cast<float>(viewportWidth), 0.0f, static_cast<float>(viewportHeight));
         }
 
+        for (uint32_t i = 0; i < Renderer::maxTextureSlots; i++) {
+            Renderer::getWhiteTexture().bind(i);
+        }
+
         ubCameraData = new UniformBuffer<UBCameraData>("CameraData", 0, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
         ubLightData = new UniformBuffer<UBLightData>("LightData", 1, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("pbr"));
         ubDirShadowData = new UniformBuffer<UBDirShadowData>("DirShadowData", 2, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("dirShadowMap"));
@@ -718,9 +722,6 @@ namespace CgEngine {
             for (uint32_t i = 0; i < drawInfo.filledTextureSlots; i++) {
                 drawInfo.textureSlots[i]->bind(i);
             }
-            for (uint32_t i = drawInfo.filledTextureSlots; i < drawInfo.textureSlots.size(); i++) {
-                Renderer::getWhiteTexture().bind(i);
-            }
             if (drawInfo.circleIndexCount > 0) {
                 Renderer::beginRenderPass(*uiCirclePass);
                 Renderer::renderUiCircles(drawInfo.circleVertices, drawInfo.circleIndexCount);
@@ -735,9 +736,6 @@ namespace CgEngine {
 
             for (uint32_t i = 0; i < drawInfo.filledFontAtlases; i++) {
                 drawInfo.fontAtlases[i]->bind(i);
-            }
-            for (uint32_t i = drawInfo.filledFontAtlases; i < drawInfo.fontAtlases.size(); i++) {
-                Renderer::getWhiteTexture().bind(i);
             }
             if (drawInfo.textIndexCount > 0) {
                 Renderer::beginRenderPass(*uiTextPass);

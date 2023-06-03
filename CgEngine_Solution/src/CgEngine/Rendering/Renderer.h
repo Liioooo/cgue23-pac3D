@@ -60,6 +60,8 @@ namespace CgEngine {
         static const uint32_t maxUiQuads = 5000;
         static const uint32_t maxUiIndices = maxUiQuads * 6;
 
+        static const uint32_t maxTextureSlots = 16;
+
     private:
         static RenderPass* currentRenderPass;
         static bool isWireframe;
