@@ -44,7 +44,7 @@ namespace CgEngine {
         ~VertexBuffer();
 
         void bind() const;
-        void bindAsSSBO(uint32_t binding);
+        void bindAsSSBO(uint32_t binding) const;
         void unbind() const;
         void setData(const void* data, uint32_t size, VertexBufferUsage usage);
         void setLayout(std::vector<VertexBufferElement> bufferElements);

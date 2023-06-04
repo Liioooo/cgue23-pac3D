@@ -30,7 +30,7 @@ namespace CgEngine {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
     }
 
-    void VertexBuffer::bindAsSSBO(uint32_t binding) {
+    void VertexBuffer::bindAsSSBO(uint32_t binding) const {
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, vbo);
     }
 

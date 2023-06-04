@@ -252,6 +252,7 @@ namespace CgEngine {
         ubDirShadowData = new UniformBuffer<UBDirShadowData>("DirShadowData", 2, *GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("dirShadowMap"));
 
         boneTransformsBuffer = new ShaderStorageBuffer();
+        boneTransformsBuffer->setData(nullptr, maxBones * maxAnimatedComponents * sizeof(glm::mat4));
     }
 
     SceneRenderer::~SceneRenderer() {
@@ -391,6 +392,7 @@ namespace CgEngine {
 
         ApplicationOptions& applicationOptions = Application::get().getApplicationOptions();
 
+        skinMeshes();
         shadowMapPass();
         preDepthPass();
         geometryPass();
@@ -409,6 +411,8 @@ namespace CgEngine {
         }
         screenPass();
         uiPass();
+
+        skinningQueue.clear();
 
         drawCommandQueue.clear();
         shadowMapDrawCommandQueue.clear();
@@ -459,18 +463,17 @@ namespace CgEngine {
     }
 
     void SceneRenderer::submitAnimatedMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform, const std::vector<glm::mat4>& boneTransforms, VertexArrayObject* skinnedVAO) {
-        auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
-        auto& skinning = *resourceManager.getResource<ComputeShader>("skinning");
+        CG_ASSERT(boneTransforms.size() <= maxBones, "Mesh contains to many bones")
+        CG_ASSERT(skinningQueue.size() < maxAnimatedComponents, "Cannot render that many AnimatedMeshRendererComponents")
 
-        boneTransformsBuffer->setData(boneTransforms.data(), boneTransforms.size() * sizeof(glm::mat4));
-        boneTransformsBuffer->bind(2);
-        mesh.getVAO()->getVertexBuffers()[0]->bindAsSSBO(3);
-        skinnedVAO->getVertexBuffers()[0]->bindAsSSBO(4);
-        mesh.getBoneInfluencesBuffer()->bind(1);
+        uint32_t boneTransformOffset = skinningQueue.size() * maxBones * sizeof(glm::mat4);
+        boneTransformsBuffer->setSubData(boneTransformOffset, boneTransforms.data(), boneTransforms.size() * sizeof(glm::mat4));
 
-        skinning.bind();
-        skinning.dispatch((mesh.getVertices().size() + (mesh.getVertices().size() % 32)) / 32, 1, 1);
-        skinning.waitForMemoryBarrier();
+        SkinningInfo& skinningInfo = skinningQueue.emplace_back();
+        skinningInfo.originalVertexBuffer = mesh.getVAO()->getVertexBuffers()[0].get();
+        skinningInfo.skinnedVertexBuffer = skinnedVAO->getVertexBuffers()[0].get();
+        skinningInfo.boneInfluencesBuffer = mesh.getBoneInfluencesBuffer();
+        skinningInfo.numVertices = mesh.getVertices().size();
 
         auto& submeshes = mesh.getSubmeshes();
 
@@ -600,6 +603,24 @@ namespace CgEngine {
         lineInfo.from = from;
         lineInfo.to = to;
         lineInfo.color = color;
+    }
+
+    void SceneRenderer::skinMeshes() {
+        auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+        auto& skinning = *resourceManager.getResource<ComputeShader>("skinning");
+
+        skinning.bind();
+        boneTransformsBuffer->bind(2);
+
+        for (uint32_t i = 0; i < skinningQueue.size(); i++) {
+            skinningQueue[i].originalVertexBuffer->bindAsSSBO(3);
+            skinningQueue[i].skinnedVertexBuffer->bindAsSSBO(4);
+            skinningQueue[i].boneInfluencesBuffer->bind(1);
+
+            skinning.setInt("u_ComponentIndex", i);
+            skinning.dispatch((skinningQueue[i].numVertices + (skinningQueue[i].numVertices % 32)) / 32, 1, 1);
+            skinning.waitForMemoryBarrier();
+        }
     }
 
     void SceneRenderer::shadowMapPass() {

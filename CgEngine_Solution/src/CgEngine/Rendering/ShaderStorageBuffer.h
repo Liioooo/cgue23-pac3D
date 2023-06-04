@@ -8,6 +8,7 @@ namespace CgEngine {
         ~ShaderStorageBuffer();
 
         void setData(const void* data, size_t size);
+        void setSubData(size_t offset, const void* data, size_t size);
         void bind(uint32_t binding) const;
 
     private:

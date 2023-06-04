@@ -28,6 +28,9 @@ namespace CgEngine {
         void submitDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 
     private:
+        static const uint32_t maxBones = 100;
+        static const uint32_t maxAnimatedComponents = 512;
+
         Scene* activeScene;
         uint32_t viewportWidth;
         uint32_t viewportHeight;
@@ -56,6 +59,7 @@ namespace CgEngine {
         Texture2DArray* dirShadowMaps;
         std::array<Texture2D*, 7> bloomTextures;
 
+        void skinMeshes();
         void shadowMapPass();
         void preDepthPass();
         void geometryPass();
@@ -153,6 +157,15 @@ namespace CgEngine {
         std::map<MeshKey, std::vector<glm::mat4>> physicsCollidersMeshTransforms;
 
         std::vector<LineDrawInfo> debugLinesDrawInfoQueue;
+
+        struct SkinningInfo {
+            const VertexBuffer* originalVertexBuffer;
+            const VertexBuffer* skinnedVertexBuffer;
+            const ShaderStorageBuffer* boneInfluencesBuffer;
+            uint32_t numVertices;
+        };
+
+        std::vector<SkinningInfo> skinningQueue;
 
         struct CurrentSceneEnvironment {
             uint32_t prefilterMapId;
