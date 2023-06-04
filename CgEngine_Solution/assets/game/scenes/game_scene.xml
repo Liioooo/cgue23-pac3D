@@ -278,6 +278,7 @@
                 <UiRect id="coins" right="0.5vw" top="3vw" width="15vw" height="2vw" line-width="0" y-align="top" x-align="right" fill-color="1 0.1 0.1 0.5" z-index="0" />
                 <UiRect id="coinsAmount" right="15.5vw" top="3vw" width="0" height="2vw" line-width="0" y-align="top" x-align="left" fill-color="1 0.1 0.1 1" z-index="1" />
             </UiCanvasComponent>
+            <ScriptComponent script-name="fpsCounter" />
         </Components>
     </Entity>
     <Entity id="ghostsCoins">

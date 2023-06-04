@@ -7,6 +7,7 @@
 #include "Game/ProjectileScript.h"
 #include "Game/LostScript.h"
 #include "Game/StartScript.h"
+#include "Game/FPSCounter.h"
 
 int main(int argc, char **argv) {
     CgEngine::Logging::init();
@@ -20,6 +21,7 @@ int main(int argc, char **argv) {
     application->registerNativeScript<Game::ProjectileScript>("projectileScript");
     application->registerNativeScript<Game::LostScript>("lostScript");
     application->registerNativeScript<Game::StartScript>("startScript");
+    application->registerNativeScript<Game::FPSCounter>("fpsCounter");
 
     application->init();
     application->run();
