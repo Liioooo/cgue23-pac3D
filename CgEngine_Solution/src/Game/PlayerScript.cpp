@@ -116,6 +116,9 @@ namespace Game {
             destroyEntity(other);
             totalCoins = ghostsController.getTotalCoinAmount();
             leftCoins = getChildEntities(coinContainer).size();
+            if (static_cast<float>(leftCoins) < static_cast<float>(totalCoins) * 0.1f) {
+                setActiveScene("scenes/win_scene.xml");
+            }
         }
     }
 

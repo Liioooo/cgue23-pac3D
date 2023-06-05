@@ -4,10 +4,10 @@
 
 namespace Game {
 
-    class LostScript : public CgEngine::NativeScript {
+    class EndScript : public CgEngine::NativeScript {
     public:
         static std::shared_ptr<CgEngine::NativeScript> instantiateScript() {
-            return std::make_shared<LostScript>();
+            return std::make_shared<EndScript>();
         }
 
     protected:

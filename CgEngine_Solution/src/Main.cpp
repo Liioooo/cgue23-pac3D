@@ -5,7 +5,7 @@
 #include "Game/GhostsController.h"
 #include "Game/PlayerScript.h"
 #include "Game/ProjectileScript.h"
-#include "Game/LostScript.h"
+#include "Game/EndScript.h"
 #include "Game/StartScript.h"
 #include "Game/FPSCounter.h"
 
@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     application->registerNativeScript<Game::GhostsController>("ghostsController");
     application->registerNativeScript<Game::PlayerScript>("player");
     application->registerNativeScript<Game::ProjectileScript>("projectileScript");
-    application->registerNativeScript<Game::LostScript>("lostScript");
+    application->registerNativeScript<Game::EndScript>("endScript");
     application->registerNativeScript<Game::StartScript>("startScript");
     application->registerNativeScript<Game::FPSCounter>("fpsCounter");
 

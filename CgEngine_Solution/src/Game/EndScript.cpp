@@ -1,13 +1,13 @@
-#include "LostScript.h"
+#include "EndScript.h"
 #include "Events/Input.h"
 #include "Application.h"
 
 namespace Game {
-    void LostScript::onAttach() {
+    void EndScript::onAttach() {
         CgEngine::Input::setCursorMode(CgEngine::CursorMode::Normal);
     }
 
-    void LostScript::onMouseButtonPressed(CgEngine::MouseButtonPressedEvent& event) {
+    void EndScript::onMouseButtonPressed(CgEngine::MouseButtonPressedEvent& event) {
         auto& canvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("canvas"));
 
         if (canvas.getUIElement<CgEngine::UiRect>("againButton")->isPointInside({event.getXPos(), event.getYPos()})) {
@@ -20,7 +20,7 @@ namespace Game {
 
     }
 
-    void LostScript::onMouseMoved(CgEngine::MouseMovedEvent& event) {
+    void EndScript::onMouseMoved(CgEngine::MouseMovedEvent& event) {
         auto& canvas = getComponent<CgEngine::UiCanvasComponent>(findEntityById("canvas"));
 
         auto* againButton = canvas.getUIElement<CgEngine::UiRect>("againButton");
