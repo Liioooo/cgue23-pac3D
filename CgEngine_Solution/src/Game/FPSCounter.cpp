@@ -29,7 +29,7 @@ namespace Game {
         }
     }
 
-    CgEngine::UiText* FPSCounter::createUI() {
+    void FPSCounter::createUI() {
         auto& gameCanvas = getComponent<CgEngine::UiCanvasComponent>();
         fps = gameCanvas.addUiText("fps");
 

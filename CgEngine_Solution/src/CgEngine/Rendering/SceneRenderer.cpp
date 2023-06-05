@@ -618,7 +618,7 @@ namespace CgEngine {
             skinningQueue[i].boneInfluencesBuffer->bind(1);
 
             skinning.setInt("u_ComponentIndex", i);
-            skinning.dispatch((skinningQueue[i].numVertices + (skinningQueue[i].numVertices % 32)) / 32, 1, 1);
+            skinning.dispatch((skinningQueue[i].numVertices / 32) + 1, 1, 1);
             skinning.waitForMemoryBarrier();
         }
     }

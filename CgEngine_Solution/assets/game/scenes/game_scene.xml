@@ -32,6 +32,22 @@
             <TriangleColliderComponent asset-file="garage.fbx" mesh-node="Garage" />
         </Components>
     </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="-7 0.2 10" rotation="0 135 0" scale="0.5 0.5 0.5" />
+            <AnimatedMeshRendererComponent asset-file="metal_ghost.fbx" auto-play="true" />
+            <RigidBodyComponent dynamic="false" />
+            <ConvexColliderComponent asset-file="metal_ghost.fbx" mesh-node="ChamferBox001" />
+        </Components>
+    </Entity>
+    <Entity>
+        <Components>
+            <TransformComponent position="7 0.2 10" rotation="0 -135 0" scale="0.5 0.5 0.5" />
+            <AnimatedMeshRendererComponent asset-file="metal_ghost.fbx" auto-play="true" />
+            <RigidBodyComponent dynamic="false" />
+            <ConvexColliderComponent asset-file="metal_ghost.fbx" mesh-node="ChamferBox001" />
+        </Components>
+    </Entity>
     <Entity id="worldColliders">
         <Components>
             <TransformComponent position="0 0 0" rotation="0 0 0" scale="1 1 1" />

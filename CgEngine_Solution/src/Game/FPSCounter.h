@@ -19,7 +19,7 @@ class FPSCounter : public CgEngine::NativeScript {
         std::array<float, 6> frameTimes;
         uint32_t currentIndex = 0;
 
-        CgEngine::UiText* createUI();
+        void createUI();
 };
 
 }
