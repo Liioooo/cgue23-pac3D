@@ -1,4 +1,6 @@
 #include "UiRect.h"
+#include "GlobalObjectManager.h"
+#include "FileSystem.h"
 
 namespace CgEngine {
     void UiRect::setWidth(float width, UIPosUnit unit) {
@@ -25,6 +27,19 @@ namespace CgEngine {
 
     void UiRect::setTexture(CgEngine::Texture2D* texture) {
         this->texture = texture;
+    }
+
+    void UiRect::setTexture(const std::string& textureName) {
+        auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+        std::string texturePath = FileSystem::getAsGamePath(textureName);
+
+        if (resourceManager.hasResource<Texture2D>(texturePath)) {
+            setTexture(resourceManager.getResource<Texture2D>(texturePath));
+        } else {
+            auto* tex = new Texture2D(texturePath, false, TextureWrap::Repeat, MipMapFiltering::Bilinear);
+            resourceManager.insertResource(texturePath, tex);
+            setTexture(tex);
+        }
     }
 
     float UiRect::getLineWidth() const {

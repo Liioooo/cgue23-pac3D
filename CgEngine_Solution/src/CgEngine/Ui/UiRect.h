@@ -17,6 +17,7 @@ namespace CgEngine {
         void setLineColor(const glm::vec4& lineColor);
         void setFillColor(const glm::vec4& fillColor);
         void setTexture(Texture2D* texture);
+        void setTexture(const std::string& textureName);
 
         float getLineWidth() const;
         const glm::vec4& getLineColor() const;
