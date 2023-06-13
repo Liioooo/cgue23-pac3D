@@ -12,104 +12,205 @@
 \usepackage[colorlinks = true,linkcolor = blue,urlcolor  = blue,citecolor = blue,anchorcolor = blue]{hyperref}
 
 \title{Pac3D Documentation}
-\author{Leo Preissegger (12122526)}
+\author{Leo Preissegger (12122526), Enisa Azizovic (01228809)}
 \date{\today}
 
 \begin{document}
 
-\maketitle
+    \maketitle
 
-\section{Features}
+    \section{Feature Description}
+    \label{sec:featureDesc}
 
-\subsection{Collision Detection and Physics}
-\label{sec:physics}
+    \subsection{Collision Detection and Physics}
+    \label{sec:physics}
 
-Collison Detection is used to prevent the player from going throw walls and to detect when the player hits ghosts or coins. Collisions are reported to the code using \verb|onTriggerEnter, onTriggerExit, onCollisionEnter, onCollisionExit| callbacks. In the future it will also be possible too shot projectiles at ghosts. This will also be implemented by using the Physics Engine. Another feature of the physics implementation is the use of raycasts. It is used to prevent the camera from going into walls and to check if ghosts can see the player, so they can chase him.
+    Collision Detection is used to prevent the player from going throw walls and to detect when the player hits ghosts or coins. Collisions are reported to the code using \verb|onTriggerEnter, onTriggerExit, onCollisionEnter, onCollisionExit| callbacks. In the game it is possible to shot projectiles at ghosts. To do so: new entities are created and a force is added to them. Another feature of the physics implementation is the use of raycasts. It is used to prevent the camera from going into walls and to check if ghosts can see the player, so they can chase him.
 
-Following Colliders are supported: Box Collider (\ref{comp:BoxColliderComponent}), Sphere Collider (\ref{comp:SphereColliderComponent}), Capsule Collider (\ref{comp:CapsuleColliderComponent}).
+    Following Colliders are supported: \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#boxcollidercomponent}{Box Collider}, \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#boxcollidercomponent}{Sphere Collider}, \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#boxcollidercomponent}{Capsule Collider}, \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#boxcollidercomponent}{Trinagle Collider} and \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#boxcollidercomponent}{Convex Collider}.
 
-All of this is implemented using the PhysX library.
+    Triangle Colliders and Convex Colliders must be cooked using the PhysX Cooking library. The meshes used to do so are loaded from AssetFiles, the same way how it's done for rendering.
 
-\subsection{Heads-Up Display}
+    Another feature of the engine that the game uses is a CharacterController. It can be used via the \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#charactercontrollercomponent}{CharacterControllerComponent}. A character controller is basically a kinematic rigid body with a few extra things. It cannot go throw walls and has a feature to automatically climb stairs, for example.
 
-A Heads-Up Display will be implemented in the future. It will show the amount of lives the player has left and how many projectiles he can shoot at the moment. Additionally, there may be a min-map and and a start menu for the game.
+    All of this is implemented using the PhysX library.
 
-\subsection{Shadow Map with PCF}
+    \subsection{Heads-Up Display}
 
-The game supports shadows for objects in the world. This is implemented using Cascading Shadow Maps and PCF. For every frame 4 shadow maps are rendered (4 cascades) from the light point of view. Every cascade handles different parts of the camera frustum, to achieve better shadow quality and move the shadow maps with the camera movement. It is also possible to decide if shadows should be casted from any given object.
+    The heads up display is implemented with a batch-renderer, that renders quads after the other parts of the scene have been rendered. For every UI primitive another shader is used. This shaders support outlining of circles and rectangles. Text rendering is done by using a font atlas that is generated at the beginning, with characters loaded from FreeType.
 
-For now the game supports shadows for only one directional light.
+    The batching is done by combining all elements of the same primitive type and the same z-index into a single Vertex Buffer and rendering them together. The distinction between z-indices is needed to archive proper transparency sorting.
 
-\subsection{Bloom/Glow}
+    Resources used to implement batch rendering: \href{https://www.youtube.com/watch?v=Th4huqR77rI&list=PLlrATfBNZ98f5vZ8nJ6UengEkZUMC4fy5}{TheCherno - Batch Rendering (YouTube)}
 
-This is not yet implemented, but will be implemented with Physically Based Bloom.
+    The HUD shows the amount of lives the player has left and how many projectiles he can shoot at the moment. Additonally there is a start screen, lose screen and win screen.
 
-This will be implemented as described here: \href{https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare}{Next Generation Post Processing in CALL OF DUTY: ADVANCED WARFARE}, \href{https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom}{LearnOpenGL}
+    To configure The HUD the following component is used: \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#uicanvascomponent}{UICanvasComponent}
 
-\subsection{Physically Based Shading}
+    \subsection{Shadow Map with PCF}
 
-The renderer is using PPR for all geometry. It supports: albedo, roughness, metalness, emission and and a normal map. The before mentioned values can also be used from texture maps.
+    The game supports shadows for objects in the world. This is implemented using Cascading Shadow Maps and PCF. For every frame 4 shadow maps are rendered (4 cascades) from the light point of view. Every cascade handles different parts of the camera frustum, to achieve better shadow quality and move the shadow maps with the camera movement. It is also possible to decide if shadows should be casted from any given object.
 
-For lighting the following light sources are supported: Directional Light (\ref{comp:DirectionalLightComponent}), Point Light (\ref{comp:PointLightComponent}), Spot Light (\ref{comp:SpotLightComponent}) and Image Based Lighting (\ref{comp:SkyboxComponent}), more on that in \ref{sec:environmentMap}.
+    For now the game supports shadows for only one directional light.
 
-Following resources were used to implement it: \href{https://learnopengl.com/PBR/Theory}{LearnOpenGL}, \href{https://google.github.io/filament/Filament.md.html}{Filament PBR}
+    \subsection{Bloom/Glow}
 
-\subsection{Environment Map}
-\label{sec:environmentMap}
+    The Bloom implementation uses a technique known as Physically based Bloom. It works by down sampling the final image a few times. After that the smallest image is upsampled  again and combined with the next larger image. This is done until we are back at the start resolution. Finally the bloom image is blended together with the scene image.
 
-Environment mapping in the game is implemented by using image based lightning. To do this a HDRi texture is loaded and preprocessed. While preprocessing, two CubeMaps are calculated via Compute-Shaders for later use: Irradiance Map (Diffuse light) and Radiance/Prefilter Map (Specular light).
+    Articles describing the technique: \href{https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare}{Next Generation Post Processing in CALL OF DUTY: ADVANCED WARFARE}, \href{https://learnopengl.com/Guest-Articles/2022/Phys.-Based-Bloom}{LearnOpenGL}
 
-For the radiance map, different roughness levels are stored in different mip-Levels. The irradiance map is computed by convoluting the HDRi, because every pixel on the hemisphere has influence on the light at the fragment.
+    \subsection{Physically Based Shading}
 
-\subsection{Animation}
+    The renderer is using PPR for all geometry. It supports: albedo, roughness, metalness, emission and and a normal map. The before mentioned values can also be used from texture maps.
 
-Animation can be done easily by updating the Transform Component (\ref{comp:TransformComponent}) every frame in the \verb|onUpdate| callback. In the future there will also be support for GPU Vertex Skinning. Then animations and armatures can be loaded from assets.
+    For lighting the following light sources are supported: \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#directionallightcomponent}{Directional Light}, \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#directionallightcomponent}{Point Light}, \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#directionallightcomponent}{Spot Light} and \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#directionallightcomponent}{Image Based Lighting}, more on that in \ref{sec:environmentMap}.
 
-\section{Implementation}
+    Following resources were used to implement it: \href{https://learnopengl.com/PBR/Theory}{LearnOpenGL}, \href{https://google.github.io/filament/Filament.md.html}{Filament PBR}
 
-Some particularly interesting aspects of the code are described here.
+    \subsection{Normal Mapping}
 
-\subsection{Entity Component System}
+    Normal mapping works by using data from a normal map instead of vertex normals. As the normal map is in tangent space, every vertex needs tangent and bitangent vectors. Using the tangent, bitangent and normal a TBN matrix is constructed, that is used to transform normals from tangent to world space. Normal mapping only works for imported assets, not for built in meshes, because they have no tangents and bitangents defined.
 
-Every object in the game is represented as a entity. Every entity has components attached to it, to store data about it. The structure of the scene can be loaded from a scene file on startup or when switching scenes. Entities and components can be dynamically added or destroyed.
+    \subsection{Environment Map}
+    \label{sec:environmentMap}
 
-This system is implemented without the use of any libraries.
+    Environment mapping in the game is implemented by using image based lightning. To do this a HDRi texture is loaded and preprocessed. While preprocessing, two CubeMaps are calculated via Compute-Shaders for later use: Irradiance Map (Diffuse light) and Radiance/Prefilter Map (Specular light).
 
-All components available are described in section: \ref{sec:compDocs}.
+    For the radiance map, different roughness levels are stored in different mip-Levels. The irradiance map is computed by convoluting the HDRi, because every pixel on the hemisphere has influence on the light at the fragment.
 
-\subsection{Scripting}
+    Following resources were used to implement it: \href{https://learnopengl.com/PBR/IBL/Diffuse-irradiance}{LearnOpenGL}
 
-To every entity a script can be attached via the \verb|ScriptComponent|. These scripts are updated every frame via \verb|onUpdate| and \verb|lateUpdate|. There are also callbacks from the Physics Engine as mentioned in \ref{sec:physics}.
+    \subsection{Animation}
 
-The Scripting system is heavily inspired by the Unity Engine.
+    Animation can be done easily by updating the Transform Component \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#transformcomponent}{TransformComponent} every frame in the \verb|onUpdate| callback.
 
-\subsection{Renderer}
+    It is also possible to load skeletal animation from Asset files. This can be done via the \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#animatedmeshrenderercomponent}{AnimatedMeshRendererComponent}. The implementation works by loading all the Bones, their vertex weights and the animation data. Every frame the animation data is interpolated to compute the current state. The actual skinning is done on the GPU using a compute shader. We are using a compute shader and not the vertex shader, because we need the skinned data more than once per frame. In the compute shader a new Vertex Buffer is written, that is used in all subsequent operations.
 
-The renderer in the game has a full HDR Rendering pipeline. That uses a few render passes: ShadowMapPass, GeometryPass, ShadowMapPass, BloomPass (in the future), PhysicsColliderPass, NormalsDebugPass, DebugLinesPass, ScreenPass.
+    Following resources were used to implement it: \href{https://learnopengl.com/Guest-Articles/2020/Skeletal-Animation}{LearnOpenGL}, \href{https://ogldev.org/www/tutorial38/tutorial38.html}{OGDev}
 
-As one can guess many of the passes are just for debugging, but for that purpose extremely useful.
+    \subsection{Adjustable Parameters}
 
-Every frame all object that should be renderered are submitted to the Renderer to be processed later. This is useful, because with the information of all objects, the renderer can instance objects together.
+    Application wide parameters can be set in \verb|settings.ini|. Examples for parameters there are: resolution, fullscreen, refresh-rate, v-sync, anisotropic-filtering, shadow-map-resolution, startScene.
 
-\section{Libraries}
+    Scenes are created and loaded via XML Files. In this file the complete scene hierarchy can be parameterized. Some other things like Materials and PhysicsMaterials are also defined via XML files.
 
-Following libraries were used to implement the above described features:
 
-\begin{tabular}{|l|l|l|}
-    \hline
-    Name & Link & Usage \\ \hline
-    spdlog & \url{https://github.com/gabime/spdlog} & Logging in the Game (useful for debugging) \\ \hline
-    inih & \url{https://github.com/benhoyt/inih} & Reading of .ini files \\ \hline
-    glfw & \url{https://github.com/glfw/glfw} & Window management abstraction \\ \hline
-    glm & \url{https://github.com/g-truc/glm} & OpenGL Mathematics (GLM) \\ \hline
-    glad & \url{https://glad.dav1d.de/} & OpenGL extension loading \\ \hline
-    pugixml & \url{https://pugixml.org/} & Loading and parsing of XML files \\ \hline
-    stb\_image & \url{https://github.com/nothings/stb} & Loading textures from files \\ \hline
-    assimp & \url{https://github.com/assimp/assimp} & 3D Model loading \\ \hline
-    PhysX & \url{https://github.com/NVIDIA-Omniverse/PhysX} & 3D Physics \\ \hline
-\end{tabular}
+    \section{List of Implemented Gameplay and Effects}
 
-\input{component_docs}
+    \begin{itemize}
+        \item Gameplay
+        \begin{itemize}
+            \item Mandatory
+            \begin{itemize}
+                \item 3D Geometry
+                \item Playable
+                \item Advanced Gameplay
+                \item Min. 60 FPS and Framerate Independence
+                \item Win/Lose Condition
+                \item Intuitive Controls
+                \item Intuitive Camera
+                \item Illumination Model
+                \item Textures
+                \item Moving Objects
+                \item Documentation
+                \item Adjustable Parameters
+            \end{itemize}
+
+            \item Optional
+            \begin{itemize}
+                \item Collision Detection (Basic Physics)
+                \item Advanced Physic
+                \item Heads-Up Display
+            \end{itemize}
+        \end{itemize}
+        \item Effects
+        \begin{itemize}
+            \item Shadow Map with PCF
+            \item GPU Vertex Skinning
+            \item Environment Map
+            \item Simple Normal Mapping
+            \item Physically Based Shading
+            \item Bloom/Glow
+        \end{itemize}
+    \end{itemize}
+
+    All listed tasked were implemented in the game. Detailed descriptions for some of the tasks can be found in \ref{sec:featureDesc}.
+
+    \section{Implementation}
+
+    Some particularly interesting aspects of the code are described here.
+
+    \subsection{Entity Component System}
+
+    Every object in the game is represented as an entity. Every entity has components attached to it, to store data about it. The structure of the scene can be loaded from a scene file on startup or when switching scenes. Entities and components can be dynamically added or destroyed.
+
+    This system is implemented without the use of any libraries.
+
+    All components available are described in section: \ref{sec:compDocs}.
+
+    Resources used: \href{https://austinmorlan.com/posts/entity_component_system/}{A SIMPLE ENTITY COMPONENT SYSTEM (ECS) [C++]}
+
+    \subsection{Scripting}
+
+    To every entity a script can be attached via the \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md#scriptcomponent}{ScriptComponent}. These scripts are updated every frame via \verb|onUpdate| and \verb|lateUpdate|. There are also callbacks from the Physics Engine as mentioned in \ref{sec:physics}.
+
+    The Scripting system is heavily inspired by the Unity Engine.
+
+    \subsection{Renderer}
+
+    The renderer in the game has a full HDR Rendering pipeline. That uses a few render passes: ShadowMapPass, PreDepthPass, GeometryPass, SkyboxPass, PhysicsColliderPass, NormalsDebugPass, DebugLinesPass, BloomPass, ScreenPass, UiPass.
+
+    As one can guess many of the passes are just for debugging, but for that purpose extremely useful.
+
+    The PreDepthPass is used to generate a Depth Buffer without using a Fragment shader. This is done to prevent necessary overdraw in subsequent passes, to improve performance.
+
+    Every frame all objects that should be rendered are submitted to the Renderer to be processed later. This is useful, because with the information of all objects, the renderer can instance objects together.
+
+    \section{Libraries}
+
+    Following libraries were used to implement the above described features:
+
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Name & Link & Usage \\ \hline
+        spdlog & \url{https://github.com/gabime/spdlog} & Logging in the Game (useful for debugging) \\ \hline
+        inih & \url{https://github.com/benhoyt/inih} & Reading of .ini files \\ \hline
+        glfw & \url{https://github.com/glfw/glfw} & Window management abstraction \\ \hline
+        glm & \url{https://github.com/g-truc/glm} & OpenGL Mathematics (GLM) \\ \hline
+        glad & \url{https://glad.dav1d.de/} & OpenGL extension loading \\ \hline
+        pugixml & \url{https://pugixml.org/} & Loading and parsing of XML files \\ \hline
+        stb\_image & \url{https://github.com/nothings/stb} & Loading textures from files \\ \hline
+        assimp & \url{https://github.com/assimp/assimp} & 3D Model loading \\ \hline
+        PhysX & \url{https://github.com/NVIDIA-Omniverse/PhysX} & 3D Physics \\ \hline
+        FreeType & \url{https://freetype.org/index.html} & Font loading \\ \hline
+    \end{tabular}
+
+    \section{Component Docs}
+    \label{sec:compDocs}
+
+    Following Components can be used in the engine:
+
+    \begin{itemize}
+        \item TransformComponent
+        \item MeshRendererComponent
+        \item AnimatedMeshRendererComponent
+        \item CameraComponent
+        \item ScriptComponent
+        \item DirectionalLightComponent
+        \item PointLightComponent
+        \item SpotLightComponent
+        \item SkyboxComponent
+        \item BoxColliderComponent
+        \item RigidBodyComponent
+        \item SphereColliderComponent
+        \item CapsuleColliderComponent
+        \item TriangleColliderComponent
+        \item ConvexColliderComponent
+        \item CharacterControllerComponent
+        \item UiCanvasComponent
+    \end{itemize}
+
+    Component docs can be found here: \href{https://github.com/Liioooo/cgue23-pac3D/blob/master/docs/md/COMPONENTS_DOCS.md}{GitHub}
 
 
 \end{document}
