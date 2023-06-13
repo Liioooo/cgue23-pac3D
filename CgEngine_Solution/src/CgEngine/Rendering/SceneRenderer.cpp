@@ -343,31 +343,31 @@ namespace CgEngine {
         ubCameraData->setData(cameraData);
 
         UBLightData lightData{};
-        lightData.dirLightDirection = lightEnvironment.dirLightDirection;
+        lightData.dirLightDirection = glm::vec4(lightEnvironment.dirLightDirection, 0.0f);
         lightData.dirLightIntensity = lightEnvironment.dirLightIntensity;
-        lightData.dirLightColor = lightEnvironment.dirLightColor;
+        lightData.dirLightColor = glm::vec4(lightEnvironment.dirLightColor, 0.0f);
         lightData.pointLightCount = lightEnvironment.pointLights.size();
         lightData.spotLightCount = lightEnvironment.spotLights.size();
 
         size_t indexPL = 0;
         for (const auto &pointLight: lightEnvironment.pointLights) {
-            lightData.pointLights[indexPL].color = pointLight.color;
+            lightData.pointLights[indexPL].color = glm::vec4(pointLight.color, 0.0f);
             lightData.pointLights[indexPL].falloff = pointLight.falloff;
             lightData.pointLights[indexPL].intensity = pointLight.intensity;
             lightData.pointLights[indexPL].radius = pointLight.radius;
-            lightData.pointLights[indexPL].position = pointLight.position;
+            lightData.pointLights[indexPL].position = glm::vec4(pointLight.position, 0.0f);
             indexPL++;
         }
 
         size_t indexSL = 0;
         for (const auto &spotLight: lightEnvironment.spotLights) {
-            lightData.spotLights[indexSL].color = spotLight.color;
+            lightData.spotLights[indexSL].color = glm::vec4(spotLight.color, 0.0f);
             lightData.spotLights[indexSL].falloff = spotLight.falloff;
             lightData.spotLights[indexSL].intensity = spotLight.intensity;
             lightData.spotLights[indexSL].radius = spotLight.radius;
-            lightData.spotLights[indexSL].position = spotLight.position;
-            lightData.spotLights[indexSL].position = spotLight.position;
-            lightData.spotLights[indexSL].direction = spotLight.direction;
+            lightData.spotLights[indexSL].position = glm::vec4(spotLight.position, 0.0f);
+            lightData.spotLights[indexSL].position = glm::vec4(spotLight.position, 0.0f);
+            lightData.spotLights[indexSL].direction = glm::vec4(spotLight.direction, 0.0f);
             lightData.spotLights[indexSL].innerAngle = spotLight.innerAngle;
             lightData.spotLights[indexSL].outerAngle = spotLight.outerAngle;
             indexSL++;

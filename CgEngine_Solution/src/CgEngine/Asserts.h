@@ -16,7 +16,8 @@
 #endif
 
 #ifdef CG_ENABLE_DEBUG_FEATURES
-    #define CG_ASSERT(check, message) { if (!(check)) { CG_LOGGING_ERROR(message) CG_DEBUG_BREAK() }}
+    #include <iostream>
+    #define CG_ASSERT(check, message) { if (!(check)) { CG_LOGGING_ERROR(message) std::cout << std::flush;  CG_DEBUG_BREAK() }}
 #else
     #define CG_ASSERT(...)
 #endif

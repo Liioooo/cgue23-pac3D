@@ -79,42 +79,42 @@ namespace CgEngine {
             glm::mat4 projection;
             glm::mat4 view;
             glm::mat4 uiProjectionMatrix;
-            glm::vec3 position;
+            glm::vec4 position;
             float exposure;
             float bloomIntensity;
             float bloomThreshold;
-            glm::vec2 _padding_;
+            float _padding0_;
         };
         UniformBuffer<UBCameraData>* ubCameraData;
 
         struct UBPointLight {
-            glm::vec3 position;
+            glm::vec4 position;
+            glm::vec4 color;
             float intensity;
-            glm::vec3 color;
             float radius;
             float falloff;
-            glm::vec3 _padding0_;
+            float _padding0_;
         };
 
         struct UBSpotLight {
-            glm::vec3 position;
+            glm::vec4 position;
+            glm::vec4 color;
+            glm::vec4 direction;
             float intensity;
-            glm::vec3 color;
             float radius;
-            glm::vec3 direction;
             float falloff;
             float innerAngle;
             float outerAngle;
-            glm::vec2 _padding0_;
+            glm::vec3 _padding0_;
         };
 
         struct UBLightData {
-            glm::vec3 dirLightDirection;
+            glm::vec4 dirLightDirection;
+            glm::vec4 dirLightColor;
             float dirLightIntensity;
-            glm::vec3 dirLightColor;
             int pointLightCount;
             int spotLightCount;
-            glm::vec3 _padding0_;
+            float _padding0_;
             UBPointLight pointLights[100];
             UBSpotLight spotLights[100];
         };

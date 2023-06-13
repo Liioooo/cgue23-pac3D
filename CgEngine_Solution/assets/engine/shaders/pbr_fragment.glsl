@@ -5,28 +5,28 @@
 layout(early_fragment_tests) in;
 
 struct PointLight {
-    vec3 position;
+    vec4 position;
+    vec4 color;
     float intensity;
-    vec3 color;
     float radius;
     float falloff;
 };
 
 struct SpotLight {
-    vec3 position;
+    vec4 position;
+    vec4 color;
+    vec4 direction;
     float intensity;
-    vec3 color;
     float radius;
-    vec3 direction;
     float falloff;
     float innerAngle;
     float outerAngle;
 };
 
 layout (binding = 1, std140) uniform LightData {
-    vec3 dirLightDirection;
+    vec4 dirLightDirection;
+    vec4 dirLightColor;
     float dirLightIntensity;
-    vec3 dirLightColor;
     int pointLightCount;
     int spotLightCount;
     PointLight pointLights[100];
@@ -178,8 +178,8 @@ vec3 calcDirLight(vec3 F0, vec3 matAlbedo, float matMetalness, float matRoughnes
         return vec3(0.0f);
     }
 
-    vec3 L = u_LightData.dirLightDirection;
-    vec3 Lradiance =  u_LightData.dirLightColor * u_LightData.dirLightIntensity;
+    vec3 L = u_LightData.dirLightDirection.xyz;
+    vec3 Lradiance =  u_LightData.dirLightColor.xyz * u_LightData.dirLightIntensity;
     vec3 H = normalize(L + V);
 
     float NdotL = max(dot(N, L), 0.0f);
@@ -201,13 +201,13 @@ vec3 calcPointLights(vec3 F0, vec3 matAlbedo, float matMetalness, float matRough
     for (int i = 0; i < u_LightData.pointLightCount; i++) {
         PointLight light = u_LightData.pointLights[i];
 
-        vec3 L = normalize(light.position - worldPos);
-        float lightDistance = length(light.position - worldPos);
+        vec3 L = normalize(light.position.xyz - worldPos);
+        float lightDistance = length(light.position.xyz - worldPos);
         vec3 H = normalize(L + V);
 
         float attenuation = squareDistanceAttenuation(lightDistance, light.radius, light.falloff);
 
-        vec3 Lradiance = light.color * light.intensity * attenuation;
+        vec3 Lradiance = light.color.xyz * light.intensity * attenuation;
 
         float NdotL = max(dot(N, L), 0.0f);
 
@@ -230,13 +230,13 @@ vec3 calcSpotLights(vec3 F0, vec3 matAlbedo, float matMetalness, float matRoughn
     for (int i = 0; i < u_LightData.spotLightCount; i++) {
         SpotLight light = u_LightData.spotLights[i];
 
-        vec3 L = normalize(light.position - worldPos);
-        float lightDistance = length(light.position - worldPos);
+        vec3 L = normalize(light.position.xyz - worldPos);
+        float lightDistance = length(light.position.xyz - worldPos);
         vec3 H = normalize(L + V);
 
-        float attenuation = squareDistanceAttenuation(lightDistance, light.radius, light.falloff) * spotAngleAttenuation(L, light.direction, light.innerAngle, light.outerAngle);
+        float attenuation = squareDistanceAttenuation(lightDistance, light.radius, light.falloff) * spotAngleAttenuation(L, light.direction.xyz, light.innerAngle, light.outerAngle);
 
-        vec3 Lradiance = light.color * light.intensity * attenuation;
+        vec3 Lradiance = light.color.xyz * light.intensity * attenuation;
 
         float NdotL = max(dot(N, L), 0.0f);
 
@@ -281,7 +281,7 @@ void main() {
         mat_Normal = normalize(fs_in.TBN * mat_Normal);
     }
 
-    vec3 V = normalize(u_CameraData.position - fs_in.WorldPosition);
+    vec3 V = normalize(u_CameraData.position.xyz - fs_in.WorldPosition);
     float NdotV = max(dot(mat_Normal, V), 0.0f);
 
     vec3 F0 = vec3(0.04f);
