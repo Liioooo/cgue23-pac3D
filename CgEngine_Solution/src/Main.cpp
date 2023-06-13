@@ -29,5 +29,6 @@ int main(int argc, char **argv) {
     delete application;
 
     CG_LOGGING_INFO("Shutting Down!");
+    system("pause");
     return 0;
 }
