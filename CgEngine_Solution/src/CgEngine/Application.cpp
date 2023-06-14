@@ -113,6 +113,7 @@ namespace CgEngine {
 
     void Application::onKeyPressed(KeyPressedEvent& event) {
         switch (event.getKeyCode()) {
+#ifdef CG_ENABLE_DEBUG_FEATURES
             case KeyCode::F1: {
                 applicationOptions.debugShowPhysicsColliders = !applicationOptions.debugShowPhysicsColliders;
                 event.stopPropagation();
@@ -123,6 +124,7 @@ namespace CgEngine {
                 event.stopPropagation();
                 break;
             }
+#endif
         }
     }
 }

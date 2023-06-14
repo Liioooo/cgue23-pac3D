@@ -19,9 +19,9 @@ namespace CgEngine {
 
         glfwSetErrorCallback(&Window::errorCallback);
 
-        #if _DEBUG
+#ifdef CG_ENABLE_DEBUG_FEATURES
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-        #endif
+#endif
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -68,10 +68,10 @@ namespace CgEngine {
 
         gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 
-        #if _DEBUG
+#ifdef CG_ENABLE_DEBUG_FEATURES
             glDebugMessageCallback(&Window::debugCallback, nullptr);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        #endif
+#endif
 
         Renderer::init();
 

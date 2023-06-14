@@ -254,6 +254,7 @@ namespace CgEngine {
 
         executeOnRenderFunctions(renderer);
 
+#ifdef CG_ENABLE_DEBUG_FEATURES
         auto& applicationOptions = Application::get().getApplicationOptions();
         if (applicationOptions.debugShowPhysicsColliders) {
             auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
@@ -290,6 +291,7 @@ namespace CgEngine {
                 renderer.submitPhysicsColliderMesh(it->getPhysicsMesh().getVisualizationMesh(), glm::scale(glm::translate(glm::mat4(1.0f), transform.getGlobalPosition()), transform.getGlobalScale()));
             }
         }
+#endif
 
         renderer.endScene();
     }

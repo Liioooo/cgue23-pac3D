@@ -92,7 +92,7 @@ namespace CgEngine {
         {
             float bloomWidth = static_cast<float>(viewportWidth) / 2.0f;
             float bloomHeight = static_cast<float>(viewportHeight) / 2.0f;
-            for (auto& bloomTexture : bloomTextures) {
+            for (auto& bloomTexture: bloomTextures) {
                 bloomTexture = new Texture2D(TextureFormat::Float32, static_cast<uint32_t>(bloomWidth), static_cast<uint32_t>(bloomHeight), TextureWrap::Clamp, MipMapFiltering::Bilinear);
                 bloomWidth /= 2.0f;
                 bloomHeight /= 2.0f;
@@ -350,7 +350,7 @@ namespace CgEngine {
         lightData.spotLightCount = lightEnvironment.spotLights.size();
 
         size_t indexPL = 0;
-        for (const auto &pointLight: lightEnvironment.pointLights) {
+        for (const auto& pointLight: lightEnvironment.pointLights) {
             lightData.pointLights[indexPL].color = glm::vec4(pointLight.color, 0.0f);
             lightData.pointLights[indexPL].falloff = pointLight.falloff;
             lightData.pointLights[indexPL].intensity = pointLight.intensity;
@@ -360,7 +360,7 @@ namespace CgEngine {
         }
 
         size_t indexSL = 0;
-        for (const auto &spotLight: lightEnvironment.spotLights) {
+        for (const auto& spotLight: lightEnvironment.spotLights) {
             lightData.spotLights[indexSL].color = glm::vec4(spotLight.color, 0.0f);
             lightData.spotLights[indexSL].falloff = spotLight.falloff;
             lightData.spotLights[indexSL].intensity = spotLight.intensity;
@@ -397,15 +397,20 @@ namespace CgEngine {
         preDepthPass();
         geometryPass();
         skyboxPass();
+
+#ifdef CG_ENABLE_DEBUG_FEATURES
         if (applicationOptions.debugShowPhysicsColliders) {
             physicsCollidersPass();
         }
         if (applicationOptions.debugShowNormals) {
             normalsDebugPass();
         }
+#endif
+
         if (applicationOptions.debugRenderLines) {
             debugLinesPass();
         }
+
         if (applicationOptions.enableBloom) {
             bloomPass();
         }
@@ -420,8 +425,10 @@ namespace CgEngine {
 
         uiDrawInfoQueue.clear();
 
+#ifdef CG_ENABLE_DEBUG_FEATURES
         physicsCollidersDrawCommandQueue.clear();
         physicsCollidersMeshTransforms.clear();
+#endif
 
         debugLinesDrawInfoQueue.clear();
 
@@ -436,7 +443,8 @@ namespace CgEngine {
 
             for (const auto& submeshIndex: meshNode.submeshIndices) {
                 const Submesh& submesh = submeshes.at(submeshIndex);
-                const Material* material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
+                const Material* material = overrideMaterial != nullptr ? overrideMaterial
+                                                                       : mesh.getMaterial(submesh.materialIndex);
                 MeshKey mk = {mesh.getVAO()->getRendererId(), submeshIndex, material->getUuid().getUuid()};
 
                 meshTransforms[mk].emplace_back(transform * meshNode.transform);
@@ -795,7 +803,7 @@ namespace CgEngine {
                     glm::vec3(-1.0f, -1.0f,  1.0f)
             };
 
-            for (auto& frustumCorner : frustumCorners) {
+            for (auto& frustumCorner: frustumCorners) {
                 glm::vec4 invFrustumCorner = invCamViewProj * glm::vec4(frustumCorner, 1.0f);
                 frustumCorner = invFrustumCorner / invFrustumCorner.w;
             }
@@ -811,7 +819,7 @@ namespace CgEngine {
             dirShadowData.cascadeSplits[i] = camera.getPerspectiveNear() + splitDist * nearToFarPlane;
 
             auto frustumCenter = glm::vec3(0.0f);
-            for (auto& frustumCorner : frustumCorners) {
+            for (auto& frustumCorner: frustumCorners) {
                 frustumCenter += frustumCorner;
             }
             frustumCenter /= 8.0f;
@@ -819,7 +827,7 @@ namespace CgEngine {
             const auto lightView = glm::lookAt(frustumCenter + dirLightDirection, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
 
             float radius = 0.0f;
-            for (auto& frustumCorner : frustumCorners) {
+            for (auto& frustumCorner: frustumCorners) {
                 float distance = glm::length(frustumCorner - frustumCenter);
                 radius = glm::max(radius, distance);
             }
