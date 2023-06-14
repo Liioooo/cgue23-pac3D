@@ -11,7 +11,7 @@
 \usepackage{xcolor}
 \usepackage[colorlinks = true,linkcolor = blue,urlcolor  = blue,citecolor = blue,anchorcolor = blue]{hyperref}
 
-\title{Pac3D Documentation}
+\title{Documentation - Group Pac3D}
 \author{Leo Preissegger (12122526), Enisa Azizovic (01228809)}
 \date{\today}
 
@@ -94,6 +94,24 @@
 
     Scenes are created and loaded via XML Files. In this file the complete scene hierarchy can be parameterized. Some other things like Materials and PhysicsMaterials are also defined via XML files.
 
+    \section{Libraries}
+
+    Following libraries were used to implement the above described features:
+
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Name & Link & Usage \\ \hline
+        spdlog & \url{https://github.com/gabime/spdlog} & Logging in the Game (useful for debugging) \\ \hline
+        inih & \url{https://github.com/benhoyt/inih} & Reading of .ini files \\ \hline
+        glfw & \url{https://github.com/glfw/glfw} & Window management abstraction \\ \hline
+        glm & \url{https://github.com/g-truc/glm} & OpenGL Mathematics (GLM) \\ \hline
+        glad & \url{https://glad.dav1d.de/} & OpenGL extension loading \\ \hline
+        pugixml & \url{https://pugixml.org/} & Loading and parsing of XML files \\ \hline
+        stb\_image & \url{https://github.com/nothings/stb} & Loading textures from files \\ \hline
+        assimp & \url{https://github.com/assimp/assimp} & 3D Model loading \\ \hline
+        PhysX & \url{https://github.com/NVIDIA-Omniverse/PhysX} & 3D Physics \\ \hline
+        FreeType & \url{https://freetype.org/index.html} & Font loading \\ \hline
+    \end{tabular}
 
     \section{List of Implemented Gameplay and Effects}
 
@@ -136,7 +154,7 @@
 
     All listed tasked were implemented in the game. Detailed descriptions for some of the tasks can be found in \ref{sec:featureDesc}.
 
-    \section{Implementation}
+    \section{Other Special Features}
 
     Some particularly interesting aspects of the code are described here.
 
@@ -166,24 +184,11 @@
 
     Every frame all objects that should be rendered are submitted to the Renderer to be processed later. This is useful, because with the information of all objects, the renderer can instance objects together.
 
-    \section{Libraries}
+    \section{Walk-through}
 
-    Following libraries were used to implement the above described features:
+    In order to win the game you have to collect 80 per cent of the red coins, while avoiding the ghosts. If you are hit by are ghost, you are respawned. This can happen four times, before you are out of lives and lose the game.
 
-    \begin{tabular}{|l|l|l|}
-        \hline
-        Name & Link & Usage \\ \hline
-        spdlog & \url{https://github.com/gabime/spdlog} & Logging in the Game (useful for debugging) \\ \hline
-        inih & \url{https://github.com/benhoyt/inih} & Reading of .ini files \\ \hline
-        glfw & \url{https://github.com/glfw/glfw} & Window management abstraction \\ \hline
-        glm & \url{https://github.com/g-truc/glm} & OpenGL Mathematics (GLM) \\ \hline
-        glad & \url{https://glad.dav1d.de/} & OpenGL extension loading \\ \hline
-        pugixml & \url{https://pugixml.org/} & Loading and parsing of XML files \\ \hline
-        stb\_image & \url{https://github.com/nothings/stb} & Loading textures from files \\ \hline
-        assimp & \url{https://github.com/assimp/assimp} & 3D Model loading \\ \hline
-        PhysX & \url{https://github.com/NVIDIA-Omniverse/PhysX} & 3D Physics \\ \hline
-        FreeType & \url{https://freetype.org/index.html} & Font loading \\ \hline
-    \end{tabular}
+    To defend against ghosts, you can shoot projectiles
 
     \section{Component Docs}
     \label{sec:compDocs}
