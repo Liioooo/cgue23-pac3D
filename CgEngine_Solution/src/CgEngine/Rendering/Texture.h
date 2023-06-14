@@ -23,6 +23,8 @@ namespace CgEngine {
         void setClampBorderColor(const glm::vec4& color, unsigned int textureType);
         void applyMipMapFiltering(MipMapFiltering mipMapFiltering, unsigned int textureType);
         uint32_t calculateMipCount(uint32_t width, uint32_t height);
+        std::tuple<unsigned char*, int, int> loadImageData(const std::string& path);
+        void freImageData(unsigned char* data);
     }
 
     class Texture2D {

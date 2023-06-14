@@ -53,6 +53,16 @@ namespace CgEngine {
             CG_LOGGING_ERROR("Failed to create Window");
         }
 
+        if (!spec.icon.empty()) {
+            GLFWimage icon;
+            auto iconData = TextureUtils::loadImageData(spec.icon);
+            icon.pixels = std::get<0>(iconData);
+            icon.width = std::get<1>(iconData);
+            icon.height = std::get<2>(iconData);
+            glfwSetWindowIcon(window, 1, &icon);
+            TextureUtils::freImageData(std::get<0>(iconData));
+        }
+
         glfwMakeContextCurrent(window);
         setVsync(spec.vSync);
 

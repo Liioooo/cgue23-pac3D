@@ -85,6 +85,16 @@ namespace CgEngine {
         uint32_t calculateMipCount(uint32_t width, uint32_t height) {
             return static_cast<uint32_t>(std::floor(std::log2(glm::min(width, height))) + 1);
         }
+
+        std::tuple<unsigned char*, int, int> loadImageData(const std::string& path) {
+            int loadWidth, loadHeight, channels;
+            auto data = stbi_load(path.c_str(), &loadWidth, &loadHeight, &channels, STBI_rgb_alpha);
+            return {data, loadWidth,loadHeight};
+        }
+
+        void freImageData(unsigned char* data) {
+            stbi_image_free(data);
+        }
     }
 
     Texture2D *Texture2D::createResource(const std::string &name) {
