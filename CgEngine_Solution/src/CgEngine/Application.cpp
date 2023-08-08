@@ -27,6 +27,7 @@ namespace CgEngine {
 
     void Application::init() {
         applicationOptions.debugShowPhysicsColliders = iniReader->GetBoolean("application", "debug_show_physics_colliders", false);
+        applicationOptions.debugShowBoundingBoxes = iniReader->GetBoolean("application", "debug_show_bounding_boxes", false);
         applicationOptions.debugShowNormals = iniReader->GetBoolean("application", "debug_show_normals", false);
         applicationOptions.debugRenderLines = iniReader->GetBoolean("application", "debug_render_lines", false);
         applicationOptions.anisotropicFiltering = static_cast<float>(iniReader->GetReal("application", "anisotropic_filtering", 1.0));
@@ -121,6 +122,11 @@ namespace CgEngine {
             }
             case KeyCode::F2: {
                 applicationOptions.debugShowNormals = !applicationOptions.debugShowNormals;
+                event.stopPropagation();
+                break;
+            }
+            case KeyCode::F3: {
+                applicationOptions.debugShowBoundingBoxes = !applicationOptions.debugShowBoundingBoxes;
                 event.stopPropagation();
                 break;
             }

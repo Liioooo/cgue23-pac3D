@@ -135,7 +135,7 @@ namespace CgEngine {
         }
         {
             RenderPassSpecification physicsCollidersRenderPassSpec;
-            physicsCollidersRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("physicsColliders");
+            physicsCollidersRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("colliders");
             physicsCollidersRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
             physicsCollidersRenderPassSpec.depthTest = false;
             physicsCollidersRenderPassSpec.depthWrite = false;
@@ -148,6 +148,23 @@ namespace CgEngine {
 
             physicsCollidersMaterial = new Material("PhysicsColliderDebugMaterial");
             physicsCollidersMaterial->set("u_Color", {0.0f, 1.0f, 0.0f});
+        }
+        {
+            RenderPassSpecification boundingBoxRenderPassSpec;
+            boundingBoxRenderPassSpec.shader = GlobalObjectManager::getInstance().getResourceManager().getResource<Shader>("colliders");
+            boundingBoxRenderPassSpec.framebuffer = geometryRenderPass->getSpecification().framebuffer;
+            boundingBoxRenderPassSpec.depthTest = true;
+            boundingBoxRenderPassSpec.depthWrite = false;
+            boundingBoxRenderPassSpec.clearColorBuffer = false;
+            boundingBoxRenderPassSpec.clearDepthBuffer = false;
+            boundingBoxRenderPassSpec.clearStencilBuffer = false;
+            boundingBoxRenderPassSpec.wireframe = true;
+            boundingBoxRenderPassSpec.backfaceCulling = false;
+
+            boundingBoxRenderPass = new RenderPass(boundingBoxRenderPassSpec);
+
+            boundingBoxMaterial = new Material("BoundingBoxDebugMaterial");
+            boundingBoxMaterial->set("u_Color", {1.0f, 1.0f, 0.0f});
         }
         {
             RenderPassSpecification mormalsDebugRenderPassSpec;
@@ -266,12 +283,14 @@ namespace CgEngine {
         delete uiRectPass;
         delete uiTextPass;
         delete physicsCollidersRenderPass;
+        delete boundingBoxRenderPass;
         delete normalsDebugRenderPass;
         delete debugLinesRenderPass;
         delete screenRenderPass;
 
         delete skyboxMaterial;
         delete physicsCollidersMaterial;
+        delete boundingBoxMaterial;
         delete normalsDebugMaterial;
         delete screenMaterial;
         delete emptyMaterial;
@@ -402,6 +421,9 @@ namespace CgEngine {
         if (applicationOptions.debugShowPhysicsColliders) {
             physicsCollidersPass();
         }
+        if (applicationOptions.debugShowBoundingBoxes) {
+            boundingBoxPass();
+        }
         if (applicationOptions.debugShowNormals) {
             normalsDebugPass();
         }
@@ -428,6 +450,9 @@ namespace CgEngine {
 #ifdef CG_ENABLE_DEBUG_FEATURES
         physicsCollidersDrawCommandQueue.clear();
         physicsCollidersMeshTransforms.clear();
+
+        boundingBoxDrawCommandQueue.clear();
+        boundingBoxMeshTransforms.clear();
 #endif
 
         debugLinesDrawInfoQueue.clear();
@@ -606,6 +631,24 @@ namespace CgEngine {
         }
     }
 
+    void SceneRenderer::submitBoundingBoxMesh(MeshVertices& boundingBoxMesh, MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, const glm::mat4& transform) {
+        for (const auto& meshNodeIndex: meshNodes) {
+            const auto& boundingBox = mesh.getMeshNodes().at(meshNodeIndex).aaBoundingBox;
+
+            const auto& boundingBoxSubmesh = boundingBoxMesh.getSubmeshes().at(0);
+            MeshKey mk = {boundingBoxMesh.getVAO()->getRendererId(), 0, boundingBoxMaterial->getUuid().getUuid()};
+            boundingBoxMeshTransforms[mk].emplace_back(transform * boundingBox.getTransformForCubeMesh());
+
+            DrawCommand& drawCommand = boundingBoxDrawCommandQueue[mk];
+            drawCommand.vao = boundingBoxMesh.getVAO();
+            drawCommand.material = boundingBoxMaterial;
+            drawCommand.baseIndex = boundingBoxSubmesh.baseIndex;
+            drawCommand.baseVertex = boundingBoxSubmesh.baseVertex;
+            drawCommand.indexCount = boundingBoxSubmesh.indexCount;
+            drawCommand.instanceCount++;
+        }
+    }
+
     void SceneRenderer::submitDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color) {
         auto& lineInfo = debugLinesDrawInfoQueue.emplace_back();
         lineInfo.from = from;
@@ -686,6 +729,17 @@ namespace CgEngine {
 
         for (const auto [mk, command]: physicsCollidersDrawCommandQueue) {
             const auto& transforms = physicsCollidersMeshTransforms[mk];
+            Renderer::executeDrawCommand(*command.vao, *command.material, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
+        }
+
+        Renderer::endRenderPass();
+    }
+
+    void SceneRenderer::boundingBoxPass() {
+        Renderer::beginRenderPass(*boundingBoxRenderPass);
+
+        for (const auto [mk, command]: boundingBoxDrawCommandQueue) {
+            const auto& transforms = boundingBoxMeshTransforms[mk];
             Renderer::executeDrawCommand(*command.vao, *command.material, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
         }
 

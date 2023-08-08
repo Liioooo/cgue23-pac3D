@@ -291,6 +291,16 @@ namespace CgEngine {
                 renderer.submitPhysicsColliderMesh(it->getPhysicsMesh().getVisualizationMesh(), glm::scale(glm::translate(glm::mat4(1.0f), transform.getGlobalPosition()), transform.getGlobalScale()));
             }
         }
+
+        if (applicationOptions.debugShowBoundingBoxes) {
+            auto& resourceManager = GlobalObjectManager::getInstance().getResourceManager();
+
+            auto& cubeMesh = *resourceManager.getResource<MeshVertices>("CG_CubeMesh");
+            for (auto it = componentManager->begin<MeshRendererComponent>(); it != componentManager->end<MeshRendererComponent>(); it++) {
+                auto& transform = componentManager->getComponent<TransformComponent>(it->getEntity());
+                renderer.submitBoundingBoxMesh(cubeMesh, it->getMeshVertices(), it->getMeshNodes(), transform.getModelMatrix());
+            }
+        }
 #endif
 
         renderer.endScene();

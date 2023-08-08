@@ -25,6 +25,7 @@ namespace CgEngine {
         void submitAnimatedMesh(MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, Material* overrideMaterial, bool castShadows, const glm::mat4& transform, const std::vector<glm::mat4>& boneTransforms, VertexArrayObject* skinnedVAO);
         void submitUiElements(const std::unordered_map<std::string, UiElement*>& uiElements);
         void submitPhysicsColliderMesh(MeshVertices& mesh, const glm::mat4& transform);
+        void submitBoundingBoxMesh(MeshVertices& boundingBoxMesh, MeshVertices& mesh, const std::vector<uint32_t>& meshNodes, const glm::mat4& transform);
         void submitDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 
     private:
@@ -48,11 +49,13 @@ namespace CgEngine {
         RenderPass* uiRectPass;
         RenderPass* uiTextPass;
         RenderPass* physicsCollidersRenderPass;
+        RenderPass* boundingBoxRenderPass;
         RenderPass* normalsDebugRenderPass;
         RenderPass* debugLinesRenderPass;
         Material* screenMaterial;
         Material* skyboxMaterial;
         Material* physicsCollidersMaterial;
+        Material* boundingBoxMaterial;
         Material* normalsDebugMaterial;
         Material* emptyMaterial;
 
@@ -65,6 +68,7 @@ namespace CgEngine {
         void geometryPass();
         void skyboxPass();
         void physicsCollidersPass();
+        void boundingBoxPass();
         void normalsDebugPass();
         void debugLinesPass();
         void bloomPass();
@@ -155,6 +159,9 @@ namespace CgEngine {
 
         std::map<MeshKey, DrawCommand> physicsCollidersDrawCommandQueue;
         std::map<MeshKey, std::vector<glm::mat4>> physicsCollidersMeshTransforms;
+
+        std::map<MeshKey, DrawCommand> boundingBoxDrawCommandQueue;
+        std::map<MeshKey, std::vector<glm::mat4>> boundingBoxMeshTransforms;
 
         std::vector<LineDrawInfo> debugLinesDrawInfoQueue;
 

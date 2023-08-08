@@ -14,6 +14,7 @@ namespace CgEngine {
 
     struct ApplicationOptions {
         bool debugShowPhysicsColliders;
+        bool debugShowBoundingBoxes;
         bool debugShowNormals;
         bool debugRenderLines;
 

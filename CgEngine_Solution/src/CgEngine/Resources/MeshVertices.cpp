@@ -311,6 +311,7 @@ namespace CgEngine {
         meshNode.submeshIndices.push_back(0);
         meshNode.transform = glm::mat4(1.0f);
         meshNode.localTransform = glm::mat4(1.0f);
+        meshNode.aaBoundingBox.addBoxCoordinates({-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f});
 
         return mesh;
     }
@@ -408,6 +409,7 @@ namespace CgEngine {
         meshNode.submeshIndices.push_back(0);
         meshNode.transform = glm::mat4(1.0f);
         meshNode.localTransform = glm::mat4(1.0f);
+        meshNode.aaBoundingBox.addBoxCoordinates({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
 
         return mesh;
     }
@@ -573,17 +575,18 @@ namespace CgEngine {
         meshNode.submeshIndices.push_back(0);
         meshNode.transform = glm::mat4(1.0f);
         meshNode.localTransform = glm::mat4(1.0f);
+        meshNode.aaBoundingBox.addBoxCoordinates({-radius, -(height / 2 + radius), -radius}, {radius, height / 2 + radius, radius});
 
         return mesh;
     }
 
-    MeshVertices *MeshVertices::loadMeshAsset(const std::string &path) {
+    MeshVertices *MeshVertices::loadMeshAsset(const std::string& path) {
         auto importer = Assimp::Importer();
 
         std::string modelPath = FileSystem::getAsGamePath(path);
 
         const aiScene *scene = importer.ReadFile(modelPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_SortByPType |
-                                                            aiProcess_GenNormals | aiProcess_FlipUVs |
+                                                            aiProcess_GenNormals | aiProcess_FlipUVs | aiProcess_GenBoundingBoxes |
                                                             aiProcess_OptimizeMeshes | aiProcess_JoinIdenticalVertices | aiProcess_LimitBoneWeights);
 
         CG_ASSERT(scene && scene->HasMeshes() && scene->mRootNode, "3D-Asset could not be loaded: " + path + ", " + importer.GetErrorString());
@@ -629,6 +632,14 @@ namespace CgEngine {
         }
 
         mesh->traverseNodes(scene->mRootNode, glm::mat4(1.0f), -1);
+
+        for (auto& mN: mesh->meshNodes) {
+            for (const auto& submeshIndex: mN.submeshIndices) {
+                const auto aiBoundingBox = scene->mMeshes[submeshIndex]->mAABB;
+                mN.aaBoundingBox.addBoxCoordinates(getVec3FromAssimpVec(aiBoundingBox.mMin), getVec3FromAssimpVec(aiBoundingBox.mMax));
+            }
+            mN.aaBoundingBox.applyTransform(mN.transform);
+        }
 
         mesh->skeleton = importSkeleton(scene, mesh);
 

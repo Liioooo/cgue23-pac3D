@@ -17,7 +17,7 @@ namespace Game {
     }
 
     void FPSCounter::onKeyPressed(CgEngine::KeyPressedEvent& event) {
-        if (event.getKeyCode() == CgEngine::KeyCode::F3) {
+        if (event.getKeyCode() == CgEngine::KeyCode::F4) {
             showing = !showing;
             if (showing) {
                 createUI();

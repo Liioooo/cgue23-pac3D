@@ -9,6 +9,7 @@
 #include "Animation/BoneInfluence.h"
 #include "Animation/BoneInfo.h"
 #include "Animation/Animation.h"
+#include "Rendering/AABoundingBox.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -40,6 +41,7 @@ namespace CgEngine {
         aiNode* aiNode;
         PhysicsTriangleMesh* physicsTriangleMesh = nullptr;
         PhysicsConvexMesh* physicsConvexMesh = nullptr;
+        AABoundingBox aaBoundingBox;
         int parentNode;
         std::vector<uint32_t> submeshIndices;
         glm::mat4 localTransform{1.0f};
@@ -70,7 +72,6 @@ namespace CgEngine {
         const std::vector<BoneInfo>& getBoneInfos() const;
         const std::unordered_map<std::string, Animation>& getAnimations() const;
         const ShaderStorageBuffer* getBoneInfluencesBuffer() const;
-
 
     private:
         static MeshVertices* createCubeMesh();
