@@ -7,6 +7,7 @@
 #include "VertexArrayObject.h"
 #include "Scene/Scene.h"
 #include "Renderer.h"
+#include "CameraFrustum.h"
 
 namespace CgEngine {
 
@@ -61,6 +62,8 @@ namespace CgEngine {
 
         Texture2DArray* dirShadowMaps;
         std::array<Texture2D*, 7> bloomTextures;
+
+        CameraFrustum cameraFrustum;
 
         void skinMeshes();
         void shadowMapPass();
@@ -154,8 +157,9 @@ namespace CgEngine {
         };
 
         std::map<MeshKey, DrawCommand> drawCommandQueue;
-        std::map<MeshKey, DrawCommand> shadowMapDrawCommandQueue;
         std::map<MeshKey, std::vector<glm::mat4>> meshTransforms;
+        std::map<MeshKey, DrawCommand> shadowMapDrawCommandQueue;
+        std::map<MeshKey, std::vector<glm::mat4>> shadowMapMeshTransforms;
 
         std::map<MeshKey, DrawCommand> physicsCollidersDrawCommandQueue;
         std::map<MeshKey, std::vector<glm::mat4>> physicsCollidersMeshTransforms;
@@ -202,6 +206,13 @@ namespace CgEngine {
         ShaderStorageBuffer* boneTransformsBuffer;
 
         float findDrawInfoTextureIndex(UiDrawInfo& drawInfo, const Texture2D* texture) const;
+
+#ifdef CG_ENABLE_DEBUG_FEATURES
+        uint32_t submittedMeshes;
+        uint32_t renderedMeshes;
+        uint64_t sceneIndex = 0;
+#endif
+
     };
 
 }

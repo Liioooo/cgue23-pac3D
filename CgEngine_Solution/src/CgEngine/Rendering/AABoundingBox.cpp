@@ -21,11 +21,13 @@ namespace CgEngine {
             this->max = corrMax;
             addedCoords = true;
         }
+        verticesDirty = true;
     }
 
     void AABoundingBox::applyTransform(const glm::mat4& transform) {
         min = glm::vec3(transform * glm::vec4(min, 1.0f));
         max = glm::vec3(transform * glm::vec4(max, 1.0f));
+        verticesDirty = true;
     }
 
     glm::mat4 AABoundingBox::getTransformForCubeMesh() const {
@@ -38,5 +40,22 @@ namespace CgEngine {
         glm::vec3 midPoint = (min + max) / 2.0f;
 
         return glm::translate(glm::mat4(1.0f), midPoint) * glm::scale(glm::mat4(1.0f), size);
+    }
+
+    const glm::vec3& AABoundingBox::getVertex(uint32_t index) {
+        if (verticesDirty) {
+            vertices[0] = {min.x, min.y, min.z};
+            vertices[1] = {max.x, min.y, min.z};
+            vertices[2] = {min.x, max.y, min.z};
+            vertices[3] = {min.x, min.y, max.z};
+
+            vertices[4] = {max.x, max.y, min.z};
+            vertices[5] = {max.x, min.y, max.z};
+            vertices[6] = {min.x, max.y, max.z};
+            vertices[7] = {max.x, max.y, max.z};
+
+            verticesDirty = false;
+        }
+        return vertices[index];
     }
 }

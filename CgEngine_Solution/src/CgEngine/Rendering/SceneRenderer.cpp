@@ -325,6 +325,12 @@ namespace CgEngine {
         CG_ASSERT(!activeRendering, "Already Rendering Scene!")
         CG_ASSERT(activeScene, "No active Scene!")
 
+#ifdef CG_ENABLE_DEBUG_FEATURES
+        sceneIndex++;
+        submittedMeshes = 0;
+        renderedMeshes = 0;
+#endif
+
         activeRendering = true;
 
         if (needsResize && viewportWidth != 0 && viewportHeight != 0) {
@@ -360,6 +366,8 @@ namespace CgEngine {
         cameraData.bloomIntensity = camera.getBloomIntensity();
         cameraData.bloomThreshold = camera.getBloomThreshold();
         ubCameraData->setData(cameraData);
+
+        cameraFrustum.updateCameraFrustum(camera, cameraTransform[3], -cameraTransform[2]);
 
         UBLightData lightData{};
         lightData.dirLightDirection = glm::vec4(lightEnvironment.dirLightDirection, 0.0f);
@@ -442,8 +450,10 @@ namespace CgEngine {
         skinningQueue.clear();
 
         drawCommandQueue.clear();
-        shadowMapDrawCommandQueue.clear();
         meshTransforms.clear();
+
+        shadowMapDrawCommandQueue.clear();
+        shadowMapMeshTransforms.clear();
 
         uiDrawInfoQueue.clear();
 
@@ -453,6 +463,10 @@ namespace CgEngine {
 
         boundingBoxDrawCommandQueue.clear();
         boundingBoxMeshTransforms.clear();
+
+        if (sceneIndex % 300 == 0) {
+            CG_LOGGING_INFO("CULLING: (Submitted Meshes / Rendered Meshes): {0} / {1}", submittedMeshes, renderedMeshes);
+        }
 #endif
 
         debugLinesDrawInfoQueue.clear();
@@ -464,25 +478,44 @@ namespace CgEngine {
         auto& submeshes = mesh.getSubmeshes();
 
         for (const auto& meshNodeIndex: meshNodes) {
-            const auto& meshNode = mesh.getMeshNodes().at(meshNodeIndex);
+            auto& meshNode = mesh.getMeshNodes().at(meshNodeIndex);
+
+
+            bool isInCameraFrustum = cameraFrustum.testAABoundingBoxInFrustum(meshNode.aaBoundingBox, transform);
+
+#ifdef CG_ENABLE_DEBUG_FEATURES
+            submittedMeshes++;
+            if (isInCameraFrustum) {
+                renderedMeshes++;
+            }
+#endif
 
             for (const auto& submeshIndex: meshNode.submeshIndices) {
                 const Submesh& submesh = submeshes.at(submeshIndex);
-                const Material* material = overrideMaterial != nullptr ? overrideMaterial
-                                                                       : mesh.getMaterial(submesh.materialIndex);
+                const Material* material = overrideMaterial != nullptr ? overrideMaterial : mesh.getMaterial(submesh.materialIndex);
                 MeshKey mk = {mesh.getVAO()->getRendererId(), submeshIndex, material->getUuid().getUuid()};
 
-                meshTransforms[mk].emplace_back(transform * meshNode.transform);
+                glm::mat4 finalTransform;
 
-                DrawCommand& drawCommand = drawCommandQueue[mk];
-                drawCommand.vao = mesh.getVAO();
-                drawCommand.material = material;
-                drawCommand.baseIndex = submesh.baseIndex;
-                drawCommand.baseVertex = submesh.baseVertex;
-                drawCommand.indexCount = submesh.indexCount;
-                drawCommand.instanceCount++;
+                if (isInCameraFrustum || castShadows) {
+                    finalTransform = transform * meshNode.transform;
+                }
+
+                if (isInCameraFrustum) {
+                    meshTransforms[mk].emplace_back(finalTransform);
+
+                    DrawCommand& drawCommand = drawCommandQueue[mk];
+                    drawCommand.vao = mesh.getVAO();
+                    drawCommand.material = material;
+                    drawCommand.baseIndex = submesh.baseIndex;
+                    drawCommand.baseVertex = submesh.baseVertex;
+                    drawCommand.indexCount = submesh.indexCount;
+                    drawCommand.instanceCount++;
+                }
 
                 if (castShadows) {
+                    shadowMapMeshTransforms[mk].emplace_back(finalTransform);
+
                     DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
                     shadowMapDrawCommand.vao = mesh.getVAO();
                     shadowMapDrawCommand.material = material;
@@ -529,6 +562,8 @@ namespace CgEngine {
                 drawCommand.instanceCount++;
 
                 if (castShadows) {
+                    shadowMapMeshTransforms[mk].emplace_back(transform);
+
                     DrawCommand& shadowMapDrawCommand = shadowMapDrawCommandQueue[mk];
                     shadowMapDrawCommand.vao = skinnedVAO;
                     shadowMapDrawCommand.material = material;
@@ -683,7 +718,7 @@ namespace CgEngine {
         Renderer::beginRenderPass(*shadowMapRenderPass);
 
         for (const auto [mk, command]: shadowMapDrawCommandQueue) {
-            const auto& transforms = meshTransforms[mk];
+            const auto& transforms = shadowMapMeshTransforms[mk];
             Renderer::executeDrawCommand(*command.vao, *emptyMaterial, command.indexCount, command.baseIndex, command.baseVertex, transforms, command.instanceCount);
         }
 
