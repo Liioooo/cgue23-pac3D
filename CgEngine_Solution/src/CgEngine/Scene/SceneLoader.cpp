@@ -7,7 +7,7 @@ namespace CgEngine {
         auto* scene = new Scene(viewportWidth, viewportHeight);
         const auto& sceneNode = xml.child("Scene");
         for (const auto &item: sceneNode.children()) {
-            createEntity(scene, CG_ENTITY_UNAVAILABLE, item);
+            createEntity(scene, NoEntity, item);
         }
 
         return scene;
@@ -17,7 +17,7 @@ namespace CgEngine {
         const auto& idAttr = node.attribute("id");
         const auto& tagAttr = node.attribute("tag");
         Entity entity;
-        if (parent == CG_ENTITY_UNAVAILABLE) {
+        if (parent == NoEntity) {
             entity = idAttr.empty() ? scene->createEntity() : scene->createEntity(idAttr.as_string());
         } else {
             entity = idAttr.empty() ? scene->createEntity(parent) : scene->createEntity(parent, idAttr.as_string());

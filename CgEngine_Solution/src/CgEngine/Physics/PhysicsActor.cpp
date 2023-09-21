@@ -199,7 +199,7 @@ namespace CgEngine {
     }
 
     void PhysicsActor::removeCollider(uint32_t colliderUuid) {
-        if (colliders.count(colliderUuid) != 0) {
+        if (colliders.find(colliderUuid) != colliders.end()) {
             auto* collider = colliders[colliderUuid];
             collider->detachFromActor(physxActor);
             delete collider;

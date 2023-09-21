@@ -952,7 +952,7 @@ namespace CgEngine {
     }
 
     void MeshVertices::traverseNodesBone(const aiNode* node, CgEngine::Skeleton* skeleton, const std::unordered_set<std::string_view>& bones) {
-        if (bones.count(node->mName.C_Str()) != 0) {
+        if (bones.find(node->mName.C_Str()) != bones.end()) {
             traverseBone(node, skeleton, Skeleton::NoBone);
         } else {
             for (uint32_t i = 0; i < node->mNumChildren; i++) {

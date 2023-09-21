@@ -4,5 +4,5 @@ namespace CgEngine {
 
     using Entity = std::uint32_t;
 
-    #define CG_ENTITY_UNAVAILABLE 0
+    inline const Entity NoEntity = 0;
 }

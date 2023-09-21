@@ -6,7 +6,7 @@
 namespace CgEngine {
     physx::PxQueryHitType::Enum RaycastQueryFilterCallback::preFilter(const physx::PxFilterData& filterData, const physx::PxShape* shape, const physx::PxRigidActor* actor, physx::PxHitFlags& queryFlags) {
         auto* physicsActor = static_cast<AbstractPhysicsActor*>(actor->userData);
-        if (excludedEntities->count(physicsActor->getEntity()) != 0) {
+        if (excludedEntities->find(physicsActor->getEntity()) != excludedEntities->end()) {
             return physx::PxQueryHitType::eNONE;
         }
         return physx::PxQueryHitType::eBLOCK;

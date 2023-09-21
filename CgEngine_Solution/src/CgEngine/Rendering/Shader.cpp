@@ -65,7 +65,7 @@ namespace CgEngine {
         }
 
         int32_t getUniformLocation(uint32_t programId, std::unordered_map<std::string, int32_t>& uniformLocations, const std::string& name) {
-            if (uniformLocations.count(name) == 0) {
+            if (uniformLocations.find(name) == uniformLocations.end()) {
                 int32_t location = glGetUniformLocation(programId, name.c_str());
 
                 CG_ASSERT(location != -1, "Uniform doesn't exist! Uniform:" + name);
@@ -73,7 +73,7 @@ namespace CgEngine {
                 uniformLocations.insert({name, location});
                 return location;
             }
-            return uniformLocations[name];
+            return uniformLocations.at(name);
         }
 
         int getSizeForShaderDataType(ShaderDataType type) {

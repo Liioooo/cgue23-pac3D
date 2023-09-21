@@ -20,7 +20,7 @@ namespace CgEngine {
 
     public:
         void attachComponent(C& component) {
-            CG_ASSERT(entityToComponentsIndex.count(component.getEntity()) == 0, "Component added to same entity more than once.")
+            CG_ASSERT(entityToComponentsIndex.find(component.getEntity()) == entityToComponentsIndex.end(), "Component added to same entity more than once.")
 
             entityToComponentsIndex[component.getEntity()] = components.size();
             componentsIndexToEntity[components.size()] = component.getEntity();
@@ -28,7 +28,7 @@ namespace CgEngine {
         }
 
         void detachComponent(Entity entity) {
-            CG_ASSERT(entityToComponentsIndex.count(entity) != 0, "Removing non-existent component.")
+            CG_ASSERT(entityToComponentsIndex.find(entity) != entityToComponentsIndex.end(), "Removing non-existent component.")
 
             size_t indexRemovedEntity = entityToComponentsIndex[entity];
 
@@ -51,13 +51,13 @@ namespace CgEngine {
         }
 
         C& getComponent(Entity entity) {
-            CG_ASSERT(entityToComponentsIndex.count(entity) != 0, "Getting non-existent component.")
+            CG_ASSERT(entityToComponentsIndex.find(entity) != entityToComponentsIndex.end(), "Getting non-existent component.")
 
             return components[entityToComponentsIndex[entity]];
         }
 
         bool hasComponent(Entity entity) const {
-            return entityToComponentsIndex.count(entity) != 0;
+            return entityToComponentsIndex.find(entity) != entityToComponentsIndex.end();
         }
 
         std::vector<Entity> getAllEntities() {

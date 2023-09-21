@@ -59,8 +59,8 @@ namespace CgEngine {
         Entity findEntityById(const std::string& id);
         const std::unordered_set<Entity>& getChildren(Entity entity);
         Entity getParent(Entity entity);
-        bool hasParent(Entity entity);
-        bool hasEntity(Entity entity);
+        bool hasParent(Entity entity) const;
+        bool hasEntity(Entity entity) const;
         void setEntityTag(Entity entity, const std::string& tag);
         std::string getEntityTag(Entity entity);
         void updateTransforms();

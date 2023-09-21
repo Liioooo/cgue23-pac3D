@@ -226,7 +226,7 @@ namespace Game {
             for (int j = 0; j < mapNodes[i].neighbors.size(); ++j) {
                 int jIndex = mapNodes[i].neighbors[j];
                 std::string edgeKey = i < jIndex ? std::to_string(i)  + ":" + std::to_string(jIndex) : std::to_string(jIndex)  + ":" + std::to_string(i);
-                if (visitedEdges.count(edgeKey) != 0) {
+                if (visitedEdges.find(edgeKey) != visitedEdges.end()) {
                     continue;
                 }
                 visitedEdges.insert(edgeKey);

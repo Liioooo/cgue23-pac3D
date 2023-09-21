@@ -51,11 +51,11 @@ namespace CgEngine {
     }
 
     bool UiCanvasComponent::hasUiElement(const std::string& id) {
-        return uiElements.count(id) != 0;
+        return uiElements.find(id) != uiElements.end();
     }
 
     void UiCanvasComponent::removeUIElement(const std::string& id) {
-        if (uiElements.count(id) != 0) {
+        if (uiElements.find(id) != uiElements.end()) {
             auto* element = uiElements.at(id);
             delete element;
             uiElements.erase(id);
@@ -132,7 +132,7 @@ namespace CgEngine {
         std::string id = elementNode.attribute("id").as_string("");
 
         CG_ASSERT(!id.empty(), "ID of UIElement must be set!")
-        CG_ASSERT(uiElements.count(id) == 0, "ID of UIElement already used!")
+        CG_ASSERT(uiElements.find(id) == uiElements.end(), "ID of UIElement already used!")
 
         E* element = new E();
         uiElements.insert({id, element});

@@ -22,9 +22,9 @@ namespace CgEngine {
     }
 
     Entity Scene::createEntity(const std::string &id) {
-        if (idToEntity.count(id) != 0) {
+        if (idToEntity.find(id) != idToEntity.end()) {
             CG_ASSERT(false, "Entity-Id is already used")
-            return CG_ENTITY_UNAVAILABLE;
+            return NoEntity;
         }
 
         entityCount++;
@@ -35,9 +35,9 @@ namespace CgEngine {
     }
 
     Entity Scene::createEntity(Entity parent) {
-        if (children.count(parent) == 0) {
+        if (children.find(parent) == children.end()) {
             CG_ASSERT(false, "Entity parent doesn't exist")
-            return CG_ENTITY_UNAVAILABLE;
+            return NoEntity;
         }
 
         entityCount++;
@@ -50,13 +50,13 @@ namespace CgEngine {
     }
 
     Entity Scene::createEntity(Entity parent, const std::string &id) {
-        if (children.count(parent) == 0) {
+        if (children.find(parent) == children.end()) {
             CG_ASSERT(false, "Entity parent doesn't exist")
-            return CG_ENTITY_UNAVAILABLE;
+            return NoEntity;
         }
-        if (idToEntity.count(id) != 0) {
+        if (idToEntity.find(id) != idToEntity.end()) {
             CG_ASSERT(false, "Entity-Id is already used")
-            return CG_ENTITY_UNAVAILABLE;
+            return NoEntity;
         }
 
         entityCount++;
@@ -69,16 +69,16 @@ namespace CgEngine {
     }
 
     void Scene::destroyEntity(Entity entity) {
-        if (parents.count(entity) != 0) {
+        if (parents.find(entity) != parents.end()) {
             children[parents[entity]].erase(entity);
         }
         recursiveDestroyEntity(entity);
     }
 
     Entity Scene::findEntityById(const std::string &id) {
-        if (idToEntity.count(id) == 0) {
+        if (idToEntity.find(id) == idToEntity.end()) {
             CG_LOGGING_WARNING("Entity {0} doesn't exist!", id)
-            return CG_ENTITY_UNAVAILABLE;
+            return NoEntity;
         }
         return idToEntity[id];
     }
@@ -88,18 +88,18 @@ namespace CgEngine {
     }
 
     Entity Scene::getParent(Entity entity) {
-        if (parents.count(entity) == 0) {
-            return CG_ENTITY_UNAVAILABLE;
+        if (parents.find(entity) == parents.end()) {
+            return NoEntity;
         }
-        return parents[entity];
+        return parents.at(entity);
     }
 
-    bool Scene::hasParent(Entity entity) {
-        return parents.count(entity) != 0;
+    bool Scene::hasParent(Entity entity) const {
+        return parents.find(entity) != parents.end();
     }
 
-    bool Scene::hasEntity(Entity entity) {
-        return children.count(entity) != 0;
+    bool Scene::hasEntity(Entity entity) const {
+        return children.find(entity) != children.end();
     }
 
     void Scene::setEntityTag(CgEngine::Entity entity, const std::string& tag) {
@@ -109,20 +109,20 @@ namespace CgEngine {
     }
 
     std::string Scene::getEntityTag(CgEngine::Entity entity) {
-        if (entityTags.count(entity) != 0) {
+        if (entityTags.find(entity) != entityTags.end()) {
             return entityTags.at(entity);
         }
         return "";
     }
 
     void Scene::updateTransforms() {
-        for (const auto &item : children) {
-            if (parents.count(item.first) == 0) {
-                auto& topLevelTransform = componentManager->getComponent<TransformComponent>(item.first);
+        for (const auto &[entity, _] : children) {
+            if (parents.find(entity) == parents.end()) {
+                auto& topLevelTransform = componentManager->getComponent<TransformComponent>(entity);
                 bool topLevelDirty = topLevelTransform._calculateTopLevelTransforms();
                 const glm::mat4& topLevelModelMatrix = topLevelTransform.getModelMatrix();
 
-                for (const auto &child : children[item.first]) {
+                for (const auto &child : children[entity]) {
                     recursiveUpdateChildTransforms(child, topLevelModelMatrix, topLevelDirty);
                 }
             }

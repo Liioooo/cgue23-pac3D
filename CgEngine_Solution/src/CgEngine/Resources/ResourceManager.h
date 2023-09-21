@@ -22,7 +22,7 @@ namespace CgEngine {
         }
 
         bool contains(const std::string& name) const {
-            return map.count(name) != 0;
+            return map.find(name) != map.end();
         }
 
     private:
