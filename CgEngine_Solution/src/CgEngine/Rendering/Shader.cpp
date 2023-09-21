@@ -8,18 +8,18 @@
 namespace CgEngine {
 
     namespace ShaderUtils {
-        static std::string loadShaderSourceCodeWithType(const std::string& name, const std::string& type) {
+        std::string loadShaderSourceCodeWithType(const std::string& name, const std::string& type) {
             return preprocessShaderCode(ShaderUtils::loadShaderSourceCode(name + "_" + type + ".glsl", false));
         }
 
-        static std::string loadShaderSourceCode(const std::string& name, bool useCache) {
+        std::string loadShaderSourceCode(const std::string& name, bool useCache) {
             if (!FileSystem::checkFileExists(FileSystem::getAsEnginePath("shaders/" + name))) {
                 return "";
             }
             return FileSystem::readFileToString(FileSystem::getAsEnginePath("shaders/" + name));
         }
 
-        static std::string preprocessShaderCode(std::string code) {
+        std::string preprocessShaderCode(std::string code) {
             const auto r = std::regex("#include\\s+\"(.*)\"");
 
             std::vector<std::pair<std::string, std::string>> results;
@@ -41,7 +41,7 @@ namespace CgEngine {
             return code;
         }
 
-        static void checkErrors(uint32_t id, const std::string &type) {
+        void checkErrors(uint32_t id, const std::string &type) {
             int isCompiled;
             int maxLength;
 
@@ -64,7 +64,7 @@ namespace CgEngine {
             }
         }
 
-        static int32_t getUniformLocation(uint32_t programId, std::unordered_map<std::string, int32_t>& uniformLocations, const std::string& name) {
+        int32_t getUniformLocation(uint32_t programId, std::unordered_map<std::string, int32_t>& uniformLocations, const std::string& name) {
             if (uniformLocations.count(name) == 0) {
                 int32_t location = glGetUniformLocation(programId, name.c_str());
 

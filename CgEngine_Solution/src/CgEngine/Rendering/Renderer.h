@@ -63,31 +63,31 @@ namespace CgEngine {
         static const uint32_t maxTextureSlots = 16;
 
     private:
-        static RenderPass* currentRenderPass;
-        static bool isWireframe;
-        static bool isBackFaceCulling;
-        static bool isFrontFaceCulling;
-        static DepthCompareOperator depthCompareOperator;
-        static bool depthTest;
-        static bool depthWrite;
-        static bool useBlending;
-        static BlendingEquation blendingEquation;
-        static BlendingFunction srcBlendingFunction;
-        static BlendingFunction destBlendingFunction;
+        static inline RenderPass* currentRenderPass;
+        static inline bool isWireframe;
+        static inline bool isBackFaceCulling;
+        static inline bool isFrontFaceCulling;
+        static inline DepthCompareOperator depthCompareOperator;
+        static inline bool depthTest;
+        static inline bool depthWrite;
+        static inline bool useBlending;
+        static inline BlendingEquation blendingEquation;
+        static inline BlendingFunction srcBlendingFunction;
+        static inline BlendingFunction destBlendingFunction;
 
-        static Texture2D* whiteTexture;
-        static Texture2D* brdfLUT;
-        static TextureCube* blackCubeTexture;
+        static inline Texture2D* whiteTexture;
+        static inline Texture2D* brdfLUT;
+        static inline TextureCube* blackCubeTexture;
 
-        static VertexArrayObject* quadVAO;
-        static VertexArrayObject* unitCubeVAO;
-        static VertexArrayObject* linesVAO;
+        static inline VertexArrayObject* quadVAO;
+        static inline VertexArrayObject* unitCubeVAO;
+        static inline VertexArrayObject* linesVAO;
 
-        static VertexArrayObject* uiCircleVAO;
-        static VertexArrayObject* uiRectVAO;
-        static VertexArrayObject* uiTextVAO;
+        static inline VertexArrayObject* uiCircleVAO;
+        static inline VertexArrayObject* uiRectVAO;
+        static inline VertexArrayObject* uiTextVAO;
 
-        static ShaderStorageBuffer* transformsBuffer;
+        static inline ShaderStorageBuffer* transformsBuffer;
     };
 
 }

@@ -5,29 +5,6 @@
 #include "FileSystem.h"
 
 namespace CgEngine {
-    RenderPass* Renderer::currentRenderPass = nullptr;
-    bool Renderer::isWireframe;
-    bool Renderer::isBackFaceCulling;
-    bool Renderer::isFrontFaceCulling;
-    DepthCompareOperator Renderer::depthCompareOperator;
-    bool Renderer::depthTest;
-    bool Renderer::depthWrite;
-    bool Renderer::useBlending;
-    BlendingEquation Renderer::blendingEquation;
-    BlendingFunction Renderer::srcBlendingFunction;
-    BlendingFunction Renderer::destBlendingFunction;
-    Texture2D* Renderer::whiteTexture;
-    Texture2D* Renderer::brdfLUT;
-    TextureCube* Renderer::blackCubeTexture;
-    VertexArrayObject* Renderer::quadVAO;
-    VertexArrayObject* Renderer::unitCubeVAO;
-    VertexArrayObject* Renderer::linesVAO;
-    VertexArrayObject* Renderer::uiCircleVAO;
-    VertexArrayObject* Renderer::uiRectVAO;
-    VertexArrayObject* Renderer::uiTextVAO;
-    ShaderStorageBuffer* Renderer::transformsBuffer;
-
-
     void Renderer::init() {
         struct QuadVertex {
             glm::vec3 pos;
