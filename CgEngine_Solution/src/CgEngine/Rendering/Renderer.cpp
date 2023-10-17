@@ -6,6 +6,14 @@
 
 namespace CgEngine {
     void Renderer::init() {
+        const char* rendererName = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+        const char* rendererVendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        const char* rendererVersion = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+
+        CG_LOGGING_INFO("RENDERER: Vendor: {0}", rendererVendor)
+        CG_LOGGING_INFO("RENDERER: Name: {0}", rendererName)
+        CG_LOGGING_INFO("RENDERER: Version: {0}", rendererVersion)
+
         struct QuadVertex {
             glm::vec3 pos;
             glm::vec2 uv;

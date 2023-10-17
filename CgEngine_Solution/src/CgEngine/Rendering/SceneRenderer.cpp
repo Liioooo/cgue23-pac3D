@@ -464,7 +464,7 @@ namespace CgEngine {
         boundingBoxDrawCommandQueue.clear();
         boundingBoxMeshTransforms.clear();
 
-        if (sceneIndex % 300 == 0) {
+        if (sceneIndex % 600 == 0) {
             CG_LOGGING_INFO("CULLING: (Submitted Meshes / Rendered Meshes): {0} / {1}", submittedMeshes, renderedMeshes);
         }
 #endif
