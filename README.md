@@ -1,7 +1,8 @@
 # cgue23-pac3D
 
-Leo Preissegger (12122526)<br>
-Enisa Azizovic (01228809)
+Leo Preissegger
+
+A preview of the game can be found in the [CG - Hall Of Fame 2023](https://www.cg.tuwien.ac.at/courses/CG/HallOfFame/2023S).
 
 ## Hardware
 The Game was tested on the following Hardware:
